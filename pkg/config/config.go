@@ -1,3 +1,7 @@
 package config
 
-type Config struct{}
+import "momo/pkg/log"
+
+type Config struct {
+	Log log.LogConfig `koanf:"log"`
+}
