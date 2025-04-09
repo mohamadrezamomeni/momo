@@ -31,7 +31,7 @@ func (x *Xray) AddInbound(inpt *dto.AddInbound) (*serializer.AddInboundSerialize
 	if err != nil {
 		return &serializer.AddInboundSerializer{}, fmt.Errorf("the port that is given is wrong")
 	}
-	client := x.xSDK.HsClient
+	client := x.HsClient
 	addInboundRequest := &command.AddInboundRequest{
 		Inbound: &core.InboundHandlerConfig{
 			Tag: inpt.Tag,
