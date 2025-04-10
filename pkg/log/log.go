@@ -9,7 +9,7 @@ import (
 	"momo/pkg/utils"
 )
 
-type ErrorLog struct {
+type Record struct {
 	kind    Kind
 	message string
 }
@@ -55,12 +55,12 @@ func (l *Log) getRightFile(kind Kind) (string, error) {
 	return "", fmt.Errorf("kind doesnt match in system")
 }
 
-func (l *Log) logger(errorLog *ErrorLog) {
+func (l *Log) logger(record *Record) {
 	now := time.Now().Format(time.RFC3339)
 
-	row := fmt.Sprintf("[%s] %s %s", now, errorLog.kind, errorLog.message)
+	row := fmt.Sprintf("[%s] %s %s", now, record.kind, record.message+"\n")
 
-	fileName, err := l.getRightFile(errorLog.kind)
+	fileName, err := l.getRightFile(record.kind)
 	if err != nil {
 		log.Fatal("project has a ciritical, bug please report the issue")
 	}
@@ -79,7 +79,7 @@ func (l *Log) logger(errorLog *ErrorLog) {
 }
 
 func (l *Log) WriteWarrning(message string) {
-	log := ErrorLog{
+	log := Record{
 		"warrning",
 		message,
 	}
@@ -87,7 +87,7 @@ func (l *Log) WriteWarrning(message string) {
 }
 
 func (l *Log) WriteInfo(message string) {
-	log := ErrorLog{
+	log := Record{
 		"info",
 		message,
 	}
