@@ -28,7 +28,7 @@ type IXray interface {
 	AddInbound(*dto.AddInbound) (*serializer.AddInboundSerializer, error)
 	RemoveInbound(*dto.RemoveInbound) (*serializer.RemoveInbound, error)
 	ReceiveInboundTraffic(*dto.ReceiveInboundTraffic) (*serializer.ReceiveInboundTraffic, error)
-	AddUser()
+	AddUser(*dto.AddUser) error
 	RemoveUser()
 }
 
