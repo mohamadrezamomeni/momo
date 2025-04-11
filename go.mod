@@ -8,9 +8,10 @@ require (
 	github.com/knadh/koanf/parsers/yaml v0.1.0
 	github.com/knadh/koanf/providers/file v1.1.2
 	github.com/knadh/koanf/v2 v2.1.2
+	github.com/mattn/go-sqlite3 v1.14.19
+	github.com/rubenv/sql-migrate v1.7.1
 	github.com/xtls/xray-core v1.250306.0
 	google.golang.org/grpc v1.71.1
-	google.golang.org/protobuf v1.36.6
 )
 
 require (
@@ -18,8 +19,9 @@ require (
 	github.com/cloudflare/circl v1.6.0 // indirect
 	github.com/dgryski/go-metro v0.0.0-20211217172704-adc40b04c140 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/go-gorp/gorp/v3 v3.1.0 // indirect
+	github.com/go-sql-driver/mysql v1.9.2 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
-	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/klauspost/compress v1.17.8 // indirect
 	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
@@ -37,5 +39,6 @@ require (
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
+	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -6,6 +6,9 @@ import (
 	"momo/pkg/config"
 	momoLog "momo/pkg/log"
 	"momo/proxy/xray"
+	"momo/repository/migrate"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var configPath = "config.yaml"
@@ -16,6 +19,10 @@ func main() {
 		log.Fatalf("ERROR: somthing went wrong with loding config \n - you can check existance of config \n - you can see content of config")
 	}
 	momoLogger := momoLog.New(cfg.Log)
+
+	migration := migrate.New(&cfg.DB)
+
+	migration.UP()
 
 	_, _ = xray.New(cfg.XrayConfig, momoLogger)
 }
