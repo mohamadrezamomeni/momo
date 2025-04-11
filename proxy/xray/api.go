@@ -29,7 +29,7 @@ type IXray interface {
 	RemoveInbound(*dto.RemoveInbound) (*serializer.RemoveInbound, error)
 	ReceiveInboundTraffic(*dto.ReceiveInboundTraffic) (*serializer.ReceiveInboundTraffic, error)
 	AddUser(*dto.AddUser) error
-	RemoveUser()
+	RemoveUser(*dto.RemoveUser) error
 }
 
 func New(cfg XrayConfig, logger log.ILog) (IXray, error) {

@@ -33,5 +33,12 @@ func (x *Xray) AddUser(inpt *dto.AddUser) error {
 	return nil
 }
 
-func (x *Xray) RemoveUser() {
+func (x *Xray) RemoveUser(inpt *dto.RemoveUser) error {
+	_, err := x.HsClient.AlterInbound(context.Background(), &command.AlterInboundRequest{
+		Tag: inpt.Tag,
+		Operation: serial.ToTypedMessage(&command.RemoveUserOperation{
+			Email: inpt.Email,
+		}),
+	})
+	return err
 }
