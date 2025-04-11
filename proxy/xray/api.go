@@ -26,7 +26,7 @@ type Xray struct {
 
 type IXray interface {
 	AddInbound(*dto.AddInbound) (*serializer.AddInboundSerializer, error)
-	RemoveInbound()
+	RemoveInbound(*dto.RemoveInbound) (*serializer.RemoveInbound, error)
 	QueryUser()
 	QueryInbound()
 	AddUser()
