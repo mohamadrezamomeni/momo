@@ -16,15 +16,15 @@ type Migrator struct {
 }
 
 type IMigrator interface {
-	Up()
+	UP()
 }
 
-func New(cfg *sqllite.DBConfig) Migrator {
+func New(cfg *sqllite.DBConfig) IMigrator {
 	migrations := &migrate.FileMigrationSource{
 		Dir: cfg.Migrations,
 	}
 
-	return Migrator{path: cfg.Path, dialect: cfg.Dialect, migrations: migrations}
+	return &Migrator{path: cfg.Path, dialect: cfg.Dialect, migrations: migrations}
 }
 
 func (m *Migrator) UP() {
