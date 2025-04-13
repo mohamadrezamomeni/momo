@@ -62,7 +62,7 @@ func (x *Xray) ReceiveInboundTraffic(inpt *dto.ReceiveInboundTraffic) (*serializ
 	ptn := fmt.Sprintf("inbound>>>%s>>>traffic", inpt.Tag)
 	resp, err := x.SsClient.QueryStats(context.Background(), &statsService.QueryStatsRequest{
 		Pattern: ptn,
-		Reset_:  true,
+		Reset_:  false,
 	})
 	stats := resp.GetStat()
 	if err != nil {
