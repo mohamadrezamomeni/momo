@@ -14,5 +14,5 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: somthing went wrong with loding error \n - you can follow the problem in error log")
 	}
-	_ = momoLog.New(cfg.Log)
+	momoLog.Init(cfg.Log)
 }
