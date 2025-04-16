@@ -14,53 +14,46 @@ type Record struct {
 	message string
 }
 
-type ILog interface {
-	WriteWarrning(string)
-	WriteInfo(string)
-}
-
-type Log struct {
+var (
 	accessFile string
 	errorFile  string
-}
+)
 
-func New(cfg LogConfig) ILog {
+func Init(cfg LogConfig) {
 	if len(cfg.AccessFile) != 0 {
 		utils.CreateFile(cfg.AccessFile)
+		accessFile = cfg.AccessFile
 	}
 	if len(cfg.ErrorFile) != 0 {
 		utils.CreateFile(cfg.ErrorFile)
-	}
-	return &Log{
-		accessFile: cfg.AccessFile,
-		errorFile:  cfg.ErrorFile,
+		errorFile = cfg.ErrorFile
 	}
 }
 
-func (l *Log) getRightFile(kind Kind) (string, error) {
+func getRightFile(kind Kind) (string, error) {
 	errors := []string{warrning}
 	acceesses := []string{info}
 	for _, name := range errors {
 		if name == kind {
-			return l.errorFile, nil
+			return errorFile, nil
 		}
 	}
 
 	for _, name := range acceesses {
 		if name == kind {
-			return l.accessFile, nil
+			return accessFile, nil
 		}
 	}
 
 	return "", fmt.Errorf("kind doesnt match in system")
 }
 
-func (l *Log) logger(record *Record) {
+func logger(record *Record) {
 	now := time.Now().Format(time.RFC3339)
 
 	row := fmt.Sprintf("[%s] %s %s", now, record.kind, record.message+"\n")
 
-	fileName, err := l.getRightFile(record.kind)
+	fileName, err := getRightFile(record.kind)
 	if err != nil {
 		log.Fatal("project has a ciritical, bug please report the issue")
 	}
@@ -78,18 +71,18 @@ func (l *Log) logger(record *Record) {
 	_, _ = file.WriteString(row)
 }
 
-func (l *Log) WriteWarrning(message string) {
+func Warrning(message string) {
 	log := Record{
 		"warrning",
 		message,
 	}
-	l.logger(&log)
+	logger(&log)
 }
 
-func (l *Log) WriteInfo(message string) {
+func Info(message string) {
 	log := Record{
 		"info",
 		message,
 	}
-	l.logger(&log)
+	logger(&log)
 }
