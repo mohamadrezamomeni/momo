@@ -2,9 +2,12 @@ package migrate
 
 import (
 	"database/sql"
-	"fmt"
 
 	"momo/repository/sqllite"
+
+	momoError "momo/pkg/error"
+
+	momoLogger "momo/pkg/log"
 
 	migrate "github.com/rubenv/sql-migrate"
 )
@@ -30,12 +33,12 @@ func New(cfg *sqllite.DBConfig) IMigrator {
 func (m *Migrator) UP() {
 	db, err := sql.Open(m.dialect, m.path)
 	if err != nil {
-		panic(fmt.Errorf("can't open sqllite db: %v", err))
+		panic(momoError.Errorf("unable to open sqllite db: %v", err))
 	}
 
 	n, err := migrate.Exec(db, m.dialect, m.migrations, migrate.Up)
 	if err != nil {
-		panic(fmt.Errorf("can't apply migrations: %v", err))
+		panic(momoError.Errorf("unable to apply migrations: %v", err))
 	}
-	fmt.Printf("Applied %d migrations!\n", n)
+	momoLogger.Info("Applied %d migrations!\n", n)
 }

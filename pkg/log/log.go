@@ -71,18 +71,20 @@ func logger(record *Record) {
 	_, _ = file.WriteString(row)
 }
 
-func Warrning(message string) {
+func Warrning(format string, args ...interface{}) {
+	s := fmt.Sprintf(format, args)
 	log := Record{
 		"warrning",
-		message,
+		s,
 	}
 	logger(&log)
 }
 
-func Info(message string) {
+func Info(format string, args ...interface{}) {
+	s := fmt.Sprintf(format, args)
 	log := Record{
 		"info",
-		message,
+		s,
 	}
 	logger(&log)
 }

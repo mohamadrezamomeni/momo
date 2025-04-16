@@ -6,12 +6,11 @@ import (
 	"momo/proxy/xray/dto"
 	"momo/proxy/xray/serializer"
 
-	momoLogger "momo/pkg/log"
+	momoError "momo/pkg/error"
 
 	loggerService "github.com/xtls/xray-core/app/log/command"
 	handlerService "github.com/xtls/xray-core/app/proxyman/command"
 	statsService "github.com/xtls/xray-core/app/stats/command"
-
 	"google.golang.org/grpc"
 )
 
@@ -35,8 +34,7 @@ type IXray interface {
 func New(cfg XrayConfig) (IXray, error) {
 	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", cfg.Address, cfg.ApiPort), grpc.WithInsecure())
 	if err != nil {
-		momoLogger.Warrning("xray isn't accessable \n - check configuration")
-		return &Xray{}, fmt.Errorf("xray isnt accessable")
+		return &Xray{}, momoError.Error("xray isnt accessable please check configuration")
 	}
 
 	return &Xray{

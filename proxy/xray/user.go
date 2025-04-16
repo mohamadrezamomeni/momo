@@ -2,10 +2,11 @@ package xray
 
 import (
 	"context"
-	"fmt"
 
 	"momo/pkg/utils"
 	"momo/proxy/xray/dto"
+
+	momoError "momo/pkg/error"
 
 	"github.com/xtls/xray-core/app/proxyman/command"
 	"github.com/xtls/xray-core/common/protocol"
@@ -16,7 +17,7 @@ import (
 func (x *Xray) AddUser(inpt *dto.AddUser) error {
 	level, err := utils.ConvertToUint32(inpt.Level)
 	if err != nil {
-		return fmt.Errorf("user's level is wrong.")
+		return momoError.Errorf("user's level is wrong.")
 	}
 	_, err = x.HsClient.AlterInbound(context.Background(), &command.AlterInboundRequest{
 		Tag: inpt.Tag,

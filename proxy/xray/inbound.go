@@ -10,6 +10,8 @@ import (
 	"momo/pkg/utils"
 	"momo/proxy/xray/serializer"
 
+	momoError "momo/pkg/error"
+
 	"github.com/xtls/xray-core/app/proxyman"
 	"github.com/xtls/xray-core/app/proxyman/command"
 	statsService "github.com/xtls/xray-core/app/stats/command"
@@ -23,7 +25,7 @@ import (
 func (x *Xray) AddInbound(inpt *dto.AddInbound) (*serializer.AddInboundSerializer, error) {
 	port, err := utils.ConvertToUint16(inpt.Port)
 	if err != nil {
-		return &serializer.AddInboundSerializer{}, fmt.Errorf("the port that is given is wrong")
+		return &serializer.AddInboundSerializer{}, momoError.Error("the port that is given is wrong")
 	}
 	client := x.HsClient
 	addInboundRequest := &command.AddInboundRequest{
@@ -69,7 +71,7 @@ func (x *Xray) ReceiveInboundTraffic(inpt *dto.ReceiveInboundTraffic) (*serializ
 		return &serializer.ReceiveInboundTraffic{}, err
 	}
 	if len(stats) == 0 {
-		return &serializer.ReceiveInboundTraffic{}, fmt.Errorf("result wasn't found")
+		return &serializer.ReceiveInboundTraffic{}, momoError.Error("result wasn't found")
 	}
 
 	data, err := x.convertStatsToMap(stats)
@@ -88,7 +90,7 @@ func (x *Xray) convertStatsToMap(stats []*statsService.Stat) (map[string]int64, 
 		} else if strings.Contains(stat.Name, "downlink") {
 			res["downlink"] = x.getValStat(stat)
 		} else {
-			return map[string]int64{}, fmt.Errorf("something went wrong. we faced unexpected situation")
+			return map[string]int64{}, momoError.Error("something went wrong. we faced unexpected situation")
 		}
 	}
 	return res, nil
