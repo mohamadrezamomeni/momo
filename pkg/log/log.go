@@ -71,7 +71,7 @@ func logger(record *Record) {
 	_, _ = file.WriteString(row)
 }
 
-func WriteWarrning(message string) {
+func Warrning(message string) {
 	log := Record{
 		"warrning",
 		message,
