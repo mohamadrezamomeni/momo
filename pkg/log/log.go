@@ -79,7 +79,7 @@ func Warrning(message string) {
 	logger(&log)
 }
 
-func WriteInfo(message string) {
+func Info(message string) {
 	log := Record{
 		"info",
 		message,
