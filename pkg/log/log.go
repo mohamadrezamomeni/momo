@@ -31,7 +31,7 @@ func Init(cfg LogConfig) {
 }
 
 func getRightFile(kind Kind) (string, error) {
-	errors := []string{warrning}
+	errors := []string{warrning, debugging}
 	acceesses := []string{info}
 	for _, name := range errors {
 		if name == kind {
@@ -83,6 +83,15 @@ func Info(message string) {
 	log := Record{
 		"info",
 		message,
+	}
+	logger(&log)
+}
+
+func Debugging(format string, args ...interface{}) {
+	s := fmt.Sprintf(format, args)
+	log := Record{
+		"debugging",
+		s,
 	}
 	logger(&log)
 }
