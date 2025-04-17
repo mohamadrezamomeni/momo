@@ -71,8 +71,8 @@ func logger(record *Record) {
 	_, _ = file.WriteString(row)
 }
 
-func Warrning(format string, args ...interface{}) {
-	s := fmt.Sprintf(format, args)
+func Warrningf(format string, args ...any) {
+	s := fmt.Sprintf(format, args...)
 	log := Record{
 		"warrning",
 		s,
@@ -80,8 +80,16 @@ func Warrning(format string, args ...interface{}) {
 	logger(&log)
 }
 
-func Info(format string, args ...interface{}) {
-	s := fmt.Sprintf(format, args)
+func Warrning(s string) {
+	log := Record{
+		"warrning",
+		s,
+	}
+	logger(&log)
+}
+
+func Infof(format string, args ...any) {
+	s := fmt.Sprintf(format, args...)
 	log := Record{
 		"info",
 		s,
@@ -89,8 +97,24 @@ func Info(format string, args ...interface{}) {
 	logger(&log)
 }
 
-func Debugging(format string, args ...interface{}) {
-	s := fmt.Sprintf(format, args)
+func Info(s string) {
+	log := Record{
+		"info",
+		s,
+	}
+	logger(&log)
+}
+
+func Debugging(s string) {
+	log := Record{
+		"debugging",
+		s,
+	}
+	logger(&log)
+}
+
+func Debuggingf(format string, args ...any) {
+	s := fmt.Sprintf(format, args...)
 	log := Record{
 		"debugging",
 		s,

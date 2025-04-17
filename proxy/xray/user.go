@@ -17,7 +17,7 @@ import (
 func (x *Xray) AddUser(inpt *dto.AddUser) error {
 	level, err := utils.ConvertToUint32(inpt.Level)
 	if err != nil {
-		return momoError.Errorf("user's level is wrong.")
+		return momoError.Error("user's level is wrong.")
 	}
 	_, err = x.HsClient.AlterInbound(context.Background(), &command.AlterInboundRequest{
 		Tag: inpt.Tag,

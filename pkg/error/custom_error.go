@@ -17,44 +17,49 @@ func (m *MomoError) Error() string {
 	return m.message
 }
 
-func Fatalf(format string, args ...interface{}) {
-	momoLogger.Warrning(fmt.Sprintf(format, args))
+func Fatalf(format string, args ...any) {
+	momoLogger.Debuggingf(format, args...)
 
 	os.Exit(1)
 }
 
-func Errorf(format string, args ...interface{}) error {
-	s := fmt.Sprintf(format, args)
+func Fatal(s string) {
+	momoLogger.Debugging(s)
+
+	os.Exit(1)
+}
+
+func Errorf(format string, args ...any) error {
+	momoLogger.Warrningf(format, args...)
+	s := fmt.Sprintf(format, args...)
+	return &MomoError{
+		args:    args,
+		pattern: format,
+		message: s,
+	}
+}
+
+func Error(s string) error {
 	momoLogger.Warrning(s)
 	return &MomoError{
-		args:    args,
-		pattern: format,
+		pattern: s,
 		message: s,
 	}
 }
 
-func Error(format string) error {
-	momoLogger.Warrning(format)
+func DebuggingErrorf(format string, args ...any) error {
+	momoLogger.Debuggingf(format, args...)
 	return &MomoError{
+		args:    args,
 		pattern: format,
-		message: format,
+		message: fmt.Sprintf(format, args...),
 	}
 }
 
-func DebuggingErrorf(format string, args ...interface{}) error {
-	s := fmt.Sprintf(format, args)
+func DebuggingError(s string) error {
 	momoLogger.Debugging(s)
 	return &MomoError{
-		args:    args,
-		pattern: format,
+		pattern: s,
 		message: s,
-	}
-}
-
-func DebuggingError(format string) error {
-	momoLogger.Debugging(format)
-	return &MomoError{
-		pattern: format,
-		message: format,
 	}
 }
