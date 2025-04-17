@@ -2,8 +2,10 @@ package sqllite
 
 import (
 	"database/sql"
+	"path/filepath"
 
 	momoError "momo/pkg/error"
+	"momo/pkg/utils"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -17,7 +19,9 @@ func (s *SqlliteDB) Conn() *sql.DB {
 }
 
 func New(cfg *DBConfig) *SqlliteDB {
-	db, err := sql.Open(cfg.Dialect, cfg.Path)
+	root, _ := utils.GetRootOfProject()
+	path := filepath.Join(root, cfg.Path)
+	db, err := sql.Open(cfg.Dialect, path)
 	if err != nil {
 		panic(momoError.Errorf("ERROR: something went wrong with connectiong db: %s", err))
 	}

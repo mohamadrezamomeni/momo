@@ -2,6 +2,9 @@ package config
 
 import (
 	"fmt"
+	"path/filepath"
+
+	"momo/pkg/utils"
 
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
@@ -13,7 +16,12 @@ var (
 	k      = koanf.New(".")
 )
 
-func Load(path string) (Config, error) {
+func Load(fileName string) (Config, error) {
+	root, err := utils.GetRootOfProject()
+	if err != nil {
+		return Config{}, fmt.Errorf("somethine wrong happend error: %v", err)
+	}
+	path := filepath.Join(root, fileName)
 	if err := k.Load(file.Provider(path), yaml.Parser()); err != nil {
 		return Config{}, fmt.Errorf("error loading config error: %v", err)
 	}
