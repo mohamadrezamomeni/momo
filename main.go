@@ -9,8 +9,6 @@ import (
 	"momo/repository/migrate"
 	"momo/repository/sqllite"
 
-	momoError "momo/pkg/error"
-
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -27,9 +25,8 @@ func main() {
 	migration := migrate.New(&cfg.DB)
 
 	migration.UP()
-	_, err = sqllite.New(&cfg.DB)
-	if err != nil {
-		momoError.Fatalf("ERROR: something went wrong with connectiong db")
-	}
+
+	_ = sqllite.New(&cfg.DB)
+
 	_, _ = xray.New(cfg.XrayConfig)
 }
