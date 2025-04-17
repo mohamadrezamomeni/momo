@@ -1,8 +1,8 @@
 package entity
 
 type User struct {
-	Tag   string
-	Email string
-	Level string
-	UUID  string
+	Tag       string
+	Email     string
+	LastName  string
+	FirstName string
 }

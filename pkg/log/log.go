@@ -73,7 +73,6 @@ func logger(record *Record) {
 
 func Warrning(format string, args ...interface{}) {
 	s := fmt.Sprintf(format, args)
-
 	log := Record{
 		"warrning",
 		s,

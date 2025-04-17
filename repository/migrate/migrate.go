@@ -40,5 +40,5 @@ func (m *Migrator) UP() {
 	if err != nil {
 		panic(momoError.Errorf("unable to apply migrations: %v", err))
 	}
-	momoLogger.Info("Applied %d migrations!\n", n)
+	momoLogger.Info("Applied %d migrations!", n)
 }
