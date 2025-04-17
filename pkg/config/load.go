@@ -15,7 +15,7 @@ var (
 
 func Load(path string) (Config, error) {
 	if err := k.Load(file.Provider(path), yaml.Parser()); err != nil {
-		return Config{}, fmt.Errorf("error loading config")
+		return Config{}, fmt.Errorf("error loading config error: %v", err)
 	}
 	var config Config
 	if err := k.Unmarshal("", &config); err != nil {
