@@ -40,3 +40,21 @@ func Error(format string) error {
 		message: format,
 	}
 }
+
+func DebuggingErrorf(format string, args ...interface{}) error {
+	s := fmt.Sprintf(format, args)
+	momoLogger.Debugging(s)
+	return &MomoError{
+		args:    args,
+		pattern: format,
+		message: s,
+	}
+}
+
+func DebuggingError(format string) error {
+	momoLogger.Debugging(format)
+	return &MomoError{
+		pattern: format,
+		message: format,
+	}
+}

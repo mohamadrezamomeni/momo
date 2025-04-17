@@ -7,7 +7,8 @@ import (
 )
 
 type IUserRepository interface {
-	Create(dto.Create) (*entity.User, error)
+	Create(*dto.Create) (*entity.User, error)
+	FilterUsers(q *dto.FilterUsers) ([]*entity.User, error)
 }
 
 type User struct {
