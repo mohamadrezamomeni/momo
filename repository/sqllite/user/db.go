@@ -9,6 +9,8 @@ import (
 type IUserRepository interface {
 	Create(*dto.Create) (*entity.User, error)
 	FilterUsers(q *dto.FilterUsers) ([]*entity.User, error)
+	FindUserByEmail(string) (*entity.User, error)
+	FindUserByID(string) (*entity.User, error)
 }
 
 type User struct {
