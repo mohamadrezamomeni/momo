@@ -20,6 +20,7 @@ type Migrator struct {
 
 type IMigrator interface {
 	UP()
+	DOWN()
 }
 
 func New(cfg *sqllite.DBConfig) IMigrator {
@@ -41,4 +42,17 @@ func (m *Migrator) UP() {
 		panic(momoError.Errorf("unable to apply migrations: %v", err))
 	}
 	momoLogger.Infof("Applied %d migrations!", n)
+}
+
+func (m *Migrator) DOWN() {
+	db, err := sql.Open(m.dialect, m.path)
+	if err != nil {
+		panic(momoError.Errorf("unable to open sqllite db: %v", err))
+	}
+
+	n, err := migrate.Exec(db, m.dialect, m.migrations, migrate.Down)
+	if err != nil {
+		panic(momoError.Errorf("unable to undo migrations: %v", err))
+	}
+	momoLogger.Infof("undo %d migrations!", n)
 }
