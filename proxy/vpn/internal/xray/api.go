@@ -3,9 +3,6 @@ package xray
 import (
 	"fmt"
 
-	"momo/proxy/vpn/internal/xray/dto"
-	"momo/proxy/vpn/internal/xray/serializer"
-
 	momoError "momo/pkg/error"
 
 	loggerService "github.com/xtls/xray-core/app/log/command"
@@ -18,31 +15,37 @@ type Xray struct {
 	address    string
 	apiPort    string
 	configPath string
-	HsClient   handlerService.HandlerServiceClient
-	SsClient   statsService.StatsServiceClient
-	LsClient   loggerService.LoggerServiceClient
+	hsClient   handlerService.HandlerServiceClient
+	ssClient   statsService.StatsServiceClient
+	lsClient   loggerService.LoggerServiceClient
 }
 
-type IXray interface {
-	AddInbound(*dto.AddInbound) (*serializer.AddInboundSerializer, error)
-	RemoveInbound(*dto.RemoveInbound) (*serializer.RemoveInbound, error)
-	ReceiveInboundTraffic(*dto.ReceiveInboundTraffic) (*serializer.ReceiveInboundTraffic, error)
-	AddUser(*dto.AddUser) error
-	RemoveUser(*dto.RemoveUser) error
-}
-
-func New(cfg XrayConfig) (IXray, error) {
+func New(cfg *XrayConfig) *Xray {
 	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", cfg.Address, cfg.ApiPort), grpc.WithInsecure())
 	if err != nil {
-		return &Xray{}, momoError.Error("xray isnt accessable please check configuration")
+		momoError.Fatalf("xray isnt accessable please check configuration")
 	}
 
 	return &Xray{
-		HsClient: handlerService.NewHandlerServiceClient(conn),
-		SsClient: statsService.NewStatsServiceClient(conn),
-		LsClient: loggerService.NewLoggerServiceClient(conn),
+		hsClient: handlerService.NewHandlerServiceClient(conn),
+		ssClient: statsService.NewStatsServiceClient(conn),
+		lsClient: loggerService.NewLoggerServiceClient(conn),
 
 		address: cfg.Address,
 		apiPort: cfg.ApiPort,
-	}, nil
+	}
 }
+
+func (x *Xray) GetAddress() string {
+	return x.address
+}
+
+func (x *Xray) Add() error {
+	return nil
+}
+
+func (x *Xray) Disable() error {
+	return nil
+}
+
+func (x *Xray) GetTraffic() {}

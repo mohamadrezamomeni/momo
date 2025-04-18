@@ -14,12 +14,12 @@ import (
 	"github.com/xtls/xray-core/proxy/vmess"
 )
 
-func (x *Xray) AddUser(inpt *dto.AddUser) error {
+func (x *Xray) addUser(inpt *dto.AddUser) error {
 	level, err := utils.ConvertToUint32(inpt.Level)
 	if err != nil {
 		return momoError.Error("user's level is wrong.")
 	}
-	_, err = x.HsClient.AlterInbound(context.Background(), &command.AlterInboundRequest{
+	_, err = x.hsClient.AlterInbound(context.Background(), &command.AlterInboundRequest{
 		Tag: inpt.Tag,
 		Operation: serial.ToTypedMessage(&command.AddUserOperation{
 			User: &protocol.User{
@@ -34,8 +34,8 @@ func (x *Xray) AddUser(inpt *dto.AddUser) error {
 	return nil
 }
 
-func (x *Xray) RemoveUser(inpt *dto.RemoveUser) error {
-	_, err := x.HsClient.AlterInbound(context.Background(), &command.AlterInboundRequest{
+func (x *Xray) removeUser(inpt *dto.RemoveUser) error {
+	_, err := x.hsClient.AlterInbound(context.Background(), &command.AlterInboundRequest{
 		Tag: inpt.Tag,
 		Operation: serial.ToTypedMessage(&command.RemoveUserOperation{
 			Email: inpt.Email,

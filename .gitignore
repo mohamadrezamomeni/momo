@@ -3,3 +3,4 @@ error.log
 *.db
 config.yaml
 config_test.yaml
+xray_config.yaml

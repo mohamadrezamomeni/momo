@@ -2,10 +2,6 @@ log:
   accessFile:
   errorFile:
 
-xray:
-  address:
-  api_port:
-
 db:
   dialect:
   path:

@@ -22,12 +22,12 @@ import (
 	vmessInbound "github.com/xtls/xray-core/proxy/vmess/inbound"
 )
 
-func (x *Xray) AddInbound(inpt *dto.AddInbound) (*serializer.AddInboundSerializer, error) {
+func (x *Xray) addInbound(inpt *dto.AddInbound) (*serializer.AddInboundSerializer, error) {
 	port, err := utils.ConvertToUint16(inpt.Port)
 	if err != nil {
 		return &serializer.AddInboundSerializer{}, momoError.Error("the port that is given is wrong")
 	}
-	client := x.HsClient
+	client := x.hsClient
 	addInboundRequest := &command.AddInboundRequest{
 		Inbound: &core.InboundHandlerConfig{
 			Tag: inpt.Tag,
@@ -52,17 +52,17 @@ func (x *Xray) AddInbound(inpt *dto.AddInbound) (*serializer.AddInboundSerialize
 	return &serializer.AddInboundSerializer{}, err
 }
 
-func (x *Xray) RemoveInbound(inpt *dto.RemoveInbound) (*serializer.RemoveInbound, error) {
-	client := x.HsClient
+func (x *Xray) removeInbound(inpt *dto.RemoveInbound) (*serializer.RemoveInbound, error) {
+	client := x.hsClient
 	_, err := client.RemoveInbound(context.Background(), &command.RemoveInboundRequest{
 		Tag: inpt.Tag,
 	})
 	return &serializer.RemoveInbound{}, err
 }
 
-func (x *Xray) ReceiveInboundTraffic(inpt *dto.ReceiveInboundTraffic) (*serializer.ReceiveInboundTraffic, error) {
+func (x *Xray) receiveInboundTraffic(inpt *dto.ReceiveInboundTraffic) (*serializer.ReceiveInboundTraffic, error) {
 	ptn := fmt.Sprintf("inbound>>>%s>>>traffic", inpt.Tag)
-	resp, err := x.SsClient.QueryStats(context.Background(), &statsService.QueryStatsRequest{
+	resp, err := x.ssClient.QueryStats(context.Background(), &statsService.QueryStatsRequest{
 		Pattern: ptn,
 		Reset_:  false,
 	})
