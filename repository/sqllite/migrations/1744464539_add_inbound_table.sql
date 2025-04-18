@@ -14,6 +14,7 @@ CREATE TABLE `inbounds` (
         `protocol` varchar(32),
         `isAvailable` boolean default true,
         `domain` varchar(64),
+        `type` varchar(32),
         `port` varchar(8),
         `user_id` varchar(8),
         `tag` varchar(32),

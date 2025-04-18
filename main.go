@@ -5,7 +5,6 @@ import (
 
 	"momo/pkg/config"
 	momoLog "momo/pkg/log"
-	"momo/proxy/xray"
 	"momo/repository/migrate"
 	"momo/repository/sqllite"
 
@@ -27,6 +26,4 @@ func main() {
 	migration.UP()
 
 	_ = sqllite.New(&cfg.DB)
-
-	_, _ = xray.New(cfg.XrayConfig)
 }

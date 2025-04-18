@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"momo/proxy/xray/dto"
+	"momo/proxy/vpn/internal/xray/dto"
 
 	"momo/pkg/utils"
-	"momo/proxy/xray/serializer"
+	"momo/proxy/vpn/internal/xray/serializer"
 
 	momoError "momo/pkg/error"
 

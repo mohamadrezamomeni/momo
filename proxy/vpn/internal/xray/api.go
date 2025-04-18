@@ -3,8 +3,8 @@ package xray
 import (
 	"fmt"
 
-	"momo/proxy/xray/dto"
-	"momo/proxy/xray/serializer"
+	"momo/proxy/vpn/internal/xray/dto"
+	"momo/proxy/vpn/internal/xray/serializer"
 
 	momoError "momo/pkg/error"
 

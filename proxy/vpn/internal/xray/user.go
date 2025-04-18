@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"momo/pkg/utils"
-	"momo/proxy/xray/dto"
+	"momo/proxy/vpn/internal/xray/dto"
 
 	momoError "momo/pkg/error"
 
