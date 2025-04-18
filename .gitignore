@@ -2,3 +2,4 @@ access.log
 error.log
 *.db
 config.yaml
+config_test.yaml
