@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
+	"momo/entity"
 	"momo/pkg/config"
-	"momo/pkg/entity"
 	"momo/pkg/utils"
 
 	"momo/repository/migrate"
