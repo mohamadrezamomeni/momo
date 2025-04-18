@@ -6,6 +6,7 @@ import (
 
 	"momo/pkg/config"
 
+	"momo/repository/migrate"
 	"momo/repository/sqllite"
 	"momo/repository/sqllite/user/dto"
 )
@@ -18,11 +19,15 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	cfg, err := config.Load("config.yaml")
+	cfg, err := config.Load("config_test.yaml")
 	if err != nil {
 		os.Exit(1)
 	}
 	db := sqllite.New(&cfg.DB)
+
+	migrate := migrate.New(&cfg.DB)
+
+	migrate.UP()
 
 	userRepo = New(db)
 

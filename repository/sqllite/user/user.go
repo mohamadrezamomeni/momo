@@ -19,7 +19,7 @@ func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 	RETURNING id, email, lastName, firstName
 `, inpt.Email, inpt.LastName, inpt.FirstName).Scan(&id, &email, &lastName, &firstName)
 	if err != nil {
-		return &entity.User{}, momoError.Errorf("somoething went wrong to save user")
+		return &entity.User{}, momoError.Errorf("somoething went wrong to save user error: %v", err)
 	}
 
 	return &entity.User{

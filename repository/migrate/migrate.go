@@ -2,10 +2,12 @@ package migrate
 
 import (
 	"database/sql"
+	"path/filepath"
 
 	"momo/repository/sqllite"
 
 	momoError "momo/pkg/error"
+	"momo/pkg/utils"
 
 	momoLogger "momo/pkg/log"
 
@@ -24,11 +26,12 @@ type IMigrator interface {
 }
 
 func New(cfg *sqllite.DBConfig) IMigrator {
+	root, _ := utils.GetRootOfProject()
 	migrations := &migrate.FileMigrationSource{
-		Dir: cfg.Migrations,
+		Dir: filepath.Join(root, cfg.Migrations),
 	}
 
-	return &Migrator{path: cfg.Path, dialect: cfg.Dialect, migrations: migrations}
+	return &Migrator{path: filepath.Join(root, cfg.Path), dialect: cfg.Dialect, migrations: migrations}
 }
 
 func (m *Migrator) UP() {
