@@ -1,6 +1,7 @@
 package dto
 
 type User struct {
-	Username string
-	ID       string
+	Email string
+	Level string
+	ID    string
 }

@@ -6,43 +6,66 @@ import (
 	"momo/proxy/vpn/internal/xray/dto"
 )
 
-var xray *Xray = New(&XrayConfig{
+var xrayInbound *Xray = New(&XrayConfig{
 	Address: "192.168.116.129",
 	ApiPort: "62789",
 })
 
 var (
-	protocoll string = "vmess"
-	port      string = "1081"
-	tag       string = "inbound-1081"
+	protocolInbound string = "vmess"
+	portInbound     string = "1081"
+	tagInbound      string = "inbound-1081"
+
+	emailInbound string = "mohamadian@gmail.com"
+	levelInbound string = "0"
+	uuidInbound  string = "0393ed06-29bb-41c2-b3f4-6382a6729c3e"
 )
 
 func TestAddInbound(t *testing.T) {
-	_, err := xray.addInbound(&dto.AddInbound{Port: port, Tag: tag, Protocol: protocoll})
+	_, err := xrayInbound.addInbound(&dto.AddInbound{
+		Port:     portInbound,
+		Tag:      tagInbound,
+		Protocol: protocolInbound,
+		User: &dto.InboundUser{
+			Email: emailInbound,
+			Level: level,
+			UUID:  uuidInbound,
+		},
+	})
 	if err != nil {
 		t.Errorf("error has occured please follow error: %v", err)
 	}
-	xray.removeInbound(&dto.RemoveInbound{Tag: tag})
+	xrayInbound.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
 }
 
 func TestRemoveInbound(t *testing.T) {
-	xray.addInbound(&dto.AddInbound{Port: port, Tag: tag, Protocol: protocoll})
-	_, err := xray.removeInbound(&dto.RemoveInbound{Tag: tag})
+	xrayInbound.addInbound(&dto.AddInbound{
+		Port:     portInbound,
+		Tag:      tagInbound,
+		Protocol: protocolInbound,
+		User: &dto.InboundUser{
+			Email: emailInbound,
+			Level: level,
+			UUID:  uuidInbound,
+		},
+	})
+	_, err := xrayInbound.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
 	if err != nil {
 		t.Errorf("error has occured please follow error: %v", err)
 	}
 }
 
 func TestGetTraffic(t *testing.T) {
-	xray.addInbound(&dto.AddInbound{Port: port, Tag: tag, Protocol: protocoll})
+	xrayInbound.addInbound(&dto.AddInbound{Port: portInbound, Tag: tagInbound, Protocol: protocolInbound})
 
-	ret, err := xray.receiveInboundTraffic(&dto.ReceiveInboundTraffic{Tag: tag})
+	ret, err := xrayInbound.receiveInboundTraffic(&dto.ReceiveInboundTraffic{Tag: tagInbound})
 	if err != nil {
+		xrayInbound.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
 		t.Errorf("error has happend and the error was %v", err)
-		xray.removeInbound(&dto.RemoveInbound{Tag: tag})
 	}
 	if ret.UpLink != 0 || ret.DownLink != 0 {
+		xrayInbound.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
 		t.Error("service gave wrong answer")
-		xray.removeInbound(&dto.RemoveInbound{Tag: tag})
 	}
+	xrayInbound.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
 }

@@ -19,6 +19,7 @@ import (
 	"github.com/xtls/xray-core/common/protocol"
 	"github.com/xtls/xray-core/common/serial"
 	"github.com/xtls/xray-core/core"
+	"github.com/xtls/xray-core/proxy/vmess"
 	vmessInbound "github.com/xtls/xray-core/proxy/vmess/inbound"
 )
 
@@ -27,7 +28,23 @@ func (x *Xray) addInbound(inpt *dto.AddInbound) (*serializer.AddInboundSerialize
 	if err != nil {
 		return &serializer.AddInboundSerializer{}, momoError.Error("the port that is given is wrong")
 	}
-	client := x.hsClient
+
+	users := make([]*protocol.User, 0)
+	if inpt.User != nil {
+		level, err := utils.ConvertToUint32(inpt.User.Level)
+		if err != nil {
+			return &serializer.AddInboundSerializer{}, momoError.Error("user's level is wrong.")
+		}
+		user := &protocol.User{
+			Level: level,
+			Email: inpt.User.Email,
+			Account: serial.ToTypedMessage(&vmess.Account{
+				Id: inpt.User.UUID,
+			}),
+		}
+		users = append(users, user)
+	}
+
 	addInboundRequest := &command.AddInboundRequest{
 		Inbound: &core.InboundHandlerConfig{
 			Tag: inpt.Tag,
@@ -43,13 +60,23 @@ func (x *Xray) addInbound(inpt *dto.AddInbound) (*serializer.AddInboundSerialize
 			}),
 
 			ProxySettings: serial.ToTypedMessage(&vmessInbound.Config{
-				User: []*protocol.User{},
+				User: users,
 			}),
 		},
 	}
 
-	_, err = client.AddInbound(context.Background(), addInboundRequest)
-	return &serializer.AddInboundSerializer{}, err
+	_, err = x.hsClient.AddInbound(context.Background(), addInboundRequest)
+	if err != nil {
+		return &serializer.AddInboundSerializer{}, momoError.Errorf("the error has happend the problem was %v", err)
+	}
+	return &serializer.AddInboundSerializer{}, nil
+}
+
+func (x *Xray) isUserFilled(u *dto.InboundUser) bool {
+	if u.Email != "" && u.Level != "" && u.UUID != "" {
+		return true
+	}
+	return false
 }
 
 func (x *Xray) removeInbound(inpt *dto.RemoveInbound) (*serializer.RemoveInbound, error) {
@@ -57,6 +84,7 @@ func (x *Xray) removeInbound(inpt *dto.RemoveInbound) (*serializer.RemoveInbound
 	_, err := client.RemoveInbound(context.Background(), &command.RemoveInboundRequest{
 		Tag: inpt.Tag,
 	})
+	fmt.Println(err)
 	return &serializer.RemoveInbound{}, err
 }
 

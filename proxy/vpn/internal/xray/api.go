@@ -5,6 +5,10 @@ import (
 
 	momoError "momo/pkg/error"
 
+	vpnDto "momo/proxy/vpn/dto"
+	"momo/proxy/vpn/internal/xray/dto"
+	vpnSerializer "momo/proxy/vpn/serializer"
+
 	loggerService "github.com/xtls/xray-core/app/log/command"
 	handlerService "github.com/xtls/xray-core/app/proxyman/command"
 	statsService "github.com/xtls/xray-core/app/stats/command"
@@ -40,12 +44,42 @@ func (x *Xray) GetAddress() string {
 	return x.address
 }
 
-func (x *Xray) Add() error {
+func (x *Xray) Add(inpt *vpnDto.Inbound) error {
+	_, err := x.addInbound(&dto.AddInbound{
+		Port:     inpt.Port,
+		Tag:      inpt.Tag,
+		Protocol: inpt.Protocol,
+		User: &dto.InboundUser{
+			Email: inpt.User.Email,
+			Level: inpt.User.Level,
+			UUID:  inpt.User.ID,
+		},
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func (x *Xray) Disable() error {
+func (x *Xray) Disable(inpt *vpnDto.Inbound) error {
+	_, err := x.removeInbound(&dto.RemoveInbound{
+		Tag: inpt.Tag,
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func (x *Xray) GetTraffic() {}
+func (x *Xray) GetTraffic(inpt *vpnDto.Inbound) (*vpnSerializer.Traffic, error) {
+	data, err := x.receiveInboundTraffic(&dto.ReceiveInboundTraffic{
+		Tag: inpt.Tag,
+	})
+	if err != nil {
+		return &vpnSerializer.Traffic{}, err
+	}
+	return &vpnSerializer.Traffic{
+		Download: int(data.DownLink),
+		Upload:   int(data.UpLink),
+	}, nil
+}
