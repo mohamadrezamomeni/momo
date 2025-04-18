@@ -42,8 +42,7 @@ func New(cfg XrayConfig) (IXray, error) {
 		SsClient: statsService.NewStatsServiceClient(conn),
 		LsClient: loggerService.NewLoggerServiceClient(conn),
 
-		address:    cfg.Address,
-		apiPort:    cfg.ApiPort,
-		configPath: cfg.configPath,
+		address: cfg.Address,
+		apiPort: cfg.ApiPort,
 	}, nil
 }

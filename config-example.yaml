@@ -5,7 +5,6 @@ log:
 xray:
   address:
   api_port:
-  config_path:
 
 db:
   dialect:
