@@ -23,10 +23,29 @@ func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 	}
 
 	return &entity.User{
+		ID:        id,
 		Email:     email,
 		LastName:  lastName,
 		FirstName: firstName,
 	}, nil
+}
+
+func (u *User) Delete(id string) error {
+	sql := fmt.Sprintf("DELETE FROM users WHERE id='%s'", id)
+	res, err := u.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+	}
+
+	if rowsAffected == 0 {
+		return momoError.Error("None of the records have been affected.")
+	}
+	return nil
 }
 
 func (u *User) FilterUsers(q *dto.FilterUsers) ([]*entity.User, error) {
@@ -60,8 +79,8 @@ func (u *User) generateFilterUserQuery(q *dto.FilterUsers) (string, error) {
 
 	v := reflect.ValueOf(*q)
 	t := reflect.TypeOf(*q)
-	isWherePut := false
 
+	conditions := []string{}
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		value := v.Field(i)
@@ -74,15 +93,18 @@ func (u *User) generateFilterUserQuery(q *dto.FilterUsers) (string, error) {
 			)
 		}
 		v := value.String()
-		if !isWherePut && v != "" {
-			query += " WHERE "
-			isWherePut = true
-		}
+
 		if v != "" {
-			query += fmt.Sprintf(" %s='%s'", strings.ToLower(field.Name), v)
+			conditions = append(conditions, fmt.Sprintf(" %s LIKE '%%%s%%'", strings.ToLower(field.Name), v))
 		}
 	}
+	if len(conditions) != 0 {
+		joinedConditions := strings.Join(conditions, " AND ")
 
+		query += " WHERE "
+		query += joinedConditions
+
+	}
 	return query, nil
 }
 
