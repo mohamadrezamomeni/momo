@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"strings"
 
-	"momo/pkg/entity"
+	"momo/entity"
 	momoError "momo/pkg/error"
 	"momo/repository/sqllite/user/dto"
 )
