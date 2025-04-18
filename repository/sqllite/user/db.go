@@ -1,7 +1,7 @@
 package user
 
 import (
-	"momo/pkg/entity"
+	"momo/entity"
 	"momo/repository/sqllite"
 	"momo/repository/sqllite/user/dto"
 )
