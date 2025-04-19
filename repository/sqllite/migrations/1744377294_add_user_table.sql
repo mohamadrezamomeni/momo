@@ -12,7 +12,7 @@ CREATE TABLE `users` (
             )
         )
         ),
-        `email` varchar(32) UNIQUE NOT NULL,
+        `username` varchar(32) UNIQUE NOT NULL,
         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         `lastName` varchar(32),
         `firstName` varchar(32)

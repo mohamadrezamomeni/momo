@@ -1,7 +1,7 @@
 package dto
 
 type FindUserQuery struct {
-	Email     string
+	Username  string
 	ID        string
 	FirstName string
 	LastName  string

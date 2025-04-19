@@ -1,6 +1,6 @@
 package dto
 
 type RemoveUser struct {
-	Tag   string
-	Email string
+	Tag      string
+	Username string
 }

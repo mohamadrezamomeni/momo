@@ -8,7 +8,7 @@ type AddInbound struct {
 }
 
 type InboundUser struct {
-	Email string
-	Level string
-	UUID  string
+	Username string
+	Level    string
+	UUID     string
 }

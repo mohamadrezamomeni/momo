@@ -24,7 +24,7 @@ func (x *Xray) addUser(inpt *dto.AddUser) error {
 		Tag: inpt.Tag,
 		Operation: serial.ToTypedMessage(&command.AddUserOperation{
 			User: &protocol.User{
-				Email: inpt.Email,
+				Email: inpt.Username,
 				Level: level,
 				Account: serial.ToTypedMessage(&vmess.Account{
 					Id: inpt.UUID,
@@ -39,7 +39,7 @@ func (x *Xray) removeUser(inpt *dto.RemoveUser) error {
 	_, err := x.hsClient.AlterInbound(context.Background(), &command.AlterInboundRequest{
 		Tag: inpt.Tag,
 		Operation: serial.ToTypedMessage(&command.RemoveUserOperation{
-			Email: inpt.Email,
+			Email: inpt.Username,
 		}),
 	})
 	return err
@@ -52,11 +52,11 @@ func (x *Xray) getUsers(tag string) (*serializer.GetUsers, error) {
 	if err != nil {
 		return &serializer.GetUsers{}, momoError.Errorf("error has happend you can follow the problem the error was %v", err)
 	}
-	emails := make([]string, 0)
+	usernames := make([]string, 0)
 	for _, user := range res.Users {
-		emails = append(emails, user.Email)
+		usernames = append(usernames, user.Email)
 	}
 	return &serializer.GetUsers{
-		Emails: emails,
+		Usernames: usernames,
 	}, nil
 }

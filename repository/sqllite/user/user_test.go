@@ -35,17 +35,17 @@ func TestMain(m *testing.M) {
 }
 
 func getInfo() (string, string, string) {
-	email := fmt.Sprintf("%s@gmail.com", utils.RandomString(5))
+	username := fmt.Sprintf("%s", utils.RandomString(5))
 	name := utils.RandomString(5)
 	family := utils.RandomString(5)
-	return email, name, family
+	return username, name, family
 }
 
 func TestCreate(t *testing.T) {
-	email, firstName, lastName := getInfo()
+	username, firstName, lastName := getInfo()
 
 	userCreated, err := userRepo.Create(&dto.Create{
-		Email:     email,
+		Username:  username,
 		FirstName: firstName,
 		LastName:  lastName,
 	})
@@ -54,28 +54,28 @@ func TestCreate(t *testing.T) {
 		return
 	}
 
-	if userCreated.Email != email || userCreated.FirstName != firstName || userCreated.LastName != lastName {
+	if userCreated.Username != username || userCreated.FirstName != firstName || userCreated.LastName != lastName {
 		t.Error("user creation requires some troubleshooting")
 		return
 	}
 	userRepo.Delete(userCreated.ID)
 }
 
-func TestFindByEmail(t *testing.T) {
-	email, firstName, lastName := getInfo()
+func TestFindByUsername(t *testing.T) {
+	username, firstName, lastName := getInfo()
 	userCreated, err := userRepo.Create(&dto.Create{
-		Email:     email,
+		Username:  username,
 		FirstName: firstName,
 		LastName:  lastName,
 	})
 
-	user, err := userRepo.FindUserByEmail(email)
+	user, err := userRepo.FindUserByUsername(username)
 	if err != nil {
-		t.Errorf("findByEmail needs troubleshooting error: %v", err)
+		t.Errorf("findByUsername needs troubleshooting error: %v", err)
 		userRepo.Delete(userCreated.ID)
 		return
 	}
-	if user.Email != email || user.FirstName != firstName || user.LastName != lastName || user.ID != userCreated.ID {
+	if user.Username != username || user.FirstName != firstName || user.LastName != lastName || user.ID != userCreated.ID {
 		t.Error("something went wrong to compare results")
 		userRepo.Delete(userCreated.ID)
 		return
@@ -84,20 +84,20 @@ func TestFindByEmail(t *testing.T) {
 }
 
 func TestFindByID(t *testing.T) {
-	email, firstName, lastName := getInfo()
+	username, firstName, lastName := getInfo()
 	userCreated, err := userRepo.Create(&dto.Create{
-		Email:     email,
+		Username:  username,
 		FirstName: firstName,
 		LastName:  lastName,
 	})
 	user, err := userRepo.FindUserByID(userCreated.ID)
 	if err != nil {
-		t.Errorf("findByEmail needs troubleshooting error: %v", err)
+		t.Errorf("findByUsername needs troubleshooting error: %v", err)
 		userRepo.Delete(userCreated.ID)
 		return
 	}
 
-	if user.Email != email || user.FirstName != firstName || user.LastName != lastName || user.ID != userCreated.ID {
+	if user.Username != username || user.FirstName != firstName || user.LastName != lastName || user.ID != userCreated.ID {
 		t.Error("something went wrong to compare results")
 		return
 	}
@@ -113,12 +113,10 @@ func TestFilter(t *testing.T) {
 	})
 	if err != nil {
 		t.Errorf("1. something went wrong. please follow problem the error was %v", err)
-		deleteUsers(ids)
 	}
 
 	if len(users) != 2 {
 		t.Errorf("1. something went wrong.")
-		deleteUsers(ids)
 	}
 
 	users, err = userRepo.FilterUsers(&dto.FilterUsers{
@@ -127,12 +125,10 @@ func TestFilter(t *testing.T) {
 	})
 	if err != nil {
 		t.Errorf("2. something went wrong. please follow problem the error was %v", err)
-		deleteUsers(ids)
 	}
 
 	if len(users) != 2 {
 		t.Errorf("2. something went wrong.")
-		deleteUsers(ids)
 	}
 
 	users, err = userRepo.FilterUsers(&dto.FilterUsers{
@@ -140,12 +136,10 @@ func TestFilter(t *testing.T) {
 	})
 	if err != nil {
 		t.Errorf("3. something went wrong. please follow problem the error was %v", err)
-		deleteUsers(ids)
 	}
 
 	if len(users) != 1 {
 		t.Errorf("3. something went wrong.")
-		deleteUsers(ids)
 	}
 
 	users, err = userRepo.FilterUsers(&dto.FilterUsers{
@@ -153,19 +147,18 @@ func TestFilter(t *testing.T) {
 	})
 	if err != nil {
 		t.Errorf("4. something went wrong. please follow problem the error was %v", err)
-		deleteUsers(ids)
 	}
 
 	if len(users) != 1 {
 		t.Errorf("4. something went wrong.")
-		deleteUsers(ids)
 	}
+	deleteUsers(ids)
 }
 
 func staticUsers() (*entity.User, *entity.User, *entity.User) {
-	email1 := "andy@gmail.com"
-	email2 := "micheal@gmail.com"
-	email3 := "micka@gmail.com"
+	username1 := "andy"
+	username2 := "micheal"
+	username3 := "micka"
 
 	firstName1 := "andy"
 	firstName2 := "micheal"
@@ -176,17 +169,17 @@ func staticUsers() (*entity.User, *entity.User, *entity.User) {
 	lastName3 := "castarica"
 
 	user1, _ := userRepo.Create(&dto.Create{
-		Email:     email1,
+		Username:  username1,
 		FirstName: firstName1,
 		LastName:  lastName1,
 	})
 	user2, _ := userRepo.Create(&dto.Create{
-		Email:     email2,
+		Username:  username2,
 		FirstName: firstName2,
 		LastName:  lastName2,
 	})
 	user3, _ := userRepo.Create(&dto.Create{
-		Email:     email3,
+		Username:  username3,
 		FirstName: firstName3,
 		LastName:  lastName3,
 	})

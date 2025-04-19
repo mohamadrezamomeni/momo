@@ -1,5 +1,5 @@
 package serializer
 
 type GetUsers struct {
-	Emails []string
+	Usernames []string
 }

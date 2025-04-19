@@ -50,9 +50,9 @@ func (x *Xray) Add(inpt *vpnDto.Inbound) error {
 		Tag:      inpt.Tag,
 		Protocol: inpt.Protocol,
 		User: &dto.InboundUser{
-			Email: inpt.User.Email,
-			Level: inpt.User.Level,
-			UUID:  inpt.User.ID,
+			Username: inpt.User.Username,
+			Level:    inpt.User.Level,
+			UUID:     inpt.User.ID,
 		},
 	})
 	if err != nil {
@@ -86,7 +86,7 @@ func (x *Xray) GetTraffic(inpt *vpnDto.Inbound) (*vpnSerializer.Traffic, error) 
 
 func (x *Xray) DoesExist(inpt *vpnDto.Inbound) (bool, error) {
 	data, err := x.getUsers(inpt.Tag)
-	if err == nil && len(data.Emails) > 0 {
+	if err == nil && len(data.Usernames) > 0 {
 		return true, nil
 	}
 	return false, err

@@ -37,7 +37,7 @@ func (x *Xray) addInbound(inpt *dto.AddInbound) (*serializer.AddInboundSerialize
 		}
 		user := &protocol.User{
 			Level: level,
-			Email: inpt.User.Email,
+			Email: inpt.User.Username,
 			Account: serial.ToTypedMessage(&vmess.Account{
 				Id: inpt.User.UUID,
 			}),
@@ -73,7 +73,7 @@ func (x *Xray) addInbound(inpt *dto.AddInbound) (*serializer.AddInboundSerialize
 }
 
 func (x *Xray) isUserFilled(u *dto.InboundUser) bool {
-	if u.Email != "" && u.Level != "" && u.UUID != "" {
+	if u.Username != "" && u.Level != "" && u.UUID != "" {
 		return true
 	}
 	return false

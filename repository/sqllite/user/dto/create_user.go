@@ -1,7 +1,7 @@
 package dto
 
 type Create struct {
-	Email     string
+	Username  string
 	FirstName string
 	LastName  string
 }

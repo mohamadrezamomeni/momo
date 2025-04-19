@@ -12,19 +12,19 @@ import (
 )
 
 func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
-	var id, email, lastName, firstName string
+	var id, username, lastName, firstName string
 	err := u.db.Conn().QueryRow(`
-	INSERT INTO users (email, lastName, firstName)
+	INSERT INTO users (username, lastName, firstName)
 	VALUES (?, ?, ?)
-	RETURNING id, email, lastName, firstName
-`, inpt.Email, inpt.LastName, inpt.FirstName).Scan(&id, &email, &lastName, &firstName)
+	RETURNING id, username, lastName, firstName
+`, inpt.Username, inpt.LastName, inpt.FirstName).Scan(&id, &username, &lastName, &firstName)
 	if err != nil {
 		return &entity.User{}, momoError.Errorf("somoething went wrong to save user error: %v", err)
 	}
 
 	return &entity.User{
 		ID:        id,
-		Email:     email,
+		Username:  username,
 		LastName:  lastName,
 		FirstName: firstName,
 	}, nil
@@ -63,13 +63,13 @@ func (u *User) FilterUsers(q *dto.FilterUsers) ([]*entity.User, error) {
 		var id string
 		var firstName string
 		var lastName string
-		var email string
+		var username string
 		var createdAt interface{}
-		err = rows.Scan(&id, &email, &createdAt, &lastName, &firstName)
+		err = rows.Scan(&id, &username, &createdAt, &lastName, &firstName)
 		if err != nil {
 			momoError.DebuggingErrorf("error has occured err: %v", err)
 		}
-		users = append(users, &entity.User{ID: id, Email: email, FirstName: firstName, LastName: lastName})
+		users = append(users, &entity.User{ID: id, Username: username, FirstName: firstName, LastName: lastName})
 	}
 	return users, nil
 }
@@ -108,8 +108,8 @@ func (u *User) generateFilterUserQuery(q *dto.FilterUsers) (string, error) {
 	return query, nil
 }
 
-func (u *User) FindUserByEmail(email string) (*entity.User, error) {
-	return u.findUser("email", email)
+func (u *User) FindUserByUsername(username string) (*entity.User, error) {
+	return u.findUser("username", username)
 }
 
 func (u *User) FindUserByID(ID string) (*entity.User, error) {
@@ -120,16 +120,16 @@ func (u *User) findUser(key string, value string) (*entity.User, error) {
 	var id string
 	var firstName string
 	var lastName string
-	var email string
+	var username string
 	var createdAt interface{}
 	s := fmt.Sprintf("SELECT * FROM users WHERE %s='%s' LIMIT 1", key, value)
-	err := u.db.Conn().QueryRow(s).Scan(&id, &email, &createdAt, &lastName, &firstName)
+	err := u.db.Conn().QueryRow(s).Scan(&id, &username, &createdAt, &lastName, &firstName)
 	if err == nil {
 		return &entity.User{
 			ID:        id,
 			FirstName: firstName,
 			LastName:  lastName,
-			Email:     email,
+			Username:  username,
 		}, err
 	}
 	if err == sql.ErrNoRows {

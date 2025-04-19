@@ -16,9 +16,9 @@ var (
 	portInbound     string = "1081"
 	tagInbound      string = "inbound-1081"
 
-	emailInbound string = "mohamadian@gmail.com"
-	levelInbound string = "0"
-	uuidInbound  string = "0393ed06-29bb-41c2-b3f4-6382a6729c3e"
+	usernameInbound string = "mohamadian"
+	levelInbound    string = "0"
+	uuidInbound     string = "0393ed06-29bb-41c2-b3f4-6382a6729c3e"
 
 	inboundDoesntExist string = "inbound-1083"
 )
@@ -29,9 +29,9 @@ func TestAddInbound(t *testing.T) {
 		Tag:      tagInbound,
 		Protocol: protocolInbound,
 		User: &dto.InboundUser{
-			Email: emailInbound,
-			Level: level,
-			UUID:  uuidInbound,
+			Username: usernameInbound,
+			Level:    level,
+			UUID:     uuidInbound,
 		},
 	})
 	if err != nil {
@@ -46,9 +46,9 @@ func TestRemoveInbound(t *testing.T) {
 		Tag:      tagInbound,
 		Protocol: protocolInbound,
 		User: &dto.InboundUser{
-			Email: emailInbound,
-			Level: level,
-			UUID:  uuidInbound,
+			Username: usernameInbound,
+			Level:    level,
+			UUID:     uuidInbound,
 		},
 	})
 	_, err := xrayInbound.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
@@ -78,7 +78,7 @@ func TestInboundDoesntExist(t *testing.T) {
 	if err == nil {
 		t.Error("error could be existed. It was unexpected situation")
 	}
-	if len(res.Emails) != 0 {
-		t.Error("the number of emails must be 0")
+	if len(res.Usernames) != 0 {
+		t.Error("the number of username must be 0")
 	}
 }

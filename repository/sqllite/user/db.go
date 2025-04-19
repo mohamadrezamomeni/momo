@@ -10,7 +10,7 @@ type IUserRepository interface {
 	Delete(string) error
 	Create(*dto.Create) (*entity.User, error)
 	FilterUsers(q *dto.FilterUsers) ([]*entity.User, error)
-	FindUserByEmail(string) (*entity.User, error)
+	FindUserByUsername(string) (*entity.User, error)
 	FindUserByID(string) (*entity.User, error)
 }
 
