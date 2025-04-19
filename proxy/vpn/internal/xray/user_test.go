@@ -39,3 +39,28 @@ func TestRemoveUser(t *testing.T) {
 	}
 	xrayU.removeInbound(&dto.RemoveInbound{Tag: tagUser})
 }
+
+func TestGetUsers(t *testing.T) {
+	xrayU.addInbound(&dto.AddInbound{
+		Tag:      tagUser,
+		Port:     portUser,
+		Protocol: protocolUser,
+		User: &dto.InboundUser{
+			Email: email,
+			Level: level,
+			UUID:  uuid,
+		},
+	})
+
+	res, err := xrayU.getUsers(tagUser)
+	if err != nil {
+		t.Errorf("error has happend you can follow the problem the problem was %v", err)
+	}
+
+	if len(res.Emails) != 1 {
+		t.Error("the inbound was empty It had been expected this inbound had one user")
+	}
+	xrayU.removeInbound(&dto.RemoveInbound{
+		Tag: tagUser,
+	})
+}

@@ -84,7 +84,6 @@ func (x *Xray) removeInbound(inpt *dto.RemoveInbound) (*serializer.RemoveInbound
 	_, err := client.RemoveInbound(context.Background(), &command.RemoveInboundRequest{
 		Tag: inpt.Tag,
 	})
-	fmt.Println(err)
 	return &serializer.RemoveInbound{}, err
 }
 

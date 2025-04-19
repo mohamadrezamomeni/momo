@@ -5,6 +5,7 @@ import (
 
 	"momo/pkg/utils"
 	"momo/proxy/vpn/internal/xray/dto"
+	"momo/proxy/vpn/internal/xray/serializer"
 
 	momoError "momo/pkg/error"
 
@@ -42,4 +43,20 @@ func (x *Xray) removeUser(inpt *dto.RemoveUser) error {
 		}),
 	})
 	return err
+}
+
+func (x *Xray) getUsers(tag string) (*serializer.GetUsers, error) {
+	res, err := x.hsClient.GetInboundUsers(context.Background(), &command.GetInboundUserRequest{
+		Tag: tag,
+	})
+	if err != nil {
+		return &serializer.GetUsers{}, momoError.Errorf("error has happend you can follow the problem the error was %v", err)
+	}
+	emails := make([]string, 0)
+	for _, user := range res.Users {
+		emails = append(emails, user.Email)
+	}
+	return &serializer.GetUsers{
+		Emails: emails,
+	}, nil
 }

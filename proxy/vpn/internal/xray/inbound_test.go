@@ -19,6 +19,8 @@ var (
 	emailInbound string = "mohamadian@gmail.com"
 	levelInbound string = "0"
 	uuidInbound  string = "0393ed06-29bb-41c2-b3f4-6382a6729c3e"
+
+	inboundDoesntExist string = "inbound-1083"
 )
 
 func TestAddInbound(t *testing.T) {
@@ -68,4 +70,15 @@ func TestGetTraffic(t *testing.T) {
 		t.Error("service gave wrong answer")
 	}
 	xrayInbound.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
+}
+
+func TestInboundDoesntExist(t *testing.T) {
+	res, err := xrayInbound.getUsers(inboundDoesntExist)
+
+	if err == nil {
+		t.Error("error could be existed. It was unexpected situation")
+	}
+	if len(res.Emails) != 0 {
+		t.Error("the number of emails must be 0")
+	}
 }
