@@ -12,6 +12,7 @@ type V interface {
 	Add(*vpnDto.Inbound) error
 	Disable(*vpnDto.Inbound) error
 	GetTraffic(*vpnDto.Inbound) (*vpnSerializer.Traffic, error)
+	DoesExist(*vpnDto.Inbound) (bool, error)
 	GetAddress() string
 }
 

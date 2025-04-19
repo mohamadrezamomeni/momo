@@ -83,3 +83,11 @@ func (x *Xray) GetTraffic(inpt *vpnDto.Inbound) (*vpnSerializer.Traffic, error) 
 		Upload:   int(data.UpLink),
 	}, nil
 }
+
+func (x *Xray) DoesExist(inpt *vpnDto.Inbound) (bool, error) {
+	data, err := x.getUsers(inpt.Tag)
+	if err == nil && len(data.Emails) > 0 {
+		return true, nil
+	}
+	return false, err
+}
