@@ -36,19 +36,22 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func TestCreateInbound(t *testing.T) {
-	id := uuid.New()
-
-	port := strconv.Itoa(utils.GenerateRandomInRange(1080, 1089))
-	domain := "google.com"
-	ret, err := inboundReop.Create(&dto.CreateInbound{
+var (
+	port           = strconv.Itoa(utils.GenerateRandomInRange(1080, 1089))
+	domain         = "google.com"
+	id             = uuid.New()
+	inboundExample = &dto.CreateInbound{
 		Tag:      fmt.Sprintf("inbound-%s", port),
 		Protocol: "vmess",
 		Port:     port,
 		Domain:   domain,
 		UserID:   id.String(),
 		VPNType:  vpn.XRAY_VPN,
-	})
+	}
+)
+
+func TestCreateInbound(t *testing.T) {
+	ret, err := inboundReop.Create(inboundExample)
 	if err != nil {
 		t.Errorf("something wrong has happend the problem was %v", err)
 	}
@@ -56,5 +59,18 @@ func TestCreateInbound(t *testing.T) {
 		t.Error("data wasn't saved currectly")
 	}
 
+	inboundReop.Delete(ret.ID)
+}
+
+func TestChangeStatus(t *testing.T) {
+	ret, err := inboundReop.Create(inboundExample)
+	if err != nil {
+		t.Errorf("something wrong has happend the problem was %v", err)
+	}
+
+	err = inboundReop.changeStatus(ret.ID, false)
+	if err != nil {
+		t.Errorf("error has happend that was %v", err)
+	}
 	inboundReop.Delete(ret.ID)
 }

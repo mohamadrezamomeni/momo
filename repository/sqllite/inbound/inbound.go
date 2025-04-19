@@ -66,3 +66,21 @@ func (i *Inbound) Delete(id int) error {
 	}
 	return nil
 }
+
+func (i *Inbound) changeStatus(id int, state bool) error {
+	sql := fmt.Sprintf("UPDATE inbounds SET is_available = %v WHERE id = %v", state, id)
+
+	_, err := i.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.DebuggingErrorf("something bad has happend the error was %v", err)
+	}
+	return nil
+}
+
+func (i *Inbound) MakeAvailable(id int) error {
+	return i.changeStatus(id, true)
+}
+
+func (i *Inbound) MakeNotAvailable(id int) error {
+	return i.changeStatus(id, false)
+}
