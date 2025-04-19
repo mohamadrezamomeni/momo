@@ -1,7 +1,7 @@
 package vpn
 
-type vpn_type = string
+type VPNType = string
 
 const (
-	xray_vpn vpn_type = "xray"
+	XRAY_VPN VPNType = "xray"
 )

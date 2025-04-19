@@ -1,0 +1,68 @@
+package inbound
+
+import (
+	"fmt"
+
+	"momo/entity"
+	momoError "momo/pkg/error"
+	"momo/repository/sqllite/inbound/dto"
+)
+
+func (i *Inbound) Create(inpt *dto.CreateInbound) (*entity.Inbound, error) {
+	var (
+		id          int
+		protocol    string
+		domain      string
+		vpnType     string
+		port        string
+		userID      string
+		tag         string
+		isAvailable bool
+	)
+	err := i.db.Conn().QueryRow(`
+	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag)
+	VALUES (?, ?, ?, ?, ?, ?)
+	RETURNING id, protocol, is_available, domain, vpn_type, port, user_id, tag
+	`, inpt.Protocol, inpt.Domain, inpt.VPNType, inpt.Port, inpt.UserID, inpt.Tag).Scan(
+		&id,
+		&protocol,
+		&isAvailable,
+		&domain,
+		&vpnType,
+		&port,
+		&userID,
+		&tag,
+	)
+	if err != nil {
+		return &entity.Inbound{}, momoError.Errorf("somoething went wrong to save user error: %v", err)
+	}
+
+	return &entity.Inbound{
+		ID:          id,
+		Protocol:    protocol,
+		Domain:      domain,
+		VPNType:     vpnType,
+		Port:        port,
+		UserID:      userID,
+		Tag:         tag,
+		IsAvailable: isAvailable,
+	}, nil
+}
+
+func (i *Inbound) Delete(id int) error {
+	sql := fmt.Sprintf("DELETE FROM inbounds WHERE id=%v", id)
+	res, err := i.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+	}
+
+	if rowsAffected == 0 {
+		return momoError.Error("None of the records have been affected.")
+	}
+	return nil
+}

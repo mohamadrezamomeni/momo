@@ -28,7 +28,7 @@ func New() *ProxyVPN {
 
 func (p *ProxyVPN) AddVpn(vpnType string, domain string, port string) {
 	switch vpnType {
-	case xray_vpn:
+	case XRAY_VPN:
 		p.xrays = append(p.xrays, xray.New(&xray.XrayConfig{
 			Address: domain,
 			ApiPort: port,
@@ -38,7 +38,7 @@ func (p *ProxyVPN) AddVpn(vpnType string, domain string, port string) {
 
 func (p *ProxyVPN) AddInbound(inpt *dto.Inbound, vpnType string) (err error) {
 	switch vpnType {
-	case xray_vpn:
+	case XRAY_VPN:
 		err = p.addXray(inpt.Address, inpt)
 	default:
 		err = momoError.DebuggingErrorf("the vpnType that was given was wrong %s", vpnType)
@@ -48,7 +48,7 @@ func (p *ProxyVPN) AddInbound(inpt *dto.Inbound, vpnType string) (err error) {
 
 func (p *ProxyVPN) DisableInbound(inpt *dto.Inbound, vpnType string) (err error) {
 	switch vpnType {
-	case xray_vpn:
+	case XRAY_VPN:
 		err = p.disableXray(inpt.Address, inpt)
 	default:
 		err = momoError.DebuggingErrorf("the vpnType that was given was wrong %s", vpnType)
@@ -58,7 +58,7 @@ func (p *ProxyVPN) DisableInbound(inpt *dto.Inbound, vpnType string) (err error)
 
 func (p *ProxyVPN) GetTraffix(inpt *dto.Inbound, vpnType string) (*vpnSerializer.Traffic, error) {
 	switch vpnType {
-	case xray_vpn:
+	case XRAY_VPN:
 		ret, err := p.getTrafficXray(inpt.Address, inpt)
 		return ret, err
 	default:

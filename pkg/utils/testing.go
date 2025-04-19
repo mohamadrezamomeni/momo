@@ -17,3 +17,9 @@ func RandomString(length int) string {
 	}
 	return string(b)
 }
+
+func GenerateRandomInRange(min, max int) int {
+	src := rand.NewSource(time.Now().UnixNano())
+	r := rand.New(src)
+	return r.Intn(max-min) + min
+}

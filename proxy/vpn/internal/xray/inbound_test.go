@@ -1,6 +1,7 @@
 package xray
 
 import (
+	"fmt"
 	"testing"
 
 	"momo/proxy/vpn/internal/xray/dto"
@@ -65,6 +66,7 @@ func TestGetTraffic(t *testing.T) {
 		xrayInbound.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
 		t.Errorf("error has happend and the error was %v", err)
 	}
+	fmt.Println(ret, tagInbound)
 	if ret.UpLink != 0 || ret.DownLink != 0 {
 		xrayInbound.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
 		t.Error("service gave wrong answer")
