@@ -68,13 +68,13 @@ var (
 	}
 
 	inboundExample4 = &dto.CreateInbound{
-		Tag:         fmt.Sprintf("inbound-%s", port3),
-		Protocol:    "http",
-		Port:        port3,
-		Domain:      "googoo.com",
-		UserID:      userID2,
-		VPNType:     vpn.XRAY_VPN,
-		IsAvailable: true,
+		Tag:      fmt.Sprintf("inbound-%s", port3),
+		Protocol: "http",
+		Port:     port3,
+		Domain:   "googoo.com",
+		UserID:   userID2,
+		VPNType:  vpn.XRAY_VPN,
+		IsActive: true,
 	}
 )
 
@@ -85,7 +85,7 @@ func TestCreateInbound(t *testing.T) {
 	}
 	if ret.Domain != inboundExample1.Domain ||
 		ret.Port != inboundExample1.Port ||
-		ret.IsAvailable != false ||
+		ret.IsActive != false ||
 		ret.UserID != inboundExample1.UserID ||
 		ret.VPNType != inboundExample1.VPNType {
 		t.Error("data wasn't saved currectly")
@@ -145,7 +145,7 @@ func TestFilterInbounds(t *testing.T) {
 	}
 
 	isAvailableT := true
-	inbounds5, err := inboundRepo.Filter(&dto.FilterInbound{IsAvailable: &isAvailableT})
+	inbounds5, err := inboundRepo.Filter(&dto.FilterInbound{IsActice: &isAvailableT})
 	if err != nil {
 		t.Errorf("5. the problem has occured that is %v", err)
 	}

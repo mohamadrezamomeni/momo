@@ -11,44 +11,27 @@ import (
 )
 
 func (i *Inbound) Create(inpt *dto.CreateInbound) (*entity.Inbound, error) {
-	var (
-		id          int
-		protocol    string
-		domain      string
-		vpnType     string
-		port        string
-		userID      string
-		tag         string
-		isAvailable bool
-	)
+	inbound := &entity.Inbound{}
 	err := i.db.Conn().QueryRow(`
-	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_available)
+	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_active)
 	VALUES (?, ?, ?, ?, ?, ?, ?)
-	RETURNING id, protocol, is_available, domain, vpn_type, port, user_id, tag
-	`, inpt.Protocol, inpt.Domain, inpt.VPNType, inpt.Port, inpt.UserID, inpt.Tag, inpt.IsAvailable).Scan(
-		&id,
-		&protocol,
-		&isAvailable,
-		&domain,
-		&vpnType,
-		&port,
-		&userID,
-		&tag,
+	RETURNING id, protocol, is_active, domain, vpn_type, port, user_id, tag, is_block
+	`, inpt.Protocol, inpt.Domain, inpt.VPNType, inpt.Port, inpt.UserID, inpt.Tag, inpt.IsActive).Scan(
+		&inbound.ID,
+		&inbound.Protocol,
+		&inbound.IsActive,
+		&inbound.Domain,
+		&inbound.VPNType,
+		&inbound.Port,
+		&inbound.UserID,
+		&inbound.Tag,
+		&inbound.IsBlock,
 	)
 	if err != nil {
 		return &entity.Inbound{}, momoError.Errorf("somoething went wrong to save inbound error: %v", err)
 	}
 
-	return &entity.Inbound{
-		ID:          id,
-		Protocol:    protocol,
-		Domain:      domain,
-		VPNType:     vpnType,
-		Port:        port,
-		UserID:      userID,
-		Tag:         tag,
-		IsAvailable: isAvailable,
-	}, nil
+	return inbound, nil
 }
 
 func (i *Inbound) Delete(id int) error {
@@ -70,7 +53,7 @@ func (i *Inbound) Delete(id int) error {
 }
 
 func (i *Inbound) changeStatus(id int, state bool) error {
-	sql := fmt.Sprintf("UPDATE inbounds SET is_available = %v WHERE id = %v", state, id)
+	sql := fmt.Sprintf("UPDATE inbounds SET is_active = %v WHERE id = %v", state, id)
 
 	_, err := i.db.Conn().Exec(sql)
 	if err != nil {
@@ -98,26 +81,27 @@ func (i *Inbound) Filter(inpt *dto.FilterInbound) ([]*entity.Inbound, error) {
 	inbounds := make([]*entity.Inbound, 0)
 
 	for rows.Next() {
-		var (
-			protocol, port, domain, vpnTpe, userID, tag string
-			isAvailable                                 bool
-			createdAt, updatedAt                        interface{}
-			id                                          int
-		)
+		inbound := &entity.Inbound{}
+		var createdAt, updatedAt interface{}
 
-		err := rows.Scan(&id, &protocol, &isAvailable, &domain, &vpnTpe, &port, &userID, &tag, &createdAt, &updatedAt)
+		err := rows.Scan(
+			&inbound.ID,
+			&inbound.Protocol,
+			&inbound.IsActive,
+			&inbound.Domain,
+			&inbound.VPNType,
+			&inbound.Port,
+			&inbound.UserID,
+			&inbound.Tag,
+			&inbound.IsBlock,
+			&createdAt,
+			&updatedAt,
+		)
 		if err != nil {
 			return []*entity.Inbound{}, momoError.DebuggingErrorf("error has occured err: %v", err)
 		}
 
-		inbounds = append(inbounds, &entity.Inbound{
-			ID:          id,
-			Domain:      domain,
-			Protocol:    protocol,
-			VPNType:     vpnTpe,
-			Tag:         tag,
-			IsAvailable: isAvailable,
-		})
+		inbounds = append(inbounds, inbound)
 	}
 	return inbounds, nil
 }
@@ -134,8 +118,8 @@ func (i *Inbound) makeQueryFilter(inpt *dto.FilterInbound) string {
 		switch k {
 		case "Protocol":
 			return "protocol"
-		case "IsAvailable":
-			return "is_available"
+		case "IsActice":
+			return "is_active"
 		case "Domain":
 			return "domain"
 		case "VPNType":
@@ -160,5 +144,6 @@ func (i *Inbound) makeQueryFilter(inpt *dto.FilterInbound) string {
 	}
 	subQuery := strings.Join(subSQLs, " AND ")
 	sql += fmt.Sprintf(" WHERE %s", subQuery)
+	fmt.Println(sql)
 	return sql
 }
