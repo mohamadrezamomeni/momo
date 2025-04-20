@@ -8,7 +8,7 @@ import (
 	vpnSerializer "momo/proxy/vpn/serializer"
 )
 
-type V interface {
+type IVPN interface {
 	Add(*vpnDto.Inbound) error
 	Disable(*vpnDto.Inbound) error
 	GetTraffic(*vpnDto.Inbound) (*vpnSerializer.Traffic, error)
@@ -16,52 +16,60 @@ type V interface {
 	GetAddress() string
 }
 
+type VPN struct {
+	VPNType VPNType
+	V       IVPN
+}
+
 type ProxyVPN struct {
-	xrays []V
+	vpns []*VPN
 }
 
 func New() *ProxyVPN {
 	return &ProxyVPN{
-		xrays: make([]V, 0),
+		vpns: make([]*VPN, 0),
 	}
 }
 
-func (p *ProxyVPN) AddVpn(vpnType string, domain string, port string) {
-	switch vpnType {
-	case XRAY_VPN:
-		p.xrays = append(p.xrays, xray.New(&xray.XrayConfig{
+func (p *ProxyVPN) AddToVPN(domain string, VPNType VPNType, port string) {
+	p.vpns = append(p.vpns, &VPN{
+		VPNType: VPNType,
+		V: xray.New(&xray.XrayConfig{
 			Address: domain,
 			ApiPort: port,
-		}))
-	}
+		}),
+	})
 }
 
-func (p *ProxyVPN) AddInbound(inpt *dto.Inbound, vpnType string) (err error) {
-	switch vpnType {
-	case XRAY_VPN:
-		err = p.addXray(inpt.Address, inpt)
-	default:
-		err = momoError.DebuggingErrorf("the vpnType that was given was wrong %s", vpnType)
+func (p *ProxyVPN) retriveVPN(address string, VPNType VPNType) IVPN {
+	for _, v := range p.vpns {
+		if v.V.GetAddress() == address && VPNType == v.VPNType {
+			return v.V
+		}
 	}
-	return
+	return nil
 }
 
-func (p *ProxyVPN) DisableInbound(inpt *dto.Inbound, vpnType string) (err error) {
-	switch vpnType {
-	case XRAY_VPN:
-		err = p.disableXray(inpt.Address, inpt)
-	default:
-		err = momoError.DebuggingErrorf("the vpnType that was given was wrong %s", vpnType)
+func (p *ProxyVPN) AddInbound(inpt *dto.Inbound, VPNType string) (err error) {
+	v := p.retriveVPN(inpt.Address, VPNType)
+	if v == nil {
+		return momoError.DebuggingErrorf("%s vpn has'nt been introuduced with address %s", VPNType, inpt.Address)
 	}
-	return
+	return v.Add(inpt)
 }
 
-func (p *ProxyVPN) GetTraffix(inpt *dto.Inbound, vpnType string) (*vpnSerializer.Traffic, error) {
-	switch vpnType {
-	case XRAY_VPN:
-		ret, err := p.getTrafficXray(inpt.Address, inpt)
-		return ret, err
-	default:
-		return &vpnSerializer.Traffic{}, momoError.DebuggingErrorf("the vpnType that was given was wrong %s", vpnType)
+func (p *ProxyVPN) DisableInbound(inpt *dto.Inbound, VPNType string) (err error) {
+	v := p.retriveVPN(inpt.Address, VPNType)
+	if v == nil {
+		return momoError.DebuggingErrorf("%s vpn has'nt been introuduced with address %s", VPNType, inpt.Address)
 	}
+	return v.Disable(inpt)
+}
+
+func (p *ProxyVPN) GetTraffix(inpt *dto.Inbound, VPNType string) (*vpnSerializer.Traffic, error) {
+	v := p.retriveVPN(inpt.Address, VPNType)
+	if v == nil {
+		return &vpnSerializer.Traffic{}, momoError.DebuggingErrorf("%s vpn has'nt been introuduced with address %s", VPNType, inpt.Address)
+	}
+	return v.GetTraffic(inpt)
 }
