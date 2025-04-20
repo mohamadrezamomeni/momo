@@ -2,6 +2,8 @@ package inbound
 
 import (
 	"fmt"
+	"reflect"
+	"strings"
 
 	"momo/entity"
 	momoError "momo/pkg/error"
@@ -20,10 +22,10 @@ func (i *Inbound) Create(inpt *dto.CreateInbound) (*entity.Inbound, error) {
 		isAvailable bool
 	)
 	err := i.db.Conn().QueryRow(`
-	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag)
-	VALUES (?, ?, ?, ?, ?, ?)
+	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_available)
+	VALUES (?, ?, ?, ?, ?, ?, ?)
 	RETURNING id, protocol, is_available, domain, vpn_type, port, user_id, tag
-	`, inpt.Protocol, inpt.Domain, inpt.VPNType, inpt.Port, inpt.UserID, inpt.Tag).Scan(
+	`, inpt.Protocol, inpt.Domain, inpt.VPNType, inpt.Port, inpt.UserID, inpt.Tag, inpt.IsAvailable).Scan(
 		&id,
 		&protocol,
 		&isAvailable,
@@ -34,7 +36,7 @@ func (i *Inbound) Create(inpt *dto.CreateInbound) (*entity.Inbound, error) {
 		&tag,
 	)
 	if err != nil {
-		return &entity.Inbound{}, momoError.Errorf("somoething went wrong to save user error: %v", err)
+		return &entity.Inbound{}, momoError.Errorf("somoething went wrong to save inbound error: %v", err)
 	}
 
 	return &entity.Inbound{
@@ -83,4 +85,80 @@ func (i *Inbound) MakeAvailable(id int) error {
 
 func (i *Inbound) MakeNotAvailable(id int) error {
 	return i.changeStatus(id, false)
+}
+
+func (i *Inbound) Filter(inpt *dto.FilterInbound) ([]*entity.Inbound, error) {
+	query := i.makeQueryFilter(inpt)
+
+	rows, err := i.db.Conn().Query(query)
+	if err != nil {
+		return []*entity.Inbound{}, momoError.DebuggingErrorf("error has occured err: %v", err)
+	}
+
+	inbounds := make([]*entity.Inbound, 0)
+
+	for rows.Next() {
+		var (
+			protocol, port, domain, vpnTpe, userID, tag string
+			isAvailable                                 bool
+			createdAt, updatedAt                        interface{}
+			id                                          int
+		)
+
+		err := rows.Scan(&id, &protocol, &isAvailable, &domain, &vpnTpe, &port, &userID, &tag, &createdAt, &updatedAt)
+		if err != nil {
+			return []*entity.Inbound{}, momoError.DebuggingErrorf("error has occured err: %v", err)
+		}
+
+		inbounds = append(inbounds, &entity.Inbound{
+			ID:          id,
+			Domain:      domain,
+			Protocol:    protocol,
+			VPNType:     vpnTpe,
+			Tag:         tag,
+			IsAvailable: isAvailable,
+		})
+	}
+	return inbounds, nil
+}
+
+func (i *Inbound) makeQueryFilter(inpt *dto.FilterInbound) string {
+	sql := "SELECT * FROM inbounds"
+
+	v := reflect.ValueOf(*inpt)
+	t := reflect.TypeOf(*inpt)
+
+	subSQLs := make([]string, 0)
+
+	convertKeysToColumns := func(k string) string {
+		switch k {
+		case "Protocol":
+			return "protocol"
+		case "IsAvailable":
+			return "is_available"
+		case "Domain":
+			return "domain"
+		case "VPNType":
+			return "vpn_type"
+		case "Port":
+			return "port"
+		case "UserID":
+			return "user_id"
+		default:
+			return ""
+		}
+	}
+	for i := 0; i < v.NumField(); i++ {
+		field := t.Field(i)
+		value := v.Field(i)
+
+		if value.Kind() == reflect.String && value.String() != "" {
+			subSQLs = append(subSQLs, fmt.Sprintf("%s = '%s'", convertKeysToColumns(field.Name), value.String()))
+		} else if value.Kind() == reflect.Pointer && !value.IsNil() && value.Elem().Kind() == reflect.Bool {
+			subSQLs = append(subSQLs, fmt.Sprintf("%s = %v", convertKeysToColumns(field.Name), true))
+		}
+	}
+	subQuery := strings.Join(subSQLs, " AND ")
+	sql += fmt.Sprintf(" WHERE %s", subQuery)
+	return sql
 }
