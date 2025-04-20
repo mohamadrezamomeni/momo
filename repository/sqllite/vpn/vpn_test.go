@@ -1,6 +1,7 @@
 package vpn
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -20,7 +21,7 @@ var (
 		StartRangePort: 1000,
 		EndRangePort:   2000,
 		VPNType:        vpn.XRAY_VPN,
-		IsActive:       true,
+		IsActive:       false,
 	}
 
 	vpnExample2 = &dto.Add_VPN{
@@ -75,12 +76,6 @@ func TestCreateVPN(t *testing.T) {
 	deleteVPNs(v1.ID)
 }
 
-func deleteVPNs(ids ...int) {
-	for _, id := range ids {
-		vpnRepo.Delete(id)
-	}
-}
-
 func TestChangeStatus(t *testing.T) {
 	v1, _ := vpnRepo.Create(vpnExample1)
 
@@ -92,5 +87,67 @@ func TestChangeStatus(t *testing.T) {
 	err = vpnRepo.deactiveVPN(v1.ID)
 	if err != nil {
 		t.Fatalf("the error has happend that was %v", err)
+	}
+	deleteVPNs(v1.ID)
+}
+
+func TestFilterVPNs(t *testing.T) {
+	v1, _ := vpnRepo.Create(vpnExample1)
+	v2, _ := vpnRepo.Create(vpnExample2)
+	v3, _ := vpnRepo.Create(vpnExample3)
+
+	isActication := true
+	vpns, err := vpnRepo.Filter(&dto.FilterVPNs{
+		IsActive: &isActication,
+	})
+	if err != nil {
+		t.Errorf("1. something wrong has happend that was %v", err)
+	}
+
+	if len(vpns) != 2 {
+		t.Errorf("1. the number of vpns must be 2 but the result was %v", len(vpns))
+	}
+
+	vpns, err = vpnRepo.Filter(&dto.FilterVPNs{
+		Domain: "joi.com",
+	})
+	if err != nil {
+		t.Errorf("2. something wrong has happend that was %v", err)
+	}
+
+	if len(vpns) != 2 {
+		t.Errorf("2. the number of vpns must be 2 but the result was %v", len(vpns))
+	}
+
+	vpns, err = vpnRepo.Filter(&dto.FilterVPNs{
+		VPNType: vpn.XRAY_VPN,
+	})
+	if err != nil {
+		t.Errorf("3. something wrong has happend that was %v", err)
+	}
+
+	if len(vpns) != 3 {
+		t.Errorf("3. the number of vpns must be 3 but the result was %v", len(vpns))
+	}
+
+	vpns, err = vpnRepo.Filter(&dto.FilterVPNs{
+		VPNType: vpn.XRAY_VPN,
+		Domain:  "joi.com",
+	})
+	if err != nil {
+		t.Errorf("4. something wrong has happend that was %v", err)
+	}
+
+	if len(vpns) != 2 {
+		t.Errorf("4. the number of vpns must be 2 but the result was %v", len(vpns))
+	}
+
+	deleteVPNs(v1.ID, v2.ID, v3.ID)
+}
+
+func deleteVPNs(ids ...int) {
+	for _, id := range ids {
+		fmt.Println(id)
+		vpnRepo.Delete(id)
 	}
 }
