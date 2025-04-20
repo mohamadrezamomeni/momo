@@ -93,3 +93,7 @@ func (x *Xray) DoesExist(inpt *vpnDto.Inbound) (bool, error) {
 	}
 	return false, err
 }
+
+func (x *Xray) Test() error {
+	return x.fakeReceiveInboundTraffic()
+}

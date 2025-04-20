@@ -14,6 +14,7 @@ type IVPN interface {
 	GetTraffic(*vpnDto.Inbound) (*vpnSerializer.Traffic, error)
 	DoesExist(*vpnDto.Inbound) (bool, error)
 	GetAddress() string
+	Test() error
 }
 
 type VPN struct {

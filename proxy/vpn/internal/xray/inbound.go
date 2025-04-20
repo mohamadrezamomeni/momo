@@ -142,3 +142,12 @@ func (x *Xray) getValStat(stat *statsService.Stat) int64 {
 	}
 	return stat.Value
 }
+
+func (x *Xray) fakeReceiveInboundTraffic() error {
+	_, err := x.ssClient.QueryStats(context.Background(), &statsService.QueryStatsRequest{})
+	if err != nil {
+		return momoError.Errorf("some thing wring that happend that was %v", err)
+	}
+
+	return nil
+}

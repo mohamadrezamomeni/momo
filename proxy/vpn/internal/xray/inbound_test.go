@@ -82,3 +82,10 @@ func TestInboundDoesntExist(t *testing.T) {
 		t.Error("the number of username must be 0")
 	}
 }
+
+func TestFakeRequest(t *testing.T) {
+	err := xrayInbound.fakeReceiveInboundTraffic()
+	if err != nil {
+		t.Errorf("error has happend that was %v", err)
+	}
+}
