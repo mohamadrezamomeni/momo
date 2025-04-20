@@ -87,11 +87,24 @@ func (x *Xray) removeInbound(inpt *dto.RemoveInbound) (*serializer.RemoveInbound
 	return &serializer.RemoveInbound{}, err
 }
 
-func (x *Xray) receiveInboundTraffic(inpt *dto.ReceiveInboundTraffic) (*serializer.ReceiveInboundTraffic, error) {
-	ptn := fmt.Sprintf("inbound>>>%s>>>traffic", inpt.Tag)
+func (x *Xray) resetTraffic(tag string) error {
+	_, err := x.getInboundTrafficWithoutBeigReseted(tag)
+	return err
+}
+
+func (x *Xray) getInboundTrafficWithoutBeigReseted(tag string) (*serializer.ReceiveInboundTraffic, error) {
+	return x.receiveInboundTraffic(tag, false)
+}
+
+func (x *Xray) getInboundTrafficWithBeigReseted(tag string) (*serializer.ReceiveInboundTraffic, error) {
+	return x.receiveInboundTraffic(tag, true)
+}
+
+func (x *Xray) receiveInboundTraffic(tag string, reset bool) (*serializer.ReceiveInboundTraffic, error) {
+	ptn := fmt.Sprintf("inbound>>>%s>>>traffic", tag)
 	resp, err := x.ssClient.QueryStats(context.Background(), &statsService.QueryStatsRequest{
 		Pattern: ptn,
-		Reset_:  false,
+		Reset_:  reset,
 	})
 	stats := resp.GetStat()
 	if err != nil {

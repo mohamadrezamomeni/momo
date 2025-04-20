@@ -68,13 +68,15 @@ func (x *Xray) Disable(inpt *vpnDto.Inbound) error {
 	if err != nil {
 		return err
 	}
+	err = x.resetTraffic(inpt.Tag)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (x *Xray) GetTraffic(inpt *vpnDto.Inbound) (*vpnSerializer.Traffic, error) {
-	data, err := x.receiveInboundTraffic(&dto.ReceiveInboundTraffic{
-		Tag: inpt.Tag,
-	})
+	data, err := x.getInboundTrafficWithoutBeigReseted(inpt.Tag)
 	if err != nil {
 		return &vpnSerializer.Traffic{}, err
 	}

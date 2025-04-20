@@ -60,7 +60,7 @@ func TestRemoveInbound(t *testing.T) {
 func TestGetTraffic(t *testing.T) {
 	xrayInbound.addInbound(&dto.AddInbound{Port: portInbound, Tag: tagInbound, Protocol: protocolInbound})
 
-	ret, err := xrayInbound.receiveInboundTraffic(&dto.ReceiveInboundTraffic{Tag: tagInbound})
+	ret, err := xrayInbound.getInboundTrafficWithoutBeigReseted(tagInbound)
 	if err != nil {
 		xrayInbound.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
 		t.Errorf("error has happend and the error was %v", err)
