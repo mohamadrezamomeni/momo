@@ -19,7 +19,7 @@ var (
 )
 
 func TestAddInbound(t *testing.T) {
-	_, err := xrayInbound.addInbound(&dto.AddInbound{
+	_, err := xrayU.addInbound(&dto.AddInbound{
 		Port:     portInbound,
 		Tag:      tagInbound,
 		Protocol: protocolInbound,
@@ -32,11 +32,11 @@ func TestAddInbound(t *testing.T) {
 	if err != nil {
 		t.Errorf("error has occured please follow error: %v", err)
 	}
-	xrayInbound.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
+	xrayU.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
 }
 
 func TestRemoveInbound(t *testing.T) {
-	xrayInbound.addInbound(&dto.AddInbound{
+	xrayU.addInbound(&dto.AddInbound{
 		Port:     portInbound,
 		Tag:      tagInbound,
 		Protocol: protocolInbound,
@@ -46,29 +46,29 @@ func TestRemoveInbound(t *testing.T) {
 			UUID:     uuidInbound,
 		},
 	})
-	_, err := xrayInbound.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
+	_, err := xrayU.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
 	if err != nil {
 		t.Errorf("error has occured please follow error: %v", err)
 	}
 }
 
 func TestGetTraffic(t *testing.T) {
-	xrayInbound.addInbound(&dto.AddInbound{Port: portInbound, Tag: tagInbound, Protocol: protocolInbound})
+	xrayU.addInbound(&dto.AddInbound{Port: portInbound, Tag: tagInbound, Protocol: protocolInbound})
 
-	ret, err := xrayInbound.getInboundTrafficWithoutBeigReseted(tagInbound)
+	ret, err := xrayU.getInboundTrafficWithoutBeigReseted(tagInbound)
 	if err != nil {
-		xrayInbound.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
+		xrayU.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
 		t.Errorf("error has happend and the error was %v", err)
 	}
 	if ret.UpLink != 0 || ret.DownLink != 0 {
-		xrayInbound.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
+		xrayU.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
 		t.Error("service gave wrong answer")
 	}
-	xrayInbound.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
+	xrayU.removeInbound(&dto.RemoveInbound{Tag: tagInbound})
 }
 
 func TestInboundDoesntExist(t *testing.T) {
-	res, err := xrayInbound.getUsers(inboundDoesntExist)
+	res, err := xrayU.getUsers(inboundDoesntExist)
 
 	if err == nil {
 		t.Error("error could be existed. It was unexpected situation")
@@ -79,7 +79,7 @@ func TestInboundDoesntExist(t *testing.T) {
 }
 
 func TestFakeRequest(t *testing.T) {
-	err := xrayInbound.fakeReceiveInboundTraffic()
+	err := xrayU.fakeReceiveInboundTraffic()
 	if err != nil {
 		t.Errorf("error has happend that was %v", err)
 	}
