@@ -6,11 +6,6 @@ import (
 	"momo/proxy/vpn/internal/xray/dto"
 )
 
-var xrayInbound *Xray = New(&XrayConfig{
-	Address: "192.168.116.129",
-	ApiPort: "62789",
-})
-
 var (
 	protocolInbound string = "vmess"
 	portInbound     string = "1081"

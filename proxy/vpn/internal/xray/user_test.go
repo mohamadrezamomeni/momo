@@ -6,10 +6,14 @@ import (
 	"momo/proxy/vpn/internal/xray/dto"
 )
 
-var xrayU *Xray = New(&XrayConfig{
-	Address: "192.168.116.129",
-	ApiPort: "62789",
-})
+var xrayU *Xray
+
+func TestMain(m *testing.M) {
+	xrayU, _ = New(&XrayConfig{
+		Address: "192.168.116.129",
+		ApiPort: "62789",
+	})
+}
 
 var (
 	protocolUser string = "vmess"
