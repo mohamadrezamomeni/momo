@@ -1,7 +1,6 @@
 package vpn
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -147,7 +146,6 @@ func TestFilterVPNs(t *testing.T) {
 
 func deleteVPNs(ids ...int) {
 	for _, id := range ids {
-		fmt.Println(id)
 		vpnRepo.Delete(id)
 	}
 }

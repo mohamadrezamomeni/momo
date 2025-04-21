@@ -1,6 +1,10 @@
 package dto
 
-import "momo/proxy/vpn"
+import (
+	"time"
+
+	"momo/proxy/vpn"
+)
 
 type CreateInbound struct {
 	Protocol string
@@ -10,4 +14,6 @@ type CreateInbound struct {
 	Domain   string
 	VPNType  vpn.VPNType
 	IsActive bool
+	Start    time.Time
+	End      time.Time
 }

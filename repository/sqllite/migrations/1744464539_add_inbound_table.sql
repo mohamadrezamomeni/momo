@@ -9,6 +9,8 @@ CREATE TABLE `inbounds` (
         `user_id` varchar(8),
         `tag` varchar(32),
         `is_block` boolean default false,
+        `start` TIMESTAMP NOT NULL,
+        `end` TIMESTAMP NOT NULL,
         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

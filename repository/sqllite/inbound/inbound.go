@@ -13,10 +13,10 @@ import (
 func (i *Inbound) Create(inpt *dto.CreateInbound) (*entity.Inbound, error) {
 	inbound := &entity.Inbound{}
 	err := i.db.Conn().QueryRow(`
-	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_active)
-	VALUES (?, ?, ?, ?, ?, ?, ?)
-	RETURNING id, protocol, is_active, domain, vpn_type, port, user_id, tag, is_block
-	`, inpt.Protocol, inpt.Domain, inpt.VPNType, inpt.Port, inpt.UserID, inpt.Tag, inpt.IsActive).Scan(
+	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_active, start, end)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+	RETURNING id, protocol, is_active, domain, vpn_type, port, user_id, tag, is_block, start, end
+	`, inpt.Protocol, inpt.Domain, inpt.VPNType, inpt.Port, inpt.UserID, inpt.Tag, inpt.IsActive, inpt.Start, inpt.End).Scan(
 		&inbound.ID,
 		&inbound.Protocol,
 		&inbound.IsActive,
@@ -26,6 +26,8 @@ func (i *Inbound) Create(inpt *dto.CreateInbound) (*entity.Inbound, error) {
 		&inbound.UserID,
 		&inbound.Tag,
 		&inbound.IsBlock,
+		&inbound.Start,
+		&inbound.End,
 	)
 	if err != nil {
 		return &entity.Inbound{}, momoError.Errorf("somoething went wrong to save inbound error: %v", err)
@@ -35,6 +37,7 @@ func (i *Inbound) Create(inpt *dto.CreateInbound) (*entity.Inbound, error) {
 }
 
 func (i *Inbound) Delete(id int) error {
+	fmt.Println(id)
 	sql := fmt.Sprintf("DELETE FROM inbounds WHERE id=%v", id)
 	res, err := i.db.Conn().Exec(sql)
 	if err != nil {
@@ -94,6 +97,8 @@ func (i *Inbound) Filter(inpt *dto.FilterInbound) ([]*entity.Inbound, error) {
 			&inbound.UserID,
 			&inbound.Tag,
 			&inbound.IsBlock,
+			&inbound.Start,
+			&inbound.End,
 			&createdAt,
 			&updatedAt,
 		)
@@ -144,6 +149,5 @@ func (i *Inbound) makeQueryFilter(inpt *dto.FilterInbound) string {
 	}
 	subQuery := strings.Join(subSQLs, " AND ")
 	sql += fmt.Sprintf(" WHERE %s", subQuery)
-	fmt.Println(sql)
 	return sql
 }

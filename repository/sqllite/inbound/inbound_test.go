@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
+	"time"
 
 	"momo/pkg/config"
 	"momo/repository/migrate"
@@ -16,6 +17,61 @@ import (
 )
 
 var inboundRepo *Inbound
+
+var (
+	layout          = "2006-01-02 15:04:05"
+	ts, _           = time.Parse(layout, "2025-04-21 14:30:00")
+	te, _           = time.Parse(layout, "2025-04-22 14:30:00")
+	port1           = "1081"
+	port2           = "1082"
+	port3           = "1083"
+	userID1         = uuid.New().String()
+	userID2         = uuid.New().String()
+	inboundExample1 = &dto.CreateInbound{
+		Tag:      fmt.Sprintf("inbound-%s", port1),
+		Protocol: "vmess",
+		Port:     port1,
+		Domain:   "google.com",
+		UserID:   userID1,
+		VPNType:  vpn.XRAY_VPN,
+		Start:    ts,
+		End:      te,
+	}
+
+	inboundExample2 = &dto.CreateInbound{
+		Tag:      fmt.Sprintf("inbound-%s", port2),
+		Protocol: "vmess",
+		Port:     port2,
+		Domain:   "twitter.com",
+		UserID:   userID2,
+		VPNType:  vpn.XRAY_VPN,
+		Start:    ts,
+		End:      te,
+	}
+
+	inboundExample3 = &dto.CreateInbound{
+		Tag:      fmt.Sprintf("inbound-%s", port2),
+		Protocol: "http",
+		Port:     port2,
+		Domain:   "googoo.com",
+		UserID:   userID2,
+		VPNType:  vpn.XRAY_VPN,
+		Start:    ts,
+		End:      te,
+	}
+
+	inboundExample4 = &dto.CreateInbound{
+		Tag:      fmt.Sprintf("inbound-%s", port3),
+		Protocol: "http",
+		Port:     port3,
+		Domain:   "googoo.com",
+		UserID:   userID2,
+		VPNType:  vpn.XRAY_VPN,
+		IsActive: true,
+		Start:    ts,
+		End:      te,
+	}
+)
 
 func TestMain(m *testing.M) {
 	cfg, err := config.Load("config_test.yaml")
@@ -33,50 +89,6 @@ func TestMain(m *testing.M) {
 	code := m.Run()
 	os.Exit(code)
 }
-
-var (
-	port1           = "1081"
-	port2           = "1082"
-	port3           = "1083"
-	userID1         = uuid.New().String()
-	userID2         = uuid.New().String()
-	inboundExample1 = &dto.CreateInbound{
-		Tag:      fmt.Sprintf("inbound-%s", port1),
-		Protocol: "vmess",
-		Port:     port1,
-		Domain:   "google.com",
-		UserID:   userID1,
-		VPNType:  vpn.XRAY_VPN,
-	}
-
-	inboundExample2 = &dto.CreateInbound{
-		Tag:      fmt.Sprintf("inbound-%s", port2),
-		Protocol: "vmess",
-		Port:     port2,
-		Domain:   "twitter.com",
-		UserID:   userID2,
-		VPNType:  vpn.XRAY_VPN,
-	}
-
-	inboundExample3 = &dto.CreateInbound{
-		Tag:      fmt.Sprintf("inbound-%s", port2),
-		Protocol: "http",
-		Port:     port2,
-		Domain:   "googoo.com",
-		UserID:   userID2,
-		VPNType:  vpn.XRAY_VPN,
-	}
-
-	inboundExample4 = &dto.CreateInbound{
-		Tag:      fmt.Sprintf("inbound-%s", port3),
-		Protocol: "http",
-		Port:     port3,
-		Domain:   "googoo.com",
-		UserID:   userID2,
-		VPNType:  vpn.XRAY_VPN,
-		IsActive: true,
-	}
-)
 
 func TestCreateInbound(t *testing.T) {
 	ret, err := inboundRepo.Create(inboundExample1)

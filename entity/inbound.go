@@ -1,6 +1,10 @@
 package entity
 
-import "momo/proxy/vpn"
+import (
+	"time"
+
+	"momo/proxy/vpn"
+)
 
 type Inbound struct {
 	IsActive bool
@@ -12,4 +16,6 @@ type Inbound struct {
 	UserID   string
 	Tag      string
 	IsBlock  bool
+	Start    time.Time
+	End      time.Time
 }
