@@ -91,7 +91,7 @@ func (p *ProxyVPN) DisableInbound(inpt *dto.Inbound, VPNType string) (err error)
 	return v.Disable(inpt)
 }
 
-func (p *ProxyVPN) GetTraffix(inpt *dto.Inbound, VPNType string) (*vpnSerializer.Traffic, error) {
+func (p *ProxyVPN) GetTraffic(inpt *dto.Inbound, VPNType string) (*vpnSerializer.Traffic, error) {
 	v := p.retriveVPN(inpt.Address, VPNType)
 	if v == nil {
 		return &vpnSerializer.Traffic{}, momoError.DebuggingErrorf("%s vpn has'nt been introuduced with address %s", VPNType, inpt.Address)
