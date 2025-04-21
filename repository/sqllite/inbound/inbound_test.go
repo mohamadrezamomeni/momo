@@ -13,40 +13,46 @@ import (
 
 	"momo/proxy/vpn"
 
+	utils "momo/pkg/utils"
+
 	"github.com/google/uuid"
 )
 
 var inboundRepo *Inbound
 
 var (
-	layout          = "2006-01-02 15:04:05"
-	ts, _           = time.Parse(layout, "2025-04-21 14:30:00")
-	te, _           = time.Parse(layout, "2025-04-22 14:30:00")
 	port1           = "1081"
 	port2           = "1082"
 	port3           = "1083"
 	userID1         = uuid.New().String()
 	userID2         = uuid.New().String()
+	userID3         = uuid.New().String()
+	userID4         = uuid.New().String()
+	userID5         = uuid.New().String()
+	userID6         = uuid.New().String()
+	userID7         = uuid.New().String()
 	inboundExample1 = &dto.CreateInbound{
 		Tag:      fmt.Sprintf("inbound-%s", port1),
 		Protocol: "vmess",
+		IsBlock:  false,
 		Port:     port1,
 		Domain:   "google.com",
 		UserID:   userID1,
 		VPNType:  vpn.XRAY_VPN,
-		Start:    ts,
-		End:      te,
+		Start:    utils.GetDateTime("2024-04-21 14:30:00"),
+		End:      utils.GetDateTime("2024-04-22 14:30:00"),
 	}
 
 	inboundExample2 = &dto.CreateInbound{
 		Tag:      fmt.Sprintf("inbound-%s", port2),
 		Protocol: "vmess",
 		Port:     port2,
+		IsBlock:  false,
 		Domain:   "twitter.com",
 		UserID:   userID2,
 		VPNType:  vpn.XRAY_VPN,
-		Start:    ts,
-		End:      te,
+		Start:    utils.GetDateTime("2024-04-21 14:30:00"),
+		End:      utils.GetDateTime("2024-04-22 14:30:00"),
 	}
 
 	inboundExample3 = &dto.CreateInbound{
@@ -55,9 +61,10 @@ var (
 		Port:     port2,
 		Domain:   "googoo.com",
 		UserID:   userID2,
+		IsBlock:  false,
 		VPNType:  vpn.XRAY_VPN,
-		Start:    ts,
-		End:      te,
+		Start:    utils.GetDateTime("2024-04-21 14:30:00"),
+		End:      utils.GetDateTime("2024-04-22 14:30:00"),
 	}
 
 	inboundExample4 = &dto.CreateInbound{
@@ -65,11 +72,51 @@ var (
 		Protocol: "http",
 		Port:     port3,
 		Domain:   "googoo.com",
-		UserID:   userID2,
+		UserID:   userID3,
 		VPNType:  vpn.XRAY_VPN,
 		IsActive: true,
-		Start:    ts,
-		End:      te,
+		IsBlock:  false,
+		Start:    time.Now().AddDate(0, 0, -15),
+		End:      time.Now().AddDate(0, 0, 15),
+	}
+
+	inboundExample5 = &dto.CreateInbound{
+		Tag:      fmt.Sprintf("inbound-%s", port3),
+		Protocol: "http",
+		Port:     port3,
+		Domain:   "googoo.com",
+		UserID:   userID4,
+		VPNType:  vpn.XRAY_VPN,
+		IsActive: true,
+		IsBlock:  true,
+		Start:    time.Now().AddDate(0, 0, -15),
+		End:      time.Now().AddDate(0, 0, 15),
+	}
+
+	inboundExample6 = &dto.CreateInbound{
+		Tag:      fmt.Sprintf("inbound-%s", port3),
+		Protocol: "http",
+		Port:     port3,
+		Domain:   "googoo.com",
+		UserID:   userID5,
+		VPNType:  vpn.XRAY_VPN,
+		IsActive: false,
+		IsBlock:  true,
+		Start:    time.Now().AddDate(0, 0, -15),
+		End:      time.Now().AddDate(0, 0, 15),
+	}
+
+	inboundExample7 = &dto.CreateInbound{
+		Tag:      fmt.Sprintf("inbound-%s", port3),
+		Protocol: "http",
+		Port:     port3,
+		Domain:   "googoo.com",
+		UserID:   userID6,
+		VPNType:  vpn.XRAY_VPN,
+		IsActive: true,
+		IsBlock:  false,
+		Start:    time.Now().AddDate(0, -2, 0),
+		End:      time.Now().AddDate(0, -1, 0),
 	}
 )
 
@@ -98,6 +145,7 @@ func TestCreateInbound(t *testing.T) {
 	if ret.Domain != inboundExample1.Domain ||
 		ret.Port != inboundExample1.Port ||
 		ret.IsActive != false ||
+		ret.IsBlock != inboundExample1.IsBlock ||
 		ret.UserID != inboundExample1.UserID ||
 		ret.VPNType != inboundExample1.VPNType {
 		t.Error("data wasn't saved currectly")
@@ -166,6 +214,42 @@ func TestFilterInbounds(t *testing.T) {
 	}
 
 	deleteInbounds(i1.ID, i2.ID, i3.ID, i4.ID)
+}
+
+func TestRertriveFaultyInbounds(t *testing.T) {
+	i4, _ := inboundRepo.Create(inboundExample4)
+	i5, _ := inboundRepo.Create(inboundExample5)
+	i6, _ := inboundRepo.Create(inboundExample6)
+	i7, _ := inboundRepo.Create(inboundExample7)
+
+	inbounds, err := inboundRepo.RetriveFaultyInbounds()
+	if err != nil {
+		t.Errorf("the problem has happend that was %v", err)
+	}
+	fmt.Println(inbounds[0].IsBlock, inbounds[0].Start, inbounds[0].End)
+	if len(inbounds) != 2 {
+		t.Errorf("the number of inbouns could be 2 but system got %v", len(inbounds))
+	}
+	userID4Status := false
+	userID6Status := false
+	for _, inbound := range inbounds {
+		switch inbound.UserID {
+		case userID4:
+			userID4Status = true
+		case userID6:
+			userID6Status = true
+		default:
+			t.Errorf("un expected vpn with userID %v", inbound.UserID)
+		}
+	}
+	if !userID4Status {
+		t.Error("we didn't get the userID4")
+	}
+	if !userID6Status {
+		t.Error("we didn't get the userID6")
+	}
+
+	deleteInbounds(i4.ID, i5.ID, i6.ID, i7.ID)
 }
 
 func deleteInbounds(ids ...int) {

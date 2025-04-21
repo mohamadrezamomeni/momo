@@ -1,9 +1,11 @@
 package inbound
 
 import (
+	"database/sql"
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	"momo/entity"
 	momoError "momo/pkg/error"
@@ -13,10 +15,10 @@ import (
 func (i *Inbound) Create(inpt *dto.CreateInbound) (*entity.Inbound, error) {
 	inbound := &entity.Inbound{}
 	err := i.db.Conn().QueryRow(`
-	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_active, start, end)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_active, start, end, is_block)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	RETURNING id, protocol, is_active, domain, vpn_type, port, user_id, tag, is_block, start, end
-	`, inpt.Protocol, inpt.Domain, inpt.VPNType, inpt.Port, inpt.UserID, inpt.Tag, inpt.IsActive, inpt.Start, inpt.End).Scan(
+	`, inpt.Protocol, inpt.Domain, inpt.VPNType, inpt.Port, inpt.UserID, inpt.Tag, inpt.IsActive, inpt.Start, inpt.End, inpt.IsBlock).Scan(
 		&inbound.ID,
 		&inbound.Protocol,
 		&inbound.IsActive,
@@ -37,7 +39,6 @@ func (i *Inbound) Create(inpt *dto.CreateInbound) (*entity.Inbound, error) {
 }
 
 func (i *Inbound) Delete(id int) error {
-	fmt.Println(id)
 	sql := fmt.Sprintf("DELETE FROM inbounds WHERE id=%v", id)
 	res, err := i.db.Conn().Exec(sql)
 	if err != nil {
@@ -84,28 +85,10 @@ func (i *Inbound) Filter(inpt *dto.FilterInbound) ([]*entity.Inbound, error) {
 	inbounds := make([]*entity.Inbound, 0)
 
 	for rows.Next() {
-		inbound := &entity.Inbound{}
-		var createdAt, updatedAt interface{}
-
-		err := rows.Scan(
-			&inbound.ID,
-			&inbound.Protocol,
-			&inbound.IsActive,
-			&inbound.Domain,
-			&inbound.VPNType,
-			&inbound.Port,
-			&inbound.UserID,
-			&inbound.Tag,
-			&inbound.IsBlock,
-			&inbound.Start,
-			&inbound.End,
-			&createdAt,
-			&updatedAt,
-		)
+		inbound, err := i.scan(rows)
 		if err != nil {
-			return []*entity.Inbound{}, momoError.DebuggingErrorf("error has occured err: %v", err)
+			return []*entity.Inbound{}, err
 		}
-
 		inbounds = append(inbounds, inbound)
 	}
 	return inbounds, nil
@@ -150,4 +133,50 @@ func (i *Inbound) makeQueryFilter(inpt *dto.FilterInbound) string {
 	subQuery := strings.Join(subSQLs, " AND ")
 	sql += fmt.Sprintf(" WHERE %s", subQuery)
 	return sql
+}
+
+func (i *Inbound) RetriveFaultyInbounds() ([]*entity.Inbound, error) {
+	query := "SELECT * FROM inbounds WHERE (end < ?) OR (is_block = true AND is_active = true) OR (is_block = false AND start >= ? AND ? <= end AND is_active = false)"
+	now := time.Now()
+	rows, err := i.db.Conn().Query(query, now, now, now)
+
+	inbounds := make([]*entity.Inbound, 0)
+	if err != nil {
+		return inbounds, momoError.DebuggingErrorf("something wrong has happend the problem was %v", err)
+	}
+
+	for rows.Next() {
+		inbound, err := i.scan(rows)
+		if err != nil {
+			return inbounds, err
+		}
+		inbounds = append(inbounds, inbound)
+	}
+
+	return inbounds, nil
+}
+
+func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
+	inbound := &entity.Inbound{}
+	var createdAt, updatedAt interface{}
+
+	err := rows.Scan(
+		&inbound.ID,
+		&inbound.Protocol,
+		&inbound.IsActive,
+		&inbound.Domain,
+		&inbound.VPNType,
+		&inbound.Port,
+		&inbound.UserID,
+		&inbound.Tag,
+		&inbound.IsBlock,
+		&inbound.Start,
+		&inbound.End,
+		&createdAt,
+		&updatedAt,
+	)
+	if err != nil {
+		return inbound, momoError.DebuggingErrorf("error has occured err: %v", err)
+	}
+	return inbound, nil
 }

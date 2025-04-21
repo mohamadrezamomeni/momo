@@ -16,4 +16,5 @@ type CreateInbound struct {
 	IsActive bool
 	Start    time.Time
 	End      time.Time
+	IsBlock  bool
 }
