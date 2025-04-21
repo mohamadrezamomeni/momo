@@ -66,11 +66,11 @@ func (i *Inbound) changeStatus(id int, state bool) error {
 	return nil
 }
 
-func (i *Inbound) MakeAvailable(id int) error {
+func (i *Inbound) Active(id int) error {
 	return i.changeStatus(id, true)
 }
 
-func (i *Inbound) MakeNotAvailable(id int) error {
+func (i *Inbound) DeActive(id int) error {
 	return i.changeStatus(id, false)
 }
 

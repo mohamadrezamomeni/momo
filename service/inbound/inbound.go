@@ -27,6 +27,8 @@ type userService interface {
 
 type inboundRepo interface {
 	RetriveFaultyInbounds() ([]*entity.Inbound, error)
+	Active(id int) error
+	DeActive(id int) error
 }
 
 func New(repo inboundRepo, vpnService vpnProxy, userService userService) *Inbound {
@@ -37,20 +39,24 @@ func New(repo inboundRepo, vpnService vpnProxy, userService userService) *Inboun
 	}
 }
 
-func (i Inbound) ApplyChanges() error {
+func (i Inbound) ApplyChangesToInbounds() error {
 	inbounds, err := i.inboundRepo.RetriveFaultyInbounds()
 	if err != nil {
 		return err
 	}
 
 	for _, inbound := range inbounds {
-		if i.mustItBeActive(inbound) {
-			i.activeInbound(inbound, inbound.VPNType)
-		} else {
-			i.deActiveInbound(inbound, inbound.VPNType)
-		}
+		i.applyChangeToInbound(inbound)
 	}
 	return nil
+}
+
+func (i Inbound) applyChangeToInbound(inbound *entity.Inbound) {
+	if i.mustItBeActive(inbound) {
+		i.activeInbound(inbound, inbound.VPNType)
+	} else {
+		i.deActiveInbound(inbound, inbound.VPNType)
+	}
 }
 
 func (i Inbound) mustItBeActive(inbound *entity.Inbound) bool {
@@ -68,7 +74,12 @@ func (i Inbound) deActiveInbound(inbound *entity.Inbound, vpnType vpn.VPNType) e
 	if err != nil {
 		return err
 	}
-	return i.vpnProxy.DisableInbound(info, vpnType)
+	err = i.vpnProxy.DisableInbound(info, vpnType)
+	if err != nil {
+		return err
+	}
+
+	return i.inboundRepo.DeActive(inbound.ID)
 }
 
 func (i Inbound) activeInbound(inbound *entity.Inbound, vpnType vpn.VPNType) error {
@@ -76,7 +87,12 @@ func (i Inbound) activeInbound(inbound *entity.Inbound, vpnType vpn.VPNType) err
 	if err != nil {
 		return err
 	}
-	return i.vpnProxy.AddInbound(info, vpnType)
+	err = i.vpnProxy.AddInbound(info, vpnType)
+	if err != nil {
+		return err
+	}
+
+	return i.inboundRepo.Active(inbound.ID)
 }
 
 func (i Inbound) getInfo(inbound *entity.Inbound) (*dto.Inbound, error) {
