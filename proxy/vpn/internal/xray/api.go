@@ -24,10 +24,10 @@ type Xray struct {
 	lsClient   loggerService.LoggerServiceClient
 }
 
-func New(cfg *XrayConfig) *Xray {
+func New(cfg *XrayConfig) (*Xray, error) {
 	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", cfg.Address, cfg.ApiPort), grpc.WithInsecure())
 	if err != nil {
-		momoError.Fatalf("xray isnt accessable please check configuration")
+		return &Xray{}, momoError.Errorf("xray isnt accessable please check configuration")
 	}
 
 	return &Xray{
@@ -37,7 +37,7 @@ func New(cfg *XrayConfig) *Xray {
 
 		address: cfg.Address,
 		apiPort: cfg.ApiPort,
-	}
+	}, nil
 }
 
 func (x *Xray) GetAddress() string {

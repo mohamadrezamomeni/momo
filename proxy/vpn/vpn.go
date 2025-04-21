@@ -26,20 +26,44 @@ type ProxyVPN struct {
 	vpns []*VPN
 }
 
-func New() *ProxyVPN {
+func New(cfgs []*VPNConfig) *ProxyVPN {
+	vpns := make([]*VPN, 0)
+	v := make(chan *VPN, len(cfgs))
+	errs := make(chan error, len(cfgs))
+
+	for i := 0; i < len(cfgs); i++ {
+		cfg := cfgs[i]
+		go addToVPN(cfg, v, errs)
+	}
+
+	for i := 0; i < len(cfgs); i++ {
+		select {
+		case vpn := <-v:
+			vpns = append(vpns, vpn)
+		case <-errs:
+		}
+	}
 	return &ProxyVPN{
-		vpns: make([]*VPN, 0),
+		vpns: vpns,
 	}
 }
 
-func (p *ProxyVPN) AddToVPN(domain string, VPNType VPNType, port string) {
-	p.vpns = append(p.vpns, &VPN{
-		VPNType: VPNType,
-		V: xray.New(&xray.XrayConfig{
-			Address: domain,
-			ApiPort: port,
-		}),
-	})
+func addToVPN(cfg *VPNConfig, v chan<- *VPN, errs chan<- error) {
+	switch cfg.VPNType {
+	case XRAY_VPN:
+		x, err := xray.New(&xray.XrayConfig{
+			Address: cfg.Domain,
+			ApiPort: cfg.Port,
+		})
+		if err != nil {
+			v <- &VPN{
+				VPNType: XRAY_VPN,
+				V:       x,
+			}
+		} else {
+			errs <- err
+		}
+	}
 }
 
 func (p *ProxyVPN) retriveVPN(address string, VPNType VPNType) IVPN {
