@@ -1,4 +1,4 @@
-package vpn
+package vpnmanager
 
 import (
 	"os"
@@ -8,7 +8,7 @@ import (
 	"momo/proxy/vpn"
 	"momo/repository/migrate"
 	"momo/repository/sqllite"
-	"momo/repository/sqllite/vpn/dto"
+	"momo/repository/sqllite/vpnmanager/dto"
 )
 
 var (

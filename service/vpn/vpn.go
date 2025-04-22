@@ -3,7 +3,7 @@ package vpn
 import (
 	"momo/entity"
 	vpnProxy "momo/proxy/vpn"
-	"momo/repository/sqllite/vpn/dto"
+	"momo/repository/sqllite/vpnmanager/dto"
 )
 
 type vpnRepo interface {

@@ -1,4 +1,4 @@
-package vpn
+package vpnmanager
 
 import (
 	"momo/repository/sqllite"
