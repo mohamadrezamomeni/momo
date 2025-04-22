@@ -8,7 +8,7 @@ import (
 	"momo/proxy/vpn"
 	"momo/repository/migrate"
 	"momo/repository/sqllite"
-	"momo/repository/sqllite/vpnmanager/dto"
+	"momo/repository/sqllite/vpn_manager/dto"
 )
 
 var (

@@ -7,7 +7,7 @@ import (
 
 	"momo/entity"
 	momoError "momo/pkg/error"
-	"momo/repository/sqllite/vpnmanager/dto"
+	"momo/repository/sqllite/vpn_manager/dto"
 )
 
 func (v *VPN) Create(inpt *dto.Add_VPN) (*entity.VPN, error) {
