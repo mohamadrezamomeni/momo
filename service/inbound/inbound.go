@@ -103,6 +103,7 @@ func (i Inbound) getInfo(inbound *entity.Inbound) (*dto.Inbound, error) {
 		User: &dto.User{
 			Username: user.Username,
 			ID:       user.ID,
+			Level:    "0",
 		},
 		Address: inbound.Domain,
 		Port:    inbound.Port,
