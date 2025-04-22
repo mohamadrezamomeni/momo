@@ -1,6 +1,6 @@
 package entity
 
-import "momo/proxy/vpn"
+import momoError "momo/pkg/error"
 
 type VPN struct {
 	ID             int
@@ -9,6 +9,30 @@ type VPN struct {
 	ApiPort        string
 	StartRangePort int
 	EndRangePort   int
-	VPNType        vpn.VPNType
+	VPNType        VPNType
 	UserCount      int
+}
+
+type VPNType = int
+
+const (
+	XRAY_VPN VPNType = iota
+)
+
+func (v *VPN) VPNTypeString() string {
+	switch v.VPNType {
+	case XRAY_VPN:
+		return "xray"
+	default:
+		return "UNKHOWN"
+	}
+}
+
+func ConvertStringVPNTypeToEnum(key string) (int, error) {
+	switch key {
+	case "xray":
+		return XRAY_VPN, nil
+	default:
+		return 0, momoError.Error("un expected enum")
+	}
 }

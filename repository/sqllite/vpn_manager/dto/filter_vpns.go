@@ -1,9 +1,9 @@
 package dto
 
-import "momo/proxy/vpn"
+import "momo/entity"
 
 type FilterVPNs struct {
 	IsActive *bool
 	Domain   string
-	VPNType  vpn.VPNType
+	VPNType  entity.VPNType
 }

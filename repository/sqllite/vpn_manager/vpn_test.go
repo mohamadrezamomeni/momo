@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
+	"momo/entity"
 	"momo/pkg/config"
-	"momo/proxy/vpn"
 	"momo/repository/migrate"
 	"momo/repository/sqllite"
 	"momo/repository/sqllite/vpn_manager/dto"
@@ -19,7 +19,7 @@ var (
 		ApiPort:        "62733",
 		StartRangePort: 1000,
 		EndRangePort:   2000,
-		VPNType:        vpn.XRAY_VPN,
+		VPNType:        entity.XRAY_VPN,
 		IsActive:       false,
 	}
 
@@ -28,7 +28,7 @@ var (
 		ApiPort:        "62733",
 		StartRangePort: 1000,
 		EndRangePort:   2500,
-		VPNType:        vpn.XRAY_VPN,
+		VPNType:        entity.XRAY_VPN,
 		IsActive:       true,
 	}
 
@@ -37,7 +37,7 @@ var (
 		ApiPort:        "62733",
 		StartRangePort: 3000,
 		EndRangePort:   3500,
-		VPNType:        vpn.XRAY_VPN,
+		VPNType:        entity.XRAY_VPN,
 		IsActive:       true,
 	}
 )
@@ -119,7 +119,7 @@ func TestFilterVPNs(t *testing.T) {
 	}
 
 	vpns, err = vpnRepo.Filter(&dto.FilterVPNs{
-		VPNType: vpn.XRAY_VPN,
+		VPNType: entity.XRAY_VPN,
 	})
 	if err != nil {
 		t.Errorf("3. something wrong has happend that was %v", err)
@@ -130,7 +130,7 @@ func TestFilterVPNs(t *testing.T) {
 	}
 
 	vpns, err = vpnRepo.Filter(&dto.FilterVPNs{
-		VPNType: vpn.XRAY_VPN,
+		VPNType: entity.XRAY_VPN,
 		Domain:  "joi.com",
 	})
 	if err != nil {

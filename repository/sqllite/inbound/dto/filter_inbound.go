@@ -1,12 +1,12 @@
 package dto
 
-import "momo/proxy/vpn"
+import "momo/entity"
 
 type FilterInbound struct {
 	Protocol string
 	IsActice *bool
 	Domain   string
-	VPNType  vpn.VPNType
+	VPNType  entity.VPNType
 	Port     string
 	UserID   string
 }

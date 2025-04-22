@@ -1,6 +1,8 @@
 package dto
 
-import "momo/proxy/vpn"
+import (
+	"momo/entity"
+)
 
 type Add_VPN struct {
 	Domain         string
@@ -8,6 +10,6 @@ type Add_VPN struct {
 	ApiPort        string
 	StartRangePort int
 	EndRangePort   int
-	VPNType        vpn.VPNType
+	VPNType        entity.VPNType
 	UserCount      int
 }

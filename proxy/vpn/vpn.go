@@ -1,6 +1,7 @@
 package vpn
 
 import (
+	"momo/entity"
 	momoError "momo/pkg/error"
 	"momo/proxy/vpn/dto"
 	vpnDto "momo/proxy/vpn/dto"
@@ -18,7 +19,7 @@ type IVPN interface {
 }
 
 type VPN struct {
-	VPNType VPNType
+	VPNType entity.VPNType
 	V       IVPN
 }
 
@@ -50,14 +51,14 @@ func New(cfgs []*VPNConfig) *ProxyVPN {
 
 func addToVPN(cfg *VPNConfig, v chan<- *VPN, errs chan<- error) {
 	switch cfg.VPNType {
-	case XRAY_VPN:
+	case entity.XRAY_VPN:
 		x, err := xray.New(&xray.XrayConfig{
 			Address: cfg.Domain,
 			ApiPort: cfg.Port,
 		})
 		if err != nil {
 			v <- &VPN{
-				VPNType: XRAY_VPN,
+				VPNType: entity.XRAY_VPN,
 				V:       x,
 			}
 		} else {
@@ -66,7 +67,7 @@ func addToVPN(cfg *VPNConfig, v chan<- *VPN, errs chan<- error) {
 	}
 }
 
-func (p *ProxyVPN) retriveVPN(address string, VPNType VPNType) IVPN {
+func (p *ProxyVPN) retriveVPN(address string, VPNType entity.VPNType) IVPN {
 	for _, v := range p.vpns {
 		if v.V.GetAddress() == address && VPNType == v.VPNType {
 			return v.V
@@ -75,26 +76,26 @@ func (p *ProxyVPN) retriveVPN(address string, VPNType VPNType) IVPN {
 	return nil
 }
 
-func (p *ProxyVPN) AddInbound(inpt *dto.Inbound, VPNType string) (err error) {
+func (p *ProxyVPN) AddInbound(inpt *dto.Inbound, VPNType entity.VPNType) (err error) {
 	v := p.retriveVPN(inpt.Address, VPNType)
 	if v == nil {
-		return momoError.DebuggingErrorf("%s vpn has'nt been introuduced with address %s", VPNType, inpt.Address)
+		return momoError.DebuggingErrorf("%v vpn has'nt been introuduced with address %s", VPNType, inpt.Address)
 	}
 	return v.Add(inpt)
 }
 
-func (p *ProxyVPN) DisableInbound(inpt *dto.Inbound, VPNType string) (err error) {
+func (p *ProxyVPN) DisableInbound(inpt *dto.Inbound, VPNType entity.VPNType) (err error) {
 	v := p.retriveVPN(inpt.Address, VPNType)
 	if v == nil {
-		return momoError.DebuggingErrorf("%s vpn has'nt been introuduced with address %s", VPNType, inpt.Address)
+		return momoError.DebuggingErrorf("%v vpn has'nt been introuduced with address %s", VPNType, inpt.Address)
 	}
 	return v.Disable(inpt)
 }
 
-func (p *ProxyVPN) GetTraffic(inpt *dto.Inbound, VPNType string) (*vpnSerializer.Traffic, error) {
+func (p *ProxyVPN) GetTraffic(inpt *dto.Inbound, VPNType entity.VPNType) (*vpnSerializer.Traffic, error) {
 	v := p.retriveVPN(inpt.Address, VPNType)
 	if v == nil {
-		return &vpnSerializer.Traffic{}, momoError.DebuggingErrorf("%s vpn has'nt been introuduced with address %s", VPNType, inpt.Address)
+		return &vpnSerializer.Traffic{}, momoError.DebuggingErrorf("%v vpn has'nt been introuduced with address %s", VPNType, inpt.Address)
 	}
 	return v.GetTraffic(inpt)
 }

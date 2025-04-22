@@ -6,12 +6,11 @@ import (
 	"testing"
 	"time"
 
+	"momo/entity"
 	"momo/pkg/config"
 	"momo/repository/migrate"
 	"momo/repository/sqllite"
 	"momo/repository/sqllite/inbound/dto"
-
-	"momo/proxy/vpn"
 
 	utils "momo/pkg/utils"
 
@@ -38,7 +37,7 @@ var (
 		Port:     port1,
 		Domain:   "google.com",
 		UserID:   userID1,
-		VPNType:  vpn.XRAY_VPN,
+		VPNType:  entity.XRAY_VPN,
 		Start:    utils.GetDateTime("2024-04-21 14:30:00"),
 		End:      utils.GetDateTime("2024-04-22 14:30:00"),
 	}
@@ -50,7 +49,7 @@ var (
 		IsBlock:  false,
 		Domain:   "twitter.com",
 		UserID:   userID2,
-		VPNType:  vpn.XRAY_VPN,
+		VPNType:  entity.XRAY_VPN,
 		Start:    utils.GetDateTime("2024-04-21 14:30:00"),
 		End:      utils.GetDateTime("2024-04-22 14:30:00"),
 	}
@@ -62,7 +61,7 @@ var (
 		Domain:   "googoo.com",
 		UserID:   userID2,
 		IsBlock:  false,
-		VPNType:  vpn.XRAY_VPN,
+		VPNType:  entity.XRAY_VPN,
 		Start:    utils.GetDateTime("2024-04-21 14:30:00"),
 		End:      utils.GetDateTime("2024-04-22 14:30:00"),
 	}
@@ -73,7 +72,7 @@ var (
 		Port:     port3,
 		Domain:   "googoo.com",
 		UserID:   userID3,
-		VPNType:  vpn.XRAY_VPN,
+		VPNType:  entity.XRAY_VPN,
 		IsActive: true,
 		IsBlock:  false,
 		Start:    time.Now().AddDate(0, 0, -15),
@@ -86,7 +85,7 @@ var (
 		Port:     port3,
 		Domain:   "googoo.com",
 		UserID:   userID4,
-		VPNType:  vpn.XRAY_VPN,
+		VPNType:  entity.XRAY_VPN,
 		IsActive: true,
 		IsBlock:  true,
 		Start:    time.Now().AddDate(0, 0, -15),
@@ -99,7 +98,7 @@ var (
 		Port:     port3,
 		Domain:   "googoo.com",
 		UserID:   userID5,
-		VPNType:  vpn.XRAY_VPN,
+		VPNType:  entity.XRAY_VPN,
 		IsActive: false,
 		IsBlock:  true,
 		Start:    time.Now().AddDate(0, 0, -15),
@@ -112,7 +111,7 @@ var (
 		Port:     port3,
 		Domain:   "googoo.com",
 		UserID:   userID6,
-		VPNType:  vpn.XRAY_VPN,
+		VPNType:  entity.XRAY_VPN,
 		IsActive: true,
 		IsBlock:  false,
 		Start:    time.Now().AddDate(0, -2, 0),

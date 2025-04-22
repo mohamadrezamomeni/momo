@@ -11,20 +11,21 @@ import (
 )
 
 func (v *VPN) Create(inpt *dto.Add_VPN) (*entity.VPN, error) {
-	var vpn *entity.VPN = &entity.VPN{}
+	var vpn *entity.VPN = &entity.VPN{
+		Domain:         inpt.Domain,
+		IsActive:       inpt.IsActive,
+		ApiPort:        inpt.ApiPort,
+		StartRangePort: inpt.StartRangePort,
+		EndRangePort:   inpt.EndRangePort,
+		VPNType:        inpt.VPNType,
+		UserCount:      inpt.UserCount,
+	}
 	err := v.db.Conn().QueryRow(`
 	INSERT INTO vpns (domain, is_active, api_port, start_range_port, end_range_port, vpn_type, user_count)
 	VALUES (?, ?, ?, ?, ?, ?, ?)
-	RETURNING id, domain, is_active, api_port, start_range_port, end_range_port, vpn_type, user_count
-	`, inpt.Domain, inpt.IsActive, inpt.ApiPort, inpt.StartRangePort, inpt.EndRangePort, inpt.VPNType, inpt.UserCount).Scan(
+	RETURNING id
+	`, inpt.Domain, inpt.IsActive, inpt.ApiPort, inpt.StartRangePort, inpt.EndRangePort, vpn.VPNTypeString(), inpt.UserCount).Scan(
 		&vpn.ID,
-		&vpn.Domain,
-		&vpn.IsActive,
-		&vpn.ApiPort,
-		&vpn.StartRangePort,
-		&vpn.EndRangePort,
-		&vpn.VPNType,
-		&vpn.UserCount,
 	)
 	if err != nil {
 		return vpn, momoError.DebuggingErrorf("something wrong has happend the problem was %v", err)
@@ -80,7 +81,7 @@ func (v *VPN) Filter(inpt *dto.FilterVPNs) ([]*entity.VPN, error) {
 	for rows.Next() {
 		vpn := &entity.VPN{}
 		var createdAt, updatedAt interface{}
-
+		var vpnType string
 		err := rows.Scan(
 			&vpn.ID,
 			&vpn.Domain,
@@ -88,7 +89,7 @@ func (v *VPN) Filter(inpt *dto.FilterVPNs) ([]*entity.VPN, error) {
 			&vpn.ApiPort,
 			&vpn.StartRangePort,
 			&vpn.EndRangePort,
-			&vpn.VPNType,
+			&vpnType,
 			&vpn.UserCount,
 			&createdAt,
 			&updatedAt,
@@ -96,7 +97,11 @@ func (v *VPN) Filter(inpt *dto.FilterVPNs) ([]*entity.VPN, error) {
 		if err != nil {
 			return []*entity.VPN{}, momoError.DebuggingErrorf("error has occured err: %v", err)
 		}
-
+		vpnTypeEnum, err := entity.ConvertStringVPNTypeToEnum(vpnType)
+		if err != nil {
+			return []*entity.VPN{}, momoError.DebuggingErrorf("fail to convert vpnType %s to enum", vpnType)
+		}
+		vpn.VPNType = vpnTypeEnum
 		vpns = append(vpns, vpn)
 	}
 

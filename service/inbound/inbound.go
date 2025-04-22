@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"momo/entity"
-	"momo/proxy/vpn"
 	"momo/proxy/vpn/dto"
 	vpnSerializer "momo/proxy/vpn/serializer"
 )
@@ -16,9 +15,9 @@ type Inbound struct {
 }
 
 type vpnProxy interface {
-	AddInbound(*dto.Inbound, string) (err error)
-	DisableInbound(inpt *dto.Inbound, VPNType string) error
-	GetTraffic(inpt *dto.Inbound, VPNType vpn.VPNType) (*vpnSerializer.Traffic, error)
+	AddInbound(*dto.Inbound, entity.VPNType) error
+	DisableInbound(*dto.Inbound, entity.VPNType) error
+	GetTraffic(*dto.Inbound, entity.VPNType) (*vpnSerializer.Traffic, error)
 }
 
 type userService interface {
@@ -69,7 +68,7 @@ func (i Inbound) mustItBeActive(inbound *entity.Inbound) bool {
 	return false
 }
 
-func (i Inbound) deActiveInbound(inbound *entity.Inbound, vpnType vpn.VPNType) error {
+func (i Inbound) deActiveInbound(inbound *entity.Inbound, vpnType entity.VPNType) error {
 	info, err := i.getInfo(inbound)
 	if err != nil {
 		return err
@@ -82,7 +81,7 @@ func (i Inbound) deActiveInbound(inbound *entity.Inbound, vpnType vpn.VPNType) e
 	return i.inboundRepo.DeActive(inbound.ID)
 }
 
-func (i Inbound) activeInbound(inbound *entity.Inbound, vpnType vpn.VPNType) error {
+func (i Inbound) activeInbound(inbound *entity.Inbound, vpnType entity.VPNType) error {
 	info, err := i.getInfo(inbound)
 	if err != nil {
 		return err

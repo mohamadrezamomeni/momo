@@ -2,15 +2,13 @@ package entity
 
 import (
 	"time"
-
-	"momo/proxy/vpn"
 )
 
 type Inbound struct {
 	IsActive bool
 	ID       int
 	Protocol string
-	VPNType  vpn.VPNType
+	VPNType  VPNType
 	Domain   string
 	Port     string
 	UserID   string

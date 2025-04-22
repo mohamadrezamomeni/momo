@@ -1,7 +1,9 @@
 package vpn
 
+import "momo/entity"
+
 type VPNConfig struct {
 	Port    string
-	VPNType VPNType
+	VPNType entity.VPNType
 	Domain  string
 }

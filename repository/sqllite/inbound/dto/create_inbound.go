@@ -3,7 +3,7 @@ package dto
 import (
 	"time"
 
-	"momo/proxy/vpn"
+	"momo/entity"
 )
 
 type CreateInbound struct {
@@ -12,7 +12,7 @@ type CreateInbound struct {
 	Port     string
 	UserID   string
 	Domain   string
-	VPNType  vpn.VPNType
+	VPNType  entity.VPNType
 	IsActive bool
 	Start    time.Time
 	End      time.Time
