@@ -1,6 +1,6 @@
 -- +migrate Up
-CREATE TABLE `host` (
-        `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE `hosts` (
+       `id` INTEGER PRIMARY KEY AUTOINCREMENT,
         `rank` INTEGER NOT NULL,
         `domain` BOOLEAN default true,
         `port` varchar(8) NOT NULL,
@@ -9,5 +9,5 @@ CREATE TABLE `host` (
         `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- -migrate Down
-DROP TABLE `host`
+-- +migrate Down
+DROP TABLE `hosts`;
