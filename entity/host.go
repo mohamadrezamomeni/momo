@@ -9,7 +9,7 @@ type Host struct {
 
 type HostStatus = int
 
-func (h *Host) StatusString() string {
+func (h *Host) HostStatusString() string {
 	switch h.Status {
 	case High:
 		return "high"
