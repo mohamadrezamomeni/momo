@@ -1,13 +1,13 @@
 package vpnmanager
 
 import (
+	vpnManagerDto "momo/dto/repository/vpn_manager"
 	"momo/entity"
 	vpnProxy "momo/proxy/vpn"
-	"momo/repository/sqllite/vpn_manager/dto"
 )
 
 type vpnRepo interface {
-	Filter(*dto.FilterVPNs) ([]*entity.VPN, error)
+	Filter(*vpnManagerDto.FilterVPNs) ([]*entity.VPN, error)
 }
 
 type VPNService struct {
@@ -21,7 +21,7 @@ func New(repo vpnRepo) *VPNService {
 }
 
 func (v *VPNService) MakeProxy() (*vpnProxy.ProxyVPN, error) {
-	vpns, err := v.vpnRepo.Filter(&dto.FilterVPNs{})
+	vpns, err := v.vpnRepo.Filter(&vpnManagerDto.FilterVPNs{})
 	if err != nil {
 		return nil, err
 	}

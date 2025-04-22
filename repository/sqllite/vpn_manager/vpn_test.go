@@ -4,17 +4,17 @@ import (
 	"os"
 	"testing"
 
+	vpnManagerDto "momo/dto/repository/vpn_manager"
 	"momo/entity"
 	"momo/pkg/config"
 	"momo/repository/migrate"
 	"momo/repository/sqllite"
-	"momo/repository/sqllite/vpn_manager/dto"
 )
 
 var (
 	vpnRepo *VPN
 
-	vpnExample1 = &dto.Add_VPN{
+	vpnExample1 = &vpnManagerDto.Add_VPN{
 		Domain:         "joi.com",
 		ApiPort:        "62733",
 		StartRangePort: 1000,
@@ -23,7 +23,7 @@ var (
 		IsActive:       false,
 	}
 
-	vpnExample2 = &dto.Add_VPN{
+	vpnExample2 = &vpnManagerDto.Add_VPN{
 		Domain:         "joi.com",
 		ApiPort:        "62733",
 		StartRangePort: 1000,
@@ -32,7 +32,7 @@ var (
 		IsActive:       true,
 	}
 
-	vpnExample3 = &dto.Add_VPN{
+	vpnExample3 = &vpnManagerDto.Add_VPN{
 		Domain:         "jordan.com",
 		ApiPort:        "62733",
 		StartRangePort: 3000,
@@ -96,7 +96,7 @@ func TestFilterVPNs(t *testing.T) {
 	v3, _ := vpnRepo.Create(vpnExample3)
 
 	isActication := true
-	vpns, err := vpnRepo.Filter(&dto.FilterVPNs{
+	vpns, err := vpnRepo.Filter(&vpnManagerDto.FilterVPNs{
 		IsActive: &isActication,
 	})
 	if err != nil {
@@ -107,7 +107,7 @@ func TestFilterVPNs(t *testing.T) {
 		t.Errorf("1. the number of vpns must be 2 but the result was %v", len(vpns))
 	}
 
-	vpns, err = vpnRepo.Filter(&dto.FilterVPNs{
+	vpns, err = vpnRepo.Filter(&vpnManagerDto.FilterVPNs{
 		Domain: "joi.com",
 	})
 	if err != nil {
@@ -118,7 +118,7 @@ func TestFilterVPNs(t *testing.T) {
 		t.Errorf("2. the number of vpns must be 2 but the result was %v", len(vpns))
 	}
 
-	vpns, err = vpnRepo.Filter(&dto.FilterVPNs{
+	vpns, err = vpnRepo.Filter(&vpnManagerDto.FilterVPNs{
 		VPNType: entity.XRAY_VPN,
 	})
 	if err != nil {
@@ -129,7 +129,7 @@ func TestFilterVPNs(t *testing.T) {
 		t.Errorf("3. the number of vpns must be 3 but the result was %v", len(vpns))
 	}
 
-	vpns, err = vpnRepo.Filter(&dto.FilterVPNs{
+	vpns, err = vpnRepo.Filter(&vpnManagerDto.FilterVPNs{
 		VPNType: entity.XRAY_VPN,
 		Domain:  "joi.com",
 	})

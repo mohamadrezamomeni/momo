@@ -1,9 +1,9 @@
 package user
 
 import (
+	dto "momo/dto/repository/user"
 	"momo/entity"
 	"momo/repository/sqllite"
-	"momo/repository/sqllite/user/dto"
 )
 
 type IUserRepository interface {

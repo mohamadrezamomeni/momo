@@ -3,8 +3,8 @@ package service
 import (
 	"time"
 
+	vpnProxyDto "momo/dto/proxy/vpn"
 	"momo/entity"
-	"momo/proxy/vpn/dto"
 	vpnSerializer "momo/proxy/vpn/serializer"
 )
 
@@ -15,9 +15,9 @@ type Inbound struct {
 }
 
 type vpnProxy interface {
-	AddInbound(*dto.Inbound, entity.VPNType) error
-	DisableInbound(*dto.Inbound, entity.VPNType) error
-	GetTraffic(*dto.Inbound, entity.VPNType) (*vpnSerializer.Traffic, error)
+	AddInbound(*vpnProxyDto.Inbound, entity.VPNType) error
+	DisableInbound(*vpnProxyDto.Inbound, entity.VPNType) error
+	GetTraffic(*vpnProxyDto.Inbound, entity.VPNType) (*vpnSerializer.Traffic, error)
 }
 
 type userService interface {
@@ -94,13 +94,13 @@ func (i Inbound) activeInbound(inbound *entity.Inbound, vpnType entity.VPNType) 
 	return i.inboundRepo.Active(inbound.ID)
 }
 
-func (i Inbound) getInfo(inbound *entity.Inbound) (*dto.Inbound, error) {
+func (i Inbound) getInfo(inbound *entity.Inbound) (*vpnProxyDto.Inbound, error) {
 	user, err := i.userService.FindByID(inbound.UserID)
 	if err != nil {
-		return &dto.Inbound{}, err
+		return &vpnProxyDto.Inbound{}, err
 	}
-	info := &dto.Inbound{
-		User: &dto.User{
+	info := &vpnProxyDto.Inbound{
+		User: &vpnProxyDto.User{
 			Username: user.Username,
 			ID:       user.ID,
 			Level:    "0",

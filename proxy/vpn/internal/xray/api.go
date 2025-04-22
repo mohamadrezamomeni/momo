@@ -5,7 +5,7 @@ import (
 
 	momoError "momo/pkg/error"
 
-	vpnDto "momo/proxy/vpn/dto"
+	vpnProxyDto "momo/dto/proxy/vpn"
 	"momo/proxy/vpn/internal/xray/dto"
 	vpnSerializer "momo/proxy/vpn/serializer"
 
@@ -44,7 +44,7 @@ func (x *Xray) GetAddress() string {
 	return x.address
 }
 
-func (x *Xray) Add(inpt *vpnDto.Inbound) error {
+func (x *Xray) Add(inpt *vpnProxyDto.Inbound) error {
 	_, err := x.addInbound(&dto.AddInbound{
 		Port:     inpt.Port,
 		Tag:      inpt.Tag,
@@ -61,7 +61,7 @@ func (x *Xray) Add(inpt *vpnDto.Inbound) error {
 	return nil
 }
 
-func (x *Xray) Disable(inpt *vpnDto.Inbound) error {
+func (x *Xray) Disable(inpt *vpnProxyDto.Inbound) error {
 	_, err := x.removeInbound(&dto.RemoveInbound{
 		Tag: inpt.Tag,
 	})
@@ -75,7 +75,7 @@ func (x *Xray) Disable(inpt *vpnDto.Inbound) error {
 	return nil
 }
 
-func (x *Xray) GetTraffic(inpt *vpnDto.Inbound) (*vpnSerializer.Traffic, error) {
+func (x *Xray) GetTraffic(inpt *vpnProxyDto.Inbound) (*vpnSerializer.Traffic, error) {
 	data, err := x.getInboundTrafficWithoutBeigReseted(inpt.Tag)
 	if err != nil {
 		return &vpnSerializer.Traffic{}, err
@@ -86,7 +86,7 @@ func (x *Xray) GetTraffic(inpt *vpnDto.Inbound) (*vpnSerializer.Traffic, error) 
 	}, nil
 }
 
-func (x *Xray) DoesExist(inpt *vpnDto.Inbound) (bool, error) {
+func (x *Xray) DoesExist(inpt *vpnProxyDto.Inbound) (bool, error) {
 	data, err := x.getUsers(inpt.Tag)
 	if err == nil && len(data.Usernames) > 0 {
 		return true, nil

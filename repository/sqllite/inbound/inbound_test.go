@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
+	inboundDto "momo/dto/repository/inbound"
 	"momo/entity"
 	"momo/pkg/config"
 	"momo/repository/migrate"
 	"momo/repository/sqllite"
-	"momo/repository/sqllite/inbound/dto"
 
 	utils "momo/pkg/utils"
 
@@ -30,7 +30,7 @@ var (
 	userID5         = uuid.New().String()
 	userID6         = uuid.New().String()
 	userID7         = uuid.New().String()
-	inboundExample1 = &dto.CreateInbound{
+	inboundExample1 = &inboundDto.CreateInbound{
 		Tag:      fmt.Sprintf("inbound-%s", port1),
 		Protocol: "vmess",
 		IsBlock:  false,
@@ -42,7 +42,7 @@ var (
 		End:      utils.GetDateTime("2024-04-22 14:30:00"),
 	}
 
-	inboundExample2 = &dto.CreateInbound{
+	inboundExample2 = &inboundDto.CreateInbound{
 		Tag:      fmt.Sprintf("inbound-%s", port2),
 		Protocol: "vmess",
 		Port:     port2,
@@ -54,7 +54,7 @@ var (
 		End:      utils.GetDateTime("2024-04-22 14:30:00"),
 	}
 
-	inboundExample3 = &dto.CreateInbound{
+	inboundExample3 = &inboundDto.CreateInbound{
 		Tag:      fmt.Sprintf("inbound-%s", port2),
 		Protocol: "http",
 		Port:     port2,
@@ -66,7 +66,7 @@ var (
 		End:      utils.GetDateTime("2024-04-22 14:30:00"),
 	}
 
-	inboundExample4 = &dto.CreateInbound{
+	inboundExample4 = &inboundDto.CreateInbound{
 		Tag:      fmt.Sprintf("inbound-%s", port3),
 		Protocol: "http",
 		Port:     port3,
@@ -79,7 +79,7 @@ var (
 		End:      time.Now().AddDate(0, 0, 15),
 	}
 
-	inboundExample5 = &dto.CreateInbound{
+	inboundExample5 = &inboundDto.CreateInbound{
 		Tag:      fmt.Sprintf("inbound-%s", port3),
 		Protocol: "http",
 		Port:     port3,
@@ -92,7 +92,7 @@ var (
 		End:      time.Now().AddDate(0, 0, 15),
 	}
 
-	inboundExample6 = &dto.CreateInbound{
+	inboundExample6 = &inboundDto.CreateInbound{
 		Tag:      fmt.Sprintf("inbound-%s", port3),
 		Protocol: "http",
 		Port:     port3,
@@ -105,7 +105,7 @@ var (
 		End:      time.Now().AddDate(0, 0, 15),
 	}
 
-	inboundExample7 = &dto.CreateInbound{
+	inboundExample7 = &inboundDto.CreateInbound{
 		Tag:      fmt.Sprintf("inbound-%s", port3),
 		Protocol: "http",
 		Port:     port3,
@@ -171,7 +171,7 @@ func TestFilterInbounds(t *testing.T) {
 	i2, _ := inboundRepo.Create(inboundExample2)
 	i3, _ := inboundRepo.Create(inboundExample3)
 	i4, _ := inboundRepo.Create(inboundExample4)
-	inbounds1, err := inboundRepo.Filter(&dto.FilterInbound{Port: port2})
+	inbounds1, err := inboundRepo.Filter(&inboundDto.FilterInbound{Port: port2})
 	if err != nil {
 		t.Errorf("1. the problem has occured that is %v", err)
 	}
@@ -179,7 +179,7 @@ func TestFilterInbounds(t *testing.T) {
 		t.Errorf("1. the number of items must be %v but got %v items", 2, len(inbounds1))
 	}
 
-	inbounds2, err := inboundRepo.Filter(&dto.FilterInbound{Protocol: "vmess"})
+	inbounds2, err := inboundRepo.Filter(&inboundDto.FilterInbound{Protocol: "vmess"})
 	if err != nil {
 		t.Errorf("2. the problem has occured that is %v", err)
 	}
@@ -187,7 +187,7 @@ func TestFilterInbounds(t *testing.T) {
 		t.Errorf("2. the number of items must be %v but got %v items", 2, len(inbounds2))
 	}
 
-	inbounds3, err := inboundRepo.Filter(&dto.FilterInbound{Domain: "google.com"})
+	inbounds3, err := inboundRepo.Filter(&inboundDto.FilterInbound{Domain: "google.com"})
 	if err != nil {
 		t.Errorf("3. the problem has occured that is %v", err)
 	}
@@ -195,7 +195,7 @@ func TestFilterInbounds(t *testing.T) {
 		t.Errorf("3. the number of items must be %v but got %v items", 1, len(inbounds3))
 	}
 
-	inbounds4, err := inboundRepo.Filter(&dto.FilterInbound{UserID: userID2, Port: port2})
+	inbounds4, err := inboundRepo.Filter(&inboundDto.FilterInbound{UserID: userID2, Port: port2})
 	if err != nil {
 		t.Errorf("4. the problem has occured that is %v", err)
 	}
@@ -204,7 +204,7 @@ func TestFilterInbounds(t *testing.T) {
 	}
 
 	isAvailableT := true
-	inbounds5, err := inboundRepo.Filter(&dto.FilterInbound{IsActice: &isAvailableT})
+	inbounds5, err := inboundRepo.Filter(&inboundDto.FilterInbound{IsActice: &isAvailableT})
 	if err != nil {
 		t.Errorf("5. the problem has occured that is %v", err)
 	}

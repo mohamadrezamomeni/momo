@@ -6,9 +6,9 @@ import (
 	"reflect"
 	"strings"
 
+	dto "momo/dto/repository/user"
 	"momo/entity"
 	momoError "momo/pkg/error"
-	"momo/repository/sqllite/user/dto"
 )
 
 func (u *User) Create(inpt *dto.Create) (*entity.User, error) {

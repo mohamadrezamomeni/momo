@@ -9,9 +9,9 @@ import (
 	"momo/pkg/config"
 	"momo/pkg/utils"
 
+	userDto "momo/dto/repository/user"
 	"momo/repository/migrate"
 	"momo/repository/sqllite"
-	"momo/repository/sqllite/user/dto"
 )
 
 var userRepo IUserRepository
@@ -44,7 +44,7 @@ func getInfo() (string, string, string) {
 func TestCreate(t *testing.T) {
 	username, firstName, lastName := getInfo()
 
-	userCreated, err := userRepo.Create(&dto.Create{
+	userCreated, err := userRepo.Create(&userDto.Create{
 		Username:  username,
 		FirstName: firstName,
 		LastName:  lastName,
@@ -63,7 +63,7 @@ func TestCreate(t *testing.T) {
 
 func TestFindByUsername(t *testing.T) {
 	username, firstName, lastName := getInfo()
-	userCreated, err := userRepo.Create(&dto.Create{
+	userCreated, err := userRepo.Create(&userDto.Create{
 		Username:  username,
 		FirstName: firstName,
 		LastName:  lastName,
@@ -85,7 +85,7 @@ func TestFindByUsername(t *testing.T) {
 
 func TestFindByID(t *testing.T) {
 	username, firstName, lastName := getInfo()
-	userCreated, err := userRepo.Create(&dto.Create{
+	userCreated, err := userRepo.Create(&userDto.Create{
 		Username:  username,
 		FirstName: firstName,
 		LastName:  lastName,
@@ -108,7 +108,7 @@ func TestFilter(t *testing.T) {
 	user1, user2, user3 := staticUsers()
 	ids := []string{user1.ID, user2.ID, user3.ID}
 
-	users, err := userRepo.FilterUsers(&dto.FilterUsers{
+	users, err := userRepo.FilterUsers(&userDto.FilterUsers{
 		FirstName: "mic",
 	})
 	if err != nil {
@@ -119,7 +119,7 @@ func TestFilter(t *testing.T) {
 		t.Errorf("1. something went wrong.")
 	}
 
-	users, err = userRepo.FilterUsers(&dto.FilterUsers{
+	users, err = userRepo.FilterUsers(&userDto.FilterUsers{
 		FirstName: "mic",
 		LastName:  "casta",
 	})
@@ -131,7 +131,7 @@ func TestFilter(t *testing.T) {
 		t.Errorf("2. something went wrong.")
 	}
 
-	users, err = userRepo.FilterUsers(&dto.FilterUsers{
+	users, err = userRepo.FilterUsers(&userDto.FilterUsers{
 		LastName: "castarica",
 	})
 	if err != nil {
@@ -142,7 +142,7 @@ func TestFilter(t *testing.T) {
 		t.Errorf("3. something went wrong.")
 	}
 
-	users, err = userRepo.FilterUsers(&dto.FilterUsers{
+	users, err = userRepo.FilterUsers(&userDto.FilterUsers{
 		FirstName: "andy",
 	})
 	if err != nil {
@@ -168,17 +168,17 @@ func staticUsers() (*entity.User, *entity.User, *entity.User) {
 	lastName2 := "casta"
 	lastName3 := "castarica"
 
-	user1, _ := userRepo.Create(&dto.Create{
+	user1, _ := userRepo.Create(&userDto.Create{
 		Username:  username1,
 		FirstName: firstName1,
 		LastName:  lastName1,
 	})
-	user2, _ := userRepo.Create(&dto.Create{
+	user2, _ := userRepo.Create(&userDto.Create{
 		Username:  username2,
 		FirstName: firstName2,
 		LastName:  lastName2,
 	})
-	user3, _ := userRepo.Create(&dto.Create{
+	user3, _ := userRepo.Create(&userDto.Create{
 		Username:  username3,
 		FirstName: firstName3,
 		LastName:  lastName3,

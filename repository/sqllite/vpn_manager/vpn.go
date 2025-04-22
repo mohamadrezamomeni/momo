@@ -5,12 +5,12 @@ import (
 	"reflect"
 	"strings"
 
+	vpnManagerDto "momo/dto/repository/vpn_manager"
 	"momo/entity"
 	momoError "momo/pkg/error"
-	"momo/repository/sqllite/vpn_manager/dto"
 )
 
-func (v *VPN) Create(inpt *dto.Add_VPN) (*entity.VPN, error) {
+func (v *VPN) Create(inpt *vpnManagerDto.Add_VPN) (*entity.VPN, error) {
 	var vpn *entity.VPN = &entity.VPN{
 		Domain:         inpt.Domain,
 		IsActive:       inpt.IsActive,
@@ -68,7 +68,7 @@ func (v *VPN) updateActivationVPN(id int, status bool) error {
 	return nil
 }
 
-func (v *VPN) Filter(inpt *dto.FilterVPNs) ([]*entity.VPN, error) {
+func (v *VPN) Filter(inpt *vpnManagerDto.FilterVPNs) ([]*entity.VPN, error) {
 	query := v.makeSQlFilter(inpt)
 
 	rows, err := v.db.Conn().Query(query)
@@ -108,7 +108,7 @@ func (v *VPN) Filter(inpt *dto.FilterVPNs) ([]*entity.VPN, error) {
 	return vpns, nil
 }
 
-func (v *VPN) makeSQlFilter(inpt *dto.FilterVPNs) string {
+func (v *VPN) makeSQlFilter(inpt *vpnManagerDto.FilterVPNs) string {
 	sql := "SELECT * FROM vpns"
 
 	val := reflect.ValueOf(*inpt)

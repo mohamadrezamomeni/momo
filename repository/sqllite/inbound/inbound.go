@@ -7,12 +7,12 @@ import (
 	"strings"
 	"time"
 
+	inboundDto "momo/dto/repository/inbound"
 	"momo/entity"
 	momoError "momo/pkg/error"
-	"momo/repository/sqllite/inbound/dto"
 )
 
-func (i *Inbound) Create(inpt *dto.CreateInbound) (*entity.Inbound, error) {
+func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error) {
 	inbound := &entity.Inbound{}
 	err := i.db.Conn().QueryRow(`
 	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_active, start, end, is_block)
@@ -74,7 +74,7 @@ func (i *Inbound) DeActive(id int) error {
 	return i.changeStatus(id, false)
 }
 
-func (i *Inbound) Filter(inpt *dto.FilterInbound) ([]*entity.Inbound, error) {
+func (i *Inbound) Filter(inpt *inboundDto.FilterInbound) ([]*entity.Inbound, error) {
 	query := i.makeQueryFilter(inpt)
 
 	rows, err := i.db.Conn().Query(query)
@@ -94,7 +94,7 @@ func (i *Inbound) Filter(inpt *dto.FilterInbound) ([]*entity.Inbound, error) {
 	return inbounds, nil
 }
 
-func (i *Inbound) makeQueryFilter(inpt *dto.FilterInbound) string {
+func (i *Inbound) makeQueryFilter(inpt *inboundDto.FilterInbound) string {
 	sql := "SELECT * FROM inbounds"
 
 	v := reflect.ValueOf(*inpt)

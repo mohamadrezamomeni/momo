@@ -1,19 +1,19 @@
 package vpn
 
 import (
+	proxyVpnDto "momo/dto/proxy/vpn"
+	vpnProxyDto "momo/dto/proxy/vpn"
 	"momo/entity"
 	momoError "momo/pkg/error"
-	"momo/proxy/vpn/dto"
-	vpnDto "momo/proxy/vpn/dto"
 	"momo/proxy/vpn/internal/xray"
 	vpnSerializer "momo/proxy/vpn/serializer"
 )
 
 type IVPN interface {
-	Add(*vpnDto.Inbound) error
-	Disable(*vpnDto.Inbound) error
-	GetTraffic(*vpnDto.Inbound) (*vpnSerializer.Traffic, error)
-	DoesExist(*vpnDto.Inbound) (bool, error)
+	Add(*vpnProxyDto.Inbound) error
+	Disable(*vpnProxyDto.Inbound) error
+	GetTraffic(*vpnProxyDto.Inbound) (*vpnSerializer.Traffic, error)
+	DoesExist(*vpnProxyDto.Inbound) (bool, error)
 	GetAddress() string
 	Test() error
 }
@@ -76,7 +76,7 @@ func (p *ProxyVPN) retriveVPN(address string, VPNType entity.VPNType) IVPN {
 	return nil
 }
 
-func (p *ProxyVPN) AddInbound(inpt *dto.Inbound, VPNType entity.VPNType) (err error) {
+func (p *ProxyVPN) AddInbound(inpt *proxyVpnDto.Inbound, VPNType entity.VPNType) (err error) {
 	v := p.retriveVPN(inpt.Address, VPNType)
 	if v == nil {
 		return momoError.DebuggingErrorf("%v vpn has'nt been introuduced with address %s", VPNType, inpt.Address)
@@ -84,7 +84,7 @@ func (p *ProxyVPN) AddInbound(inpt *dto.Inbound, VPNType entity.VPNType) (err er
 	return v.Add(inpt)
 }
 
-func (p *ProxyVPN) DisableInbound(inpt *dto.Inbound, VPNType entity.VPNType) (err error) {
+func (p *ProxyVPN) DisableInbound(inpt *proxyVpnDto.Inbound, VPNType entity.VPNType) (err error) {
 	v := p.retriveVPN(inpt.Address, VPNType)
 	if v == nil {
 		return momoError.DebuggingErrorf("%v vpn has'nt been introuduced with address %s", VPNType, inpt.Address)
@@ -92,7 +92,7 @@ func (p *ProxyVPN) DisableInbound(inpt *dto.Inbound, VPNType entity.VPNType) (er
 	return v.Disable(inpt)
 }
 
-func (p *ProxyVPN) GetTraffic(inpt *dto.Inbound, VPNType entity.VPNType) (*vpnSerializer.Traffic, error) {
+func (p *ProxyVPN) GetTraffic(inpt *proxyVpnDto.Inbound, VPNType entity.VPNType) (*vpnSerializer.Traffic, error) {
 	v := p.retriveVPN(inpt.Address, VPNType)
 	if v == nil {
 		return &vpnSerializer.Traffic{}, momoError.DebuggingErrorf("%v vpn has'nt been introuduced with address %s", VPNType, inpt.Address)
