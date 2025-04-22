@@ -33,6 +33,6 @@ func ConvertStringVPNTypeToEnum(key string) (int, error) {
 	case "xray":
 		return XRAY_VPN, nil
 	default:
-		return 0, momoError.Error("un expected enum")
+		return 0, momoError.Error("unexpected vpn_type's value")
 	}
 }
