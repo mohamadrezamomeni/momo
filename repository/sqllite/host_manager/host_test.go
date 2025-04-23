@@ -32,29 +32,39 @@ func TestMain(m *testing.M) {
 
 var (
 	hostExample1 = &hostmanagerDto.AddHost{
-		Domain: "google.com",
-		Port:   "62789",
-		Status: entity.Deactive,
+		Domain:         "google.com",
+		Port:           "62789",
+		Status:         entity.Deactive,
+		StartRangePort: 1000,
+		EndRangePort:   2000,
 	}
 	hostExample2 = &hostmanagerDto.AddHost{
-		Domain: "yahoo.com",
-		Port:   "62780",
-		Status: entity.High,
+		Domain:         "yahoo.com",
+		Port:           "62780",
+		Status:         entity.High,
+		StartRangePort: 2500,
+		EndRangePort:   3000,
 	}
 	hostExample3 = &hostmanagerDto.AddHost{
-		Domain: "facebook.com",
-		Port:   "62780",
-		Status: entity.Deactive,
+		Domain:         "facebook.com",
+		Port:           "62780",
+		Status:         entity.Deactive,
+		StartRangePort: 2000,
+		EndRangePort:   5000,
 	}
 	hostExample4 = &hostmanagerDto.AddHost{
-		Domain: "twitter.com",
-		Port:   "62780",
-		Status: entity.Medium,
+		Domain:         "twitter.com",
+		Port:           "62780",
+		Status:         entity.Medium,
+		StartRangePort: 1000,
+		EndRangePort:   2000,
 	}
 	hostExample5 = &hostmanagerDto.AddHost{
-		Domain: "github.com",
-		Port:   "62780",
-		Status: entity.Low,
+		Domain:         "github.com",
+		Port:           "62780",
+		Status:         entity.Low,
+		StartRangePort: 1000,
+		EndRangePort:   2000,
 	}
 )
 
@@ -63,10 +73,11 @@ func TestCreateHost(t *testing.T) {
 	if err != nil {
 		t.Errorf("error has happend that was %v", err)
 	}
-
 	if host.Domain != hostExample1.Domain ||
 		host.Port != hostExample1.Port ||
-		host.Status != entity.Deactive {
+		host.Status != entity.Deactive ||
+		host.StartRangePort != hostExample1.StartRangePort ||
+		host.EndRangePort != hostExample1.EndRangePort {
 		t.Error("the out put of creating was wrong")
 	}
 

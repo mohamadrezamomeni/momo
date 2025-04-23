@@ -5,11 +5,9 @@ import (
 )
 
 type Add_VPN struct {
-	Domain         string
-	IsActive       bool
-	ApiPort        string
-	StartRangePort int
-	EndRangePort   int
-	VPNType        entity.VPNType
-	UserCount      int
+	Domain    string
+	IsActive  bool
+	ApiPort   string
+	VPNType   entity.VPNType
+	UserCount int
 }

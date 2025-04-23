@@ -3,14 +3,12 @@ package entity
 import momoError "momo/pkg/error"
 
 type VPN struct {
-	ID             int
-	Domain         string
-	IsActive       bool
-	ApiPort        string
-	StartRangePort int
-	EndRangePort   int
-	VPNType        VPNType
-	UserCount      int
+	ID        int
+	Domain    string
+	IsActive  bool
+	ApiPort   string
+	VPNType   VPNType
+	UserCount int
 }
 
 type VPNType = int

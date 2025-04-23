@@ -12,15 +12,17 @@ import (
 
 func (h *Host) Create(inpt *hostmanagerDto.AddHost) (*entity.Host, error) {
 	var host *entity.Host = &entity.Host{
-		Domain: inpt.Domain,
-		Port:   inpt.Port,
-		Status: inpt.Status,
+		Domain:         inpt.Domain,
+		Port:           inpt.Port,
+		Status:         inpt.Status,
+		StartRangePort: inpt.StartRangePort,
+		EndRangePort:   inpt.EndRangePort,
 	}
 	err := h.db.Conn().QueryRow(`
-	INSERT INTO hosts (domain, port, status)
-	VALUES (?, ?, ?)
+	INSERT INTO hosts (domain, port, status, start_range_port, end_range_port)
+	VALUES (?, ?, ?, ?, ?)
 	RETURNING id
-`, host.Domain, host.Port, entity.HostStatusString(host.Status)).Scan(&host.ID)
+`, host.Domain, host.Port, entity.HostStatusString(host.Status), inpt.StartRangePort, inpt.EndRangePort).Scan(&host.ID)
 	if err != nil {
 		return &entity.Host{}, momoError.Errorf("somoething went wrong to save host error: %v", err)
 	}
@@ -100,6 +102,8 @@ func (i *Host) scan(rows *sql.Rows) (*entity.Host, error) {
 		&host.Domain,
 		&host.Port,
 		&hostStatusString,
+		&host.StartRangePort,
+		&host.EndRangePort,
 		&createdAt,
 		&updatedAt,
 	)

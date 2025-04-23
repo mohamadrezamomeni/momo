@@ -12,19 +12,17 @@ import (
 
 func (v *VPN) Create(inpt *vpnManagerDto.Add_VPN) (*entity.VPN, error) {
 	var vpn *entity.VPN = &entity.VPN{
-		Domain:         inpt.Domain,
-		IsActive:       inpt.IsActive,
-		ApiPort:        inpt.ApiPort,
-		StartRangePort: inpt.StartRangePort,
-		EndRangePort:   inpt.EndRangePort,
-		VPNType:        inpt.VPNType,
-		UserCount:      inpt.UserCount,
+		Domain:    inpt.Domain,
+		IsActive:  inpt.IsActive,
+		ApiPort:   inpt.ApiPort,
+		VPNType:   inpt.VPNType,
+		UserCount: inpt.UserCount,
 	}
 	err := v.db.Conn().QueryRow(`
-	INSERT INTO vpns (domain, is_active, api_port, start_range_port, end_range_port, vpn_type, user_count)
-	VALUES (?, ?, ?, ?, ?, ?, ?)
+	INSERT INTO vpns (domain, is_active, api_port, vpn_type, user_count)
+	VALUES (?, ?, ?, ?, ?)
 	RETURNING id
-	`, inpt.Domain, inpt.IsActive, inpt.ApiPort, inpt.StartRangePort, inpt.EndRangePort, vpn.VPNTypeString(), inpt.UserCount).Scan(
+	`, inpt.Domain, inpt.IsActive, inpt.ApiPort, vpn.VPNTypeString(), inpt.UserCount).Scan(
 		&vpn.ID,
 	)
 	if err != nil {
@@ -87,8 +85,6 @@ func (v *VPN) Filter(inpt *vpnManagerDto.FilterVPNs) ([]*entity.VPN, error) {
 			&vpn.Domain,
 			&vpn.IsActive,
 			&vpn.ApiPort,
-			&vpn.StartRangePort,
-			&vpn.EndRangePort,
 			&vpnType,
 			&vpn.UserCount,
 			&createdAt,

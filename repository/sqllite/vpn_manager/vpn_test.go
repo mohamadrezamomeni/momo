@@ -15,30 +15,24 @@ var (
 	vpnRepo *VPN
 
 	vpnExample1 = &vpnManagerDto.Add_VPN{
-		Domain:         "joi.com",
-		ApiPort:        "62733",
-		StartRangePort: 1000,
-		EndRangePort:   2000,
-		VPNType:        entity.XRAY_VPN,
-		IsActive:       false,
+		Domain:   "joi.com",
+		ApiPort:  "62733",
+		VPNType:  entity.XRAY_VPN,
+		IsActive: false,
 	}
 
 	vpnExample2 = &vpnManagerDto.Add_VPN{
-		Domain:         "joi.com",
-		ApiPort:        "62733",
-		StartRangePort: 1000,
-		EndRangePort:   2500,
-		VPNType:        entity.XRAY_VPN,
-		IsActive:       true,
+		Domain:   "joi.com",
+		ApiPort:  "62733",
+		VPNType:  entity.XRAY_VPN,
+		IsActive: true,
 	}
 
 	vpnExample3 = &vpnManagerDto.Add_VPN{
-		Domain:         "jordan.com",
-		ApiPort:        "62733",
-		StartRangePort: 3000,
-		EndRangePort:   3500,
-		VPNType:        entity.XRAY_VPN,
-		IsActive:       true,
+		Domain:   "jordan.com",
+		ApiPort:  "62733",
+		VPNType:  entity.XRAY_VPN,
+		IsActive: true,
 	}
 )
 
@@ -66,8 +60,6 @@ func TestCreateVPN(t *testing.T) {
 	}
 	if v1.ApiPort != vpnExample1.ApiPort ||
 		v1.Domain != vpnExample1.Domain ||
-		v1.StartRangePort != vpnExample1.StartRangePort ||
-		v1.EndRangePort != vpnExample1.EndRangePort ||
 		v1.VPNType != vpnExample1.VPNType {
 		t.Error("the output wasn't matched by original data")
 	}
