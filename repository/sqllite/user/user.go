@@ -12,22 +12,17 @@ import (
 )
 
 func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
-	var id, username, lastName, firstName string
+	user := &entity.User{}
 	err := u.db.Conn().QueryRow(`
 	INSERT INTO users (username, lastName, firstName)
 	VALUES (?, ?, ?)
 	RETURNING id, username, lastName, firstName
-`, inpt.Username, inpt.LastName, inpt.FirstName).Scan(&id, &username, &lastName, &firstName)
+`, inpt.Username, inpt.LastName, inpt.FirstName).Scan(&user.ID, &user.Username, &user.LastName, &user.FirstName)
 	if err != nil {
-		return &entity.User{}, momoError.Errorf("somoething went wrong to save user error: %v", err)
+		return nil, momoError.Errorf("somoething went wrong to save user error: %v", err)
 	}
 
-	return &entity.User{
-		ID:        id,
-		Username:  username,
-		LastName:  lastName,
-		FirstName: firstName,
-	}, nil
+	return user, nil
 }
 
 func (u *User) Delete(id string) error {

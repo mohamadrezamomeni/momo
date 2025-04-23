@@ -1,9 +1,12 @@
 package service
 
 import (
+	"fmt"
 	"time"
 
 	vpnProxyDto "momo/dto/proxy/vpn"
+	inboundRepoDto "momo/dto/repository/inbound"
+	dto "momo/dto/service/inbound"
 	"momo/entity"
 	vpnSerializer "momo/proxy/vpn/serializer"
 )
@@ -12,6 +15,7 @@ type Inbound struct {
 	inboundRepo inboundRepo
 	vpnProxy    vpnProxy
 	userService userService
+	hostService hostService
 }
 
 type vpnProxy interface {
@@ -28,17 +32,51 @@ type inboundRepo interface {
 	RetriveFaultyInbounds() ([]*entity.Inbound, error)
 	Active(id int) error
 	DeActive(id int) error
+	Create(*inboundRepoDto.CreateInbound) (entity.Inbound, error)
 }
 
-func New(repo inboundRepo, vpnService vpnProxy, userService userService) *Inbound {
+type hostService interface {
+	FindHost(entity.HostStatus) (string, string, error)
+}
+
+func New(
+	repo inboundRepo,
+	vpnService vpnProxy,
+	userService userService,
+	hostService hostService,
+) *Inbound {
 	return &Inbound{
 		inboundRepo: repo,
 		vpnProxy:    vpnService,
 		userService: userService,
+		hostService: hostService,
 	}
 }
 
-func (i Inbound) ApplyChangesToInbounds() error {
+func (i *Inbound) Create(inpt *dto.CreateInbound) error {
+	host, port, err := i.hostService.FindHost(inpt.ServerType)
+	if err != nil {
+		return err
+	}
+
+	_, err = i.inboundRepo.Create(&inboundRepoDto.CreateInbound{
+		Tag:      fmt.Sprintf("inbound-%s", port),
+		Port:     port,
+		Domain:   host,
+		IsActive: false,
+		IsBlock:  false,
+		UserID:   inpt.UserID,
+		Start:    inpt.Start,
+		End:      inpt.End,
+		VPNType:  inpt.VPNType,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (i *Inbound) ApplyChangesToInbounds() error {
 	inbounds, err := i.inboundRepo.RetriveFaultyInbounds()
 	if err != nil {
 		return err
@@ -50,7 +88,7 @@ func (i Inbound) ApplyChangesToInbounds() error {
 	return nil
 }
 
-func (i Inbound) applyChangeToInbound(inbound *entity.Inbound) {
+func (i *Inbound) applyChangeToInbound(inbound *entity.Inbound) {
 	if i.mustItBeActive(inbound) {
 		i.activeInbound(inbound, inbound.VPNType)
 	} else {
@@ -58,7 +96,7 @@ func (i Inbound) applyChangeToInbound(inbound *entity.Inbound) {
 	}
 }
 
-func (i Inbound) mustItBeActive(inbound *entity.Inbound) bool {
+func (i *Inbound) mustItBeActive(inbound *entity.Inbound) bool {
 	if now := time.Now(); inbound.IsBlock == false &&
 		((now.Before(inbound.End) || now.Equal(inbound.End)) &&
 			(now.After(inbound.Start) || now.Equal(inbound.Start))) &&
@@ -68,7 +106,7 @@ func (i Inbound) mustItBeActive(inbound *entity.Inbound) bool {
 	return false
 }
 
-func (i Inbound) deActiveInbound(inbound *entity.Inbound, vpnType entity.VPNType) error {
+func (i *Inbound) deActiveInbound(inbound *entity.Inbound, vpnType entity.VPNType) error {
 	info, err := i.getInfo(inbound)
 	if err != nil {
 		return err
@@ -81,7 +119,7 @@ func (i Inbound) deActiveInbound(inbound *entity.Inbound, vpnType entity.VPNType
 	return i.inboundRepo.DeActive(inbound.ID)
 }
 
-func (i Inbound) activeInbound(inbound *entity.Inbound, vpnType entity.VPNType) error {
+func (i *Inbound) activeInbound(inbound *entity.Inbound, vpnType entity.VPNType) error {
 	info, err := i.getInfo(inbound)
 	if err != nil {
 		return err
@@ -94,7 +132,7 @@ func (i Inbound) activeInbound(inbound *entity.Inbound, vpnType entity.VPNType) 
 	return i.inboundRepo.Active(inbound.ID)
 }
 
-func (i Inbound) getInfo(inbound *entity.Inbound) (*vpnProxyDto.Inbound, error) {
+func (i *Inbound) getInfo(inbound *entity.Inbound) (*vpnProxyDto.Inbound, error) {
 	user, err := i.userService.FindByID(inbound.UserID)
 	if err != nil {
 		return &vpnProxyDto.Inbound{}, err
