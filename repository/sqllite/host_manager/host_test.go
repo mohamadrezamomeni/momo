@@ -66,6 +66,13 @@ var (
 		StartRangePort: 1000,
 		EndRangePort:   2000,
 	}
+	hostExample6 = &hostmanagerDto.AddHost{
+		Domain:         "gitlab.com",
+		Port:           "62780",
+		Status:         entity.High,
+		StartRangePort: 1000,
+		EndRangePort:   2000,
+	}
 )
 
 func TestCreateHost(t *testing.T) {
@@ -154,6 +161,18 @@ func TestFilterHosts(t *testing.T) {
 	}
 
 	deleteHosts(h1.ID, h2.ID, h3.ID, h4.ID)
+}
+
+func TestUpdateHost(t *testing.T) {
+	h1, _ := hostRepo.Create(hostExample6)
+	err := hostRepo.Update(
+		h1.ID,
+		&hostmanagerDto.UpdateHost{Rank: 3, Status: entity.Low},
+	)
+	if err != nil {
+		t.Errorf("error has happend that was %e", err)
+	}
+	deleteHosts(h1.ID)
 }
 
 func deleteHosts(ids ...int) {

@@ -30,6 +30,20 @@ func (h *Host) Create(inpt *hostmanagerDto.AddHost) (*entity.Host, error) {
 	return host, nil
 }
 
+func (h *Host) Update(id int, inpt *hostmanagerDto.UpdateHost) error {
+	sql := fmt.Sprintf(
+		"UPDATE hosts SET status = '%s', rank = %v WHERE id = %v",
+		entity.HostStatusString(inpt.Status),
+		inpt.Rank,
+		id,
+	)
+	_, err := h.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.DebuggingErrorf("error to update record %v the error was %v", id, err)
+	}
+	return nil
+}
+
 func (h *Host) Delete(id int) error {
 	sql := fmt.Sprintf("DELETE FROM hosts WHERE id=%v", id)
 	res, err := h.db.Conn().Exec(sql)
