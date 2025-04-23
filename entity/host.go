@@ -1,5 +1,7 @@
 package entity
 
+import momoError "momo/pkg/error"
+
 type Host struct {
 	Domain string
 	ID     int
@@ -9,8 +11,8 @@ type Host struct {
 
 type HostStatus = int
 
-func (h *Host) HostStatusString() string {
-	switch h.Status {
+func HostStatusString(status HostStatus) string {
+	switch status {
 	case High:
 		return "high"
 	case Medium:
@@ -22,9 +24,32 @@ func (h *Host) HostStatusString() string {
 	}
 }
 
+func MapTuStatus(statusString string) (HostStatus, error) {
+	switch statusString {
+	case HighStr:
+		return High, nil
+	case MediumStr:
+		return Medium, nil
+	case LowStr:
+		return Low, nil
+	case DeactiveStr:
+		return Deactive, nil
+	default:
+		return uknown, momoError.Errorf("the status of \"%s\" doesn't exist ", statusString)
+	}
+}
+
 const (
 	High HostStatus = iota
 	Medium
 	Low
 	Deactive
+	uknown
+)
+
+const (
+	HighStr     = "high"
+	MediumStr   = "medium"
+	LowStr      = "low"
+	DeactiveStr = "deactive"
 )
