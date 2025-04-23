@@ -99,6 +99,10 @@ func TestFilterHosts(t *testing.T) {
 		t.Errorf("2. we expected 1 items but we got %v", len(hosts))
 	}
 
+	if hosts[0].Status != entity.High {
+		t.Errorf("2. we expected status be high")
+	}
+
 	hosts, err = hostRepo.Filter(&hostmanagerDto.FilterHosts{
 		Statuses: []entity.HostStatus{entity.Medium},
 	})
@@ -108,6 +112,9 @@ func TestFilterHosts(t *testing.T) {
 
 	if len(hosts) != 1 {
 		t.Errorf("3. we expected 1 items but we got %v", len(hosts))
+	}
+	if hosts[0].Status != entity.Medium {
+		t.Errorf("3. we expected status be high")
 	}
 
 	hosts, err = hostRepo.Filter(&hostmanagerDto.FilterHosts{
@@ -119,6 +126,9 @@ func TestFilterHosts(t *testing.T) {
 
 	if len(hosts) != 1 {
 		t.Errorf("4. we expected 1 items but we got %v", len(hosts))
+	}
+	if hosts[0].Status != entity.Low {
+		t.Errorf("3. we expected status be low")
 	}
 
 	hosts, err = hostRepo.Filter(&hostmanagerDto.FilterHosts{
