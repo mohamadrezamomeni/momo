@@ -225,7 +225,6 @@ func TestRertriveFaultyInbounds(t *testing.T) {
 	if err != nil {
 		t.Errorf("the problem has happend that was %v", err)
 	}
-	fmt.Println(inbounds[0].IsBlock, inbounds[0].Start, inbounds[0].End)
 	if len(inbounds) != 2 {
 		t.Errorf("the number of inbouns could be 2 but system got %v", len(inbounds))
 	}
