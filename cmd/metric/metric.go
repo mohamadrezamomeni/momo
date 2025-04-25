@@ -18,7 +18,7 @@ func main() {
 	}
 	momoLogger.Init(cfg.Log)
 
-	metricSrv := metricService.New()
+	metricSrv := metricService.New(&cfg.MetricServer)
 
 	server := metricServer.New(metricSrv, cfg.MetricServer)
 

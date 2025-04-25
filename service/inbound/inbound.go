@@ -36,7 +36,7 @@ type inboundRepo interface {
 }
 
 type hostService interface {
-	FindHost(entity.HostStatus) (string, string, error)
+	FindRightHost(entity.HostStatus) (string, string, error)
 }
 
 func New(
@@ -54,7 +54,7 @@ func New(
 }
 
 func (i *Inbound) Create(inpt *dto.CreateInbound) error {
-	host, port, err := i.hostService.FindHost(inpt.ServerType)
+	host, port, err := i.hostService.FindRightHost(inpt.ServerType)
 	if err != nil {
 		return err
 	}

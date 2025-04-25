@@ -37,7 +37,7 @@ func MapTuStatus(statusString string) (HostStatus, error) {
 	case DeactiveStr:
 		return Deactive, nil
 	default:
-		return uknown, momoError.Errorf("the status of \"%s\" doesn't exist ", statusString)
+		return Uknown, momoError.Errorf("the status of \"%s\" doesn't exist ", statusString)
 	}
 }
 
@@ -46,7 +46,7 @@ const (
 	Medium
 	Low
 	Deactive
-	uknown
+	Uknown
 )
 
 const (
