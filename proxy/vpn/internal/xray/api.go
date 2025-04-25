@@ -22,6 +22,7 @@ type Xray struct {
 	hsClient   handlerService.HandlerServiceClient
 	ssClient   statsService.StatsServiceClient
 	lsClient   loggerService.LoggerServiceClient
+	conn       *grpc.ClientConn
 }
 
 func New(cfg *XrayConfig) (*Xray, error) {
@@ -37,6 +38,7 @@ func New(cfg *XrayConfig) (*Xray, error) {
 
 		address: cfg.Address,
 		apiPort: cfg.ApiPort,
+		conn:    conn,
 	}, nil
 }
 
@@ -96,4 +98,8 @@ func (x *Xray) DoesExist(inpt *vpnProxyDto.Inbound) (bool, error) {
 
 func (x *Xray) Test() error {
 	return x.fakeReceiveInboundTraffic()
+}
+
+func (x *Xray) Close() {
+	x.conn.Close()
 }

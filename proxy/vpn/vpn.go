@@ -16,6 +16,7 @@ type IVPN interface {
 	DoesExist(*vpnProxyDto.Inbound) (bool, error)
 	GetAddress() string
 	Test() error
+	Close()
 }
 
 type VPN struct {
@@ -98,4 +99,10 @@ func (p *ProxyVPN) GetTraffic(inpt *proxyVpnDto.Inbound, VPNType entity.VPNType)
 		return &vpnSerializer.Traffic{}, momoError.DebuggingErrorf("%v vpn has'nt been introuduced with address %s", VPNType, inpt.Address)
 	}
 	return v.GetTraffic(inpt)
+}
+
+func (p *ProxyVPN) Close() {
+	for _, vpn := range p.vpns {
+		vpn.V.Close()
+	}
 }
