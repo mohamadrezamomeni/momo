@@ -9,5 +9,5 @@ import (
 type Config struct {
 	Log          log.LogConfig             `koanf:"log"`
 	DB           sqllite.DBConfig          `koanf:"db"`
-	MetricServer metricServer.MetricConfig `koandf:"metric_server"`
+	MetricServer metricServer.MetricConfig `koanf:"metric_server"`
 }

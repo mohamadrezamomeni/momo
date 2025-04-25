@@ -8,6 +8,7 @@ db:
   migrations:
 
 metric_server:
+  address:
   port:
   cpu_weight:
   memory_weight:

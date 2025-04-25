@@ -1,6 +1,7 @@
 package metricserver
 
 type MetricConfig struct {
+	Address       string `koanf:"address"`
 	Port          string `koanf:"port"`
 	CPUWeight     int    `koanf:"cpu_weight"`
 	MemoryWeight  int    `koanf:"memory_weight"`

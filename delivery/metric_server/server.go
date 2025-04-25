@@ -2,6 +2,7 @@ package metricserver
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 
@@ -13,8 +14,8 @@ import (
 
 type Server struct {
 	metric.UnimplementedMetricServer
-	svc  metricService
-	port string
+	svc     metricService
+	address string
 }
 
 type metricService interface {
@@ -22,15 +23,16 @@ type metricService interface {
 }
 
 func New(metricSvc metricService, metricConfig MetricConfig) *Server {
+	address := fmt.Sprintf("%s:%s", metricConfig.Address, metricConfig.Port)
 	return &Server{
 		UnimplementedMetricServer: metric.UnimplementedMetricServer{},
 		svc:                       metricSvc,
-		port:                      metricConfig.Port,
+		address:                   address,
 	}
 }
 
 func (s *Server) Start() {
-	listen, err := net.Listen("tcp", ":50051")
+	listen, err := net.Listen("tcp", s.address)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -46,6 +48,6 @@ func (s *Server) Start() {
 func (s *Server) GetMetric(ctx context.Context, req *metric.MetricRequest) (*metric.MetricResponse, error) {
 	return &metric.MetricResponse{
 		Rank:   2,
-		Status: "dd",
+		Status: entity.HostStatusString(entity.High),
 	}, nil
 }

@@ -17,7 +17,6 @@ func main() {
 		log.Fatalf("ERROR: somthing went wrong with loding config \n - the problem was %v", err)
 	}
 	momoLogger.Init(cfg.Log)
-
 	metricSrv := metricService.New(&cfg.MetricServer)
 
 	server := metricServer.New(metricSrv, cfg.MetricServer)
