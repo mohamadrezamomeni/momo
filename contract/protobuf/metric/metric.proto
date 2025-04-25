@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package metric;
+
+option go_package = "contract/gogrpc/metric";
+
+message MetricResponse {
+    string  status = 1;
+    uint32  rank = 2;
+}
+
+message MetricRequest {
+}
+
+
+service Metric {
+    rpc GetMetric(MetricRequest) returns (MetricResponse);
+}
