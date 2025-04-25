@@ -1,6 +1,6 @@
 package log
 
 type LogConfig struct {
-	AccessFile string `koanf:"accessFile"`
-	ErrorFile  string `koanf:"errorFile"`
+	AccessFile string `koanf:"access_file"`
+	ErrorFile  string `koanf:"error_file"`
 }

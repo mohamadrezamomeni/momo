@@ -1,8 +1,14 @@
 log:
-  accessFile:
-  errorFile:
+  access_file:
+  error_file:
 
 db:
   dialect:
   path:
   migrations:
+
+metric_server:
+  port:
+  cpu_weight:
+  memory_weight:
+  network_weight:
