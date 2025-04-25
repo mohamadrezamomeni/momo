@@ -1,6 +1,7 @@
 package xray
 
 import (
+	"os"
 	"testing"
 
 	"momo/proxy/vpn/internal/xray/dto"
@@ -13,6 +14,9 @@ func TestMain(m *testing.M) {
 		Address: "192.168.116.129",
 		ApiPort: "62789",
 	})
+
+	code := m.Run()
+	os.Exit(code)
 }
 
 var (
