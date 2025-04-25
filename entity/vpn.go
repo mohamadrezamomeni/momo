@@ -1,6 +1,8 @@
 package entity
 
-import momoError "momo/pkg/error"
+import (
+	momoError "momo/pkg/error"
+)
 
 type VPN struct {
 	ID        int
@@ -14,15 +16,16 @@ type VPN struct {
 type VPNType = int
 
 const (
-	XRAY_VPN VPNType = iota
+	XRAY_VPN VPNType = iota + 1
+	UknownVPNTYPe
 )
 
-func (v *VPN) VPNTypeString() string {
-	switch v.VPNType {
+func VPNTypeString(vpnType int) string {
+	switch vpnType {
 	case XRAY_VPN:
 		return "xray"
 	default:
-		return "UNKHOWN"
+		return "unkhown"
 	}
 }
 
@@ -31,6 +34,6 @@ func ConvertStringVPNTypeToEnum(key string) (int, error) {
 	case "xray":
 		return XRAY_VPN, nil
 	default:
-		return 0, momoError.Error("unexpected vpn_type's value")
+		return UknownVPNTYPe, momoError.Error("unexpected vpn_type's value")
 	}
 }

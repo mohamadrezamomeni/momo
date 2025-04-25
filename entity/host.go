@@ -43,7 +43,7 @@ func MapTuStatus(statusString string) (HostStatus, error) {
 }
 
 const (
-	High HostStatus = iota
+	High HostStatus = iota + 1
 	Medium
 	Low
 	Deactive
