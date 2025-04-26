@@ -38,15 +38,20 @@ func (h *Host) findAppropriateHostByStatus(statuses []entity.HostStatus) (*entit
 			Statuses: statuses,
 		},
 	)
-
-	highHosts := []*entity.Host{}
-	mediumHosts := []*entity.Host{}
-	lowHosts := []*entity.Host{}
 	if err != nil {
 		return nil, err
 	}
 
+	if err != nil {
+		return nil, err
+	}
+
+	highHosts := []*entity.Host{}
+	mediumHosts := []*entity.Host{}
+	lowHosts := []*entity.Host{}
+
 	for _, host := range hosts {
+
 		if host.Status == entity.High {
 			highHosts = append(highHosts, host)
 		}

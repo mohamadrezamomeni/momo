@@ -1,4 +1,4 @@
-package metricserver
+package worker
 
 type MetricConfig struct {
 	Address       string `koanf:"address"`

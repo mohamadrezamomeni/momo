@@ -3,13 +3,11 @@ package entity
 import momoError "momo/pkg/error"
 
 type Host struct {
-	Domain         string
-	Rank           uint32
-	ID             int
-	Port           string
-	StartRangePort int
-	EndRangePort   int
-	Status         HostStatus
+	Domain string
+	Rank   uint32
+	ID     int
+	Port   string
+	Status HostStatus
 }
 
 type HostStatus = int

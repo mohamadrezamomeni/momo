@@ -7,45 +7,33 @@ import (
 
 var (
 	hostExample1 = &hostmanagerDto.AddHost{
-		Domain:         "google.com",
-		Port:           "62789",
-		Status:         entity.Deactive,
-		StartRangePort: 1000,
-		EndRangePort:   2000,
+		Domain: "google.com",
+		Port:   "62789",
+		Status: entity.Deactive,
 	}
 	hostExample2 = &hostmanagerDto.AddHost{
-		Domain:         "yahoo.com",
-		Port:           "62780",
-		Status:         entity.High,
-		StartRangePort: 2500,
-		EndRangePort:   3000,
+		Domain: "yahoo.com",
+		Port:   "62780",
+		Status: entity.High,
 	}
 	hostExample3 = &hostmanagerDto.AddHost{
-		Domain:         "facebook.com",
-		Port:           "62780",
-		Status:         entity.Deactive,
-		StartRangePort: 2000,
-		EndRangePort:   5000,
+		Domain: "facebook.com",
+		Port:   "62780",
+		Status: entity.Deactive,
 	}
 	hostExample4 = &hostmanagerDto.AddHost{
-		Domain:         "twitter.com",
-		Port:           "62780",
-		Status:         entity.Medium,
-		StartRangePort: 1000,
-		EndRangePort:   2000,
+		Domain: "twitter.com",
+		Port:   "62780",
+		Status: entity.Medium,
 	}
 	hostExample5 = &hostmanagerDto.AddHost{
-		Domain:         "github.com",
-		Port:           "62780",
-		Status:         entity.Low,
-		StartRangePort: 1000,
-		EndRangePort:   2000,
+		Domain: "github.com",
+		Port:   "62780",
+		Status: entity.Low,
 	}
 	hostExample6 = &hostmanagerDto.AddHost{
-		Domain:         "gitlab.com",
-		Port:           "62780",
-		Status:         entity.High,
-		StartRangePort: 1000,
-		EndRangePort:   2000,
+		Domain: "gitlab.com",
+		Port:   "62780",
+		Status: entity.High,
 	}
 )

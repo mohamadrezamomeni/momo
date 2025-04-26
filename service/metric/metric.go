@@ -1,7 +1,7 @@
 package metric
 
 import (
-	metricServer "momo/delivery/metric_server"
+	metricServer "momo/delivery/worker"
 	"momo/entity"
 )
 

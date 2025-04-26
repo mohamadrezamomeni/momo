@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package port;
+
+option go_package = "contract/gogrpc/port";
+
+message PortAssignResponse {
+    string  port = 1;
+}
+
+message PortAssignRequest {
+}
+
+
+service Port {
+    rpc GetAvailablePort(PortAssignRequest) returns (PortAssignResponse);
+}

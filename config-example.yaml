@@ -7,9 +7,17 @@ db:
   path:
   migrations:
 
-metric_server:
+metric:
   address:
   port:
   cpu_weight:
   memory_weight:
   network_weight:
+
+port_assignment:
+  start_port:
+  end_port:
+
+worker_server:
+  address:
+  port:
