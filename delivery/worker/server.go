@@ -11,6 +11,8 @@ import (
 	"momo/entity"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Server struct {
@@ -65,7 +67,7 @@ func (s *Server) GetMetric(ctx context.Context, req *metric.MetricRequest) (*met
 func (s *Server) GetAvailablePort(ctx context.Context, req *port.PortAssignRequest) (*port.PortAssignResponse, error) {
 	p, err := s.portSvc.GetAvailablePort()
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Unavailable, "invalid input: %v", err)
 	}
 	return &port.PortAssignResponse{
 		Port: p,

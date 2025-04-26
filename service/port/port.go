@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"sync"
 
 	"momo/delivery/worker"
 	momoError "momo/pkg/error"
 )
 
 type Port struct {
+	mu        sync.Mutex
 	startPort int
 	endPort   int
 }
@@ -31,6 +33,8 @@ func (p *Port) GetAvailablePort() (string, error) {
 }
 
 func (p *Port) isPortAvailable(port int) bool {
+	p.mu.Lock()
+	defer p.mu.Unlock()
 	addr := fmt.Sprintf("127.0.0.1:%d", port)
 	listen, err := net.Listen("tcp", addr)
 	if err != nil {
