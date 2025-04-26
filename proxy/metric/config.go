@@ -1,4 +1,4 @@
-package slaves
+package metric
 
 type Config struct {
 	Address string

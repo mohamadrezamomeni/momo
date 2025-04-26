@@ -1,4 +1,4 @@
-package slaves
+package metric
 
 import (
 	"context"
@@ -12,25 +12,25 @@ import (
 	"google.golang.org/grpc"
 )
 
-type ProxySlave struct {
+type ProxyMetric struct {
 	conn    *grpc.ClientConn
 	address string
 }
 
-func New(cfg *Config) (*ProxySlave, error) {
+func New(cfg *Config) (*ProxyMetric, error) {
 	address := fmt.Sprintf("%s:%s", cfg.Address, cfg.Port)
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
-		return &ProxySlave{}, err
+		return &ProxyMetric{}, err
 	}
 
-	return &ProxySlave{
+	return &ProxyMetric{
 		conn:    conn,
 		address: address,
 	}, nil
 }
 
-func (ps *ProxySlave) GetMetric() (uint32, string, error) {
+func (ps *ProxyMetric) GetMetric() (uint32, string, error) {
 	metricClient := metric.NewMetricClient(ps.conn)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -41,6 +41,6 @@ func (ps *ProxySlave) GetMetric() (uint32, string, error) {
 	return metric.Rank, metric.Status, nil
 }
 
-func (ps *ProxySlave) Close() {
+func (ps *ProxyMetric) Close() {
 	ps.conn.Close()
 }

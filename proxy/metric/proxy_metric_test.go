@@ -1,4 +1,4 @@
-package slaves
+package metric
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 	"momo/entity"
 )
 
-var ps *ProxySlave
+var ps *ProxyMetric
 
 func TestMain(m *testing.M) {
 	ps, _ = New(&Config{Address: "localhost", Port: "666"})
