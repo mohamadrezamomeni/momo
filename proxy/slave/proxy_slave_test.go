@@ -1,7 +1,6 @@
 package slaves
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -23,11 +22,10 @@ func TestGetMetric(t *testing.T) {
 	if err != nil {
 		t.Errorf("something has happend we couldn't get metric the problem was %v", err)
 	}
-	fmt.Println(rank, status, err)
 	if rank < 0 {
 		t.Error("rank is wrong.")
 	}
-	hostStatus, _ := entity.MapTuStatus(status)
+	hostStatus, _ := entity.MapHostStatusToEnum(status)
 	if hostStatus == entity.Uknown {
 		t.Fatal("we got unkhon status")
 	}
