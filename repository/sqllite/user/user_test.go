@@ -1,81 +1,69 @@
 package user
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
-	"momo/entity"
-	"momo/pkg/config"
-	"momo/pkg/utils"
-
 	userDto "momo/dto/repository/user"
+
 	"momo/repository/migrate"
 	"momo/repository/sqllite"
 )
 
-var userRepo IUserRepository
+var userRepo *User
 
 func TestMain(m *testing.M) {
-	cfg, err := config.Load("config_test.yaml")
-	if err != nil {
-		os.Exit(1)
+	config := &sqllite.DBConfig{
+		Dialect:    "sqlite3",
+		Path:       "test.db",
+		Migrations: "./repository/sqllite/migrations",
 	}
-	db := sqllite.New(&cfg.DB)
 
-	migrate := migrate.New(&cfg.DB)
-
+	migrate := migrate.New(config)
 	migrate.UP()
+
+	db := sqllite.New(config)
 
 	userRepo = New(db)
 
 	code := m.Run()
 
+	migrate.DOWN()
+
 	os.Exit(code)
 }
 
-func getInfo() (string, string, string) {
-	username := fmt.Sprintf("%s", utils.RandomString(5))
-	name := utils.RandomString(5)
-	family := utils.RandomString(5)
-	return username, name, family
-}
-
 func TestCreate(t *testing.T) {
-	username, firstName, lastName := getInfo()
+	defer userRepo.DeleteAll()
 
-	userCreated, err := userRepo.Create(&userDto.Create{
-		Username:  username,
-		FirstName: firstName,
-		LastName:  lastName,
-	})
+	userCreated, err := userRepo.Create(user1)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	if userCreated.Username != username || userCreated.FirstName != firstName || userCreated.LastName != lastName {
+	if userCreated.Username != user1.Username ||
+		userCreated.FirstName != user1.FirstName ||
+		userCreated.LastName != user1.LastName {
 		t.Error("user creation requires some troubleshooting")
 		return
 	}
-	userRepo.Delete(userCreated.ID)
 }
 
 func TestFindByUsername(t *testing.T) {
-	username, firstName, lastName := getInfo()
-	userCreated, err := userRepo.Create(&userDto.Create{
-		Username:  username,
-		FirstName: firstName,
-		LastName:  lastName,
-	})
+	userCreated, err := userRepo.Create(user1)
+	defer userRepo.DeleteAll()
 
-	user, err := userRepo.FindUserByUsername(username)
+	user, err := userRepo.FindUserByUsername(user1.Username)
 	if err != nil {
 		t.Errorf("findByUsername needs troubleshooting error: %v", err)
 		userRepo.Delete(userCreated.ID)
 		return
 	}
-	if user.Username != username || user.FirstName != firstName || user.LastName != lastName || user.ID != userCreated.ID {
+	if user.Username != user1.Username ||
+		user.FirstName != user1.FirstName ||
+		user.LastName != user1.LastName ||
+		user.ID != userCreated.ID {
 		t.Error("something went wrong to compare results")
 		userRepo.Delete(userCreated.ID)
 		return
@@ -84,12 +72,9 @@ func TestFindByUsername(t *testing.T) {
 }
 
 func TestFindByID(t *testing.T) {
-	username, firstName, lastName := getInfo()
-	userCreated, err := userRepo.Create(&userDto.Create{
-		Username:  username,
-		FirstName: firstName,
-		LastName:  lastName,
-	})
+	userCreated, err := userRepo.Create(user1)
+	defer userRepo.DeleteAll()
+
 	user, err := userRepo.FindUserByID(userCreated.ID)
 	if err != nil {
 		t.Errorf("findByUsername needs troubleshooting error: %v", err)
@@ -97,17 +82,20 @@ func TestFindByID(t *testing.T) {
 		return
 	}
 
-	if user.Username != username || user.FirstName != firstName || user.LastName != lastName || user.ID != userCreated.ID {
+	if user.Username != user1.Username ||
+		user.FirstName != user1.FirstName ||
+		user.LastName != user1.LastName ||
+		user.ID != userCreated.ID {
 		t.Error("something went wrong to compare results")
 		return
 	}
-	userRepo.Delete(userCreated.ID)
 }
 
 func TestFilter(t *testing.T) {
-	user1, user2, user3 := staticUsers()
-	ids := []string{user1.ID, user2.ID, user3.ID}
-
+	userRepo.Create(user1)
+	userRepo.Create(user2)
+	userRepo.Create(user3)
+	defer userRepo.DeleteAll()
 	users, err := userRepo.FilterUsers(&userDto.FilterUsers{
 		FirstName: "mic",
 	})
@@ -151,43 +139,5 @@ func TestFilter(t *testing.T) {
 
 	if len(users) != 1 {
 		t.Errorf("4. something went wrong.")
-	}
-	deleteUsers(ids)
-}
-
-func staticUsers() (*entity.User, *entity.User, *entity.User) {
-	username1 := "andy"
-	username2 := "micheal"
-	username3 := "micka"
-
-	firstName1 := "andy"
-	firstName2 := "micheal"
-	firstName3 := "micka"
-
-	lastName1 := "arodoa"
-	lastName2 := "casta"
-	lastName3 := "castarica"
-
-	user1, _ := userRepo.Create(&userDto.Create{
-		Username:  username1,
-		FirstName: firstName1,
-		LastName:  lastName1,
-	})
-	user2, _ := userRepo.Create(&userDto.Create{
-		Username:  username2,
-		FirstName: firstName2,
-		LastName:  lastName2,
-	})
-	user3, _ := userRepo.Create(&userDto.Create{
-		Username:  username3,
-		FirstName: firstName3,
-		LastName:  lastName3,
-	})
-	return user1, user2, user3
-}
-
-func deleteUsers(ids []string) {
-	for _, id := range ids {
-		userRepo.Delete(id)
 	}
 }

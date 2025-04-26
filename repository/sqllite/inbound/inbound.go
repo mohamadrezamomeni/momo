@@ -17,13 +17,12 @@ func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error
 	err := i.db.Conn().QueryRow(`
 	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_active, start, end, is_block)
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-	RETURNING id, protocol, is_active, domain, vpn_type, port, user_id, tag, is_block, start, end
-	`, inpt.Protocol, inpt.Domain, inpt.VPNType, inpt.Port, inpt.UserID, inpt.Tag, inpt.IsActive, inpt.Start, inpt.End, inpt.IsBlock).Scan(
+	RETURNING id, protocol, is_active, domain, port, user_id, tag, is_block, start, end
+	`, inpt.Protocol, inpt.Domain, entity.VPNTypeString(inpt.VPNType), inpt.Port, inpt.UserID, inpt.Tag, inpt.IsActive, inpt.Start, inpt.End, inpt.IsBlock).Scan(
 		&inbound.ID,
 		&inbound.Protocol,
 		&inbound.IsActive,
 		&inbound.Domain,
-		&inbound.VPNType,
 		&inbound.Port,
 		&inbound.UserID,
 		&inbound.Tag,
@@ -32,9 +31,9 @@ func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error
 		&inbound.End,
 	)
 	if err != nil {
-		return &entity.Inbound{}, momoError.Errorf("somoething went wrong to save inbound error: %v", err)
+		return nil, momoError.Errorf("somoething went wrong to save inbound error: %v", err)
 	}
-
+	inbound.VPNType = inpt.VPNType
 	return inbound, nil
 }
 
@@ -53,6 +52,21 @@ func (i *Inbound) Delete(id int) error {
 	if rowsAffected == 0 {
 		return momoError.Error("None of the records have been affected.")
 	}
+	return nil
+}
+
+func (i *Inbound) DeleteAll() error {
+	sql := "DELETE FROM inbounds"
+	res, err := i.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+	}
+
+	_, err = res.RowsAffected()
+	if err != nil {
+		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+	}
+
 	return nil
 }
 
@@ -101,34 +115,24 @@ func (i *Inbound) makeQueryFilter(inpt *inboundDto.FilterInbound) string {
 	t := reflect.TypeOf(*inpt)
 
 	subSQLs := make([]string, 0)
-
-	convertKeysToColumns := func(k string) string {
-		switch k {
-		case "Protocol":
-			return "protocol"
-		case "IsActice":
-			return "is_active"
-		case "Domain":
-			return "domain"
-		case "VPNType":
-			return "vpn_type"
-		case "Port":
-			return "port"
-		case "UserID":
-			return "user_id"
-		default:
-			return ""
-		}
-	}
 	for i := 0; i < v.NumField(); i++ {
 		field := t.Field(i)
 		value := v.Field(i)
 
-		if value.Kind() == reflect.String && value.String() != "" {
-			subSQLs = append(subSQLs, fmt.Sprintf("%s = '%s'", convertKeysToColumns(field.Name), value.String()))
-		} else if value.Kind() == reflect.Pointer && !value.IsNil() && value.Elem().Kind() == reflect.Bool {
-			subSQLs = append(subSQLs, fmt.Sprintf("%s = %v", convertKeysToColumns(field.Name), true))
+		if value.Kind() == reflect.String && value.String() != "" && field.Name == "Protocol" {
+			subSQLs = append(subSQLs, fmt.Sprintf("protocol = '%s'", value.String()))
+		} else if field.Name == "IsActive" && !value.IsNil() && value.Elem().Kind() == reflect.Bool {
+			subSQLs = append(subSQLs, fmt.Sprintf("is_active = %v", value.Elem().Bool()))
+		} else if value.Kind() == reflect.String && value.String() != "" && field.Name == "Domain" {
+			subSQLs = append(subSQLs, fmt.Sprintf("domain = '%s'", value.String()))
+		} else if value.Kind() == reflect.String && value.String() != "" && field.Name == "Port" {
+			subSQLs = append(subSQLs, fmt.Sprintf("port = '%s'", value.String()))
+		} else if value.Kind() == reflect.String && value.String() != "" && field.Name == "VPNType" {
+			subSQLs = append(subSQLs, fmt.Sprintf("vpn_type = '%s'", entity.VPNTypeString(int(value.Int()))))
+		} else if value.Kind() == reflect.String && value.String() != "" && field.Name == "UserID" {
+			subSQLs = append(subSQLs, fmt.Sprintf("user_id = '%s'", value.String()))
 		}
+
 	}
 	subQuery := strings.Join(subSQLs, " AND ")
 	sql += fmt.Sprintf(" WHERE %s", subQuery)
@@ -156,16 +160,44 @@ func (i *Inbound) RetriveFaultyInbounds() ([]*entity.Inbound, error) {
 	return inbounds, nil
 }
 
+func (i *Inbound) CountingUsedPortEachHost() ([]*struct {
+	domain string
+	count  uint16
+}, error,
+) {
+	query := "SELECT domain, COUNT(*) FROM inbounds WHERE is_active = true GROUP BY domain"
+	rows, err := i.db.Conn().Query(query)
+	if err != nil {
+		return nil, momoError.DebuggingErrorf("the problem has happend that was %v", err)
+	}
+	var summeries []*struct {
+		domain string
+		count  uint16
+	}
+	for rows.Next() {
+		var data struct {
+			domain string
+			count  uint16
+		}
+
+		if err := rows.Scan(&data.domain, &data.count); err != nil {
+			return nil, momoError.DebuggingErrorf("the problem has happend that was in %v", err)
+		}
+		summeries = append(summeries, &data)
+	}
+	return summeries, nil
+}
+
 func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
 	inbound := &entity.Inbound{}
 	var createdAt, updatedAt interface{}
-
+	var vpnType string
 	err := rows.Scan(
 		&inbound.ID,
 		&inbound.Protocol,
 		&inbound.IsActive,
 		&inbound.Domain,
-		&inbound.VPNType,
+		&vpnType,
 		&inbound.Port,
 		&inbound.UserID,
 		&inbound.Tag,
@@ -178,5 +210,6 @@ func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
 	if err != nil {
 		return inbound, momoError.DebuggingErrorf("error has occured err: %v", err)
 	}
+	inbound.VPNType = entity.ConvertStringVPNTypeToEnum(vpnType)
 	return inbound, nil
 }

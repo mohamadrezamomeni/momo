@@ -1,160 +1,56 @@
 package inbound
 
 import (
-	"fmt"
 	"os"
 	"testing"
-	"time"
 
 	inboundDto "momo/dto/repository/inbound"
-	"momo/entity"
-	"momo/pkg/config"
 	"momo/repository/migrate"
 	"momo/repository/sqllite"
-
-	utils "momo/pkg/utils"
-
-	"github.com/google/uuid"
 )
 
 var inboundRepo *Inbound
 
-var (
-	port1           = "1081"
-	port2           = "1082"
-	port3           = "1083"
-	userID1         = uuid.New().String()
-	userID2         = uuid.New().String()
-	userID3         = uuid.New().String()
-	userID4         = uuid.New().String()
-	userID5         = uuid.New().String()
-	userID6         = uuid.New().String()
-	userID7         = uuid.New().String()
-	inboundExample1 = &inboundDto.CreateInbound{
-		Tag:      fmt.Sprintf("inbound-%s", port1),
-		Protocol: "vmess",
-		IsBlock:  false,
-		Port:     port1,
-		Domain:   "google.com",
-		UserID:   userID1,
-		VPNType:  entity.XRAY_VPN,
-		Start:    utils.GetDateTime("2024-04-21 14:30:00"),
-		End:      utils.GetDateTime("2024-04-22 14:30:00"),
-	}
-
-	inboundExample2 = &inboundDto.CreateInbound{
-		Tag:      fmt.Sprintf("inbound-%s", port2),
-		Protocol: "vmess",
-		Port:     port2,
-		IsBlock:  false,
-		Domain:   "twitter.com",
-		UserID:   userID2,
-		VPNType:  entity.XRAY_VPN,
-		Start:    utils.GetDateTime("2024-04-21 14:30:00"),
-		End:      utils.GetDateTime("2024-04-22 14:30:00"),
-	}
-
-	inboundExample3 = &inboundDto.CreateInbound{
-		Tag:      fmt.Sprintf("inbound-%s", port2),
-		Protocol: "http",
-		Port:     port2,
-		Domain:   "googoo.com",
-		UserID:   userID2,
-		IsBlock:  false,
-		VPNType:  entity.XRAY_VPN,
-		Start:    utils.GetDateTime("2024-04-21 14:30:00"),
-		End:      utils.GetDateTime("2024-04-22 14:30:00"),
-	}
-
-	inboundExample4 = &inboundDto.CreateInbound{
-		Tag:      fmt.Sprintf("inbound-%s", port3),
-		Protocol: "http",
-		Port:     port3,
-		Domain:   "googoo.com",
-		UserID:   userID3,
-		VPNType:  entity.XRAY_VPN,
-		IsActive: true,
-		IsBlock:  false,
-		Start:    time.Now().AddDate(0, 0, -15),
-		End:      time.Now().AddDate(0, 0, 15),
-	}
-
-	inboundExample5 = &inboundDto.CreateInbound{
-		Tag:      fmt.Sprintf("inbound-%s", port3),
-		Protocol: "http",
-		Port:     port3,
-		Domain:   "googoo.com",
-		UserID:   userID4,
-		VPNType:  entity.XRAY_VPN,
-		IsActive: true,
-		IsBlock:  true,
-		Start:    time.Now().AddDate(0, 0, -15),
-		End:      time.Now().AddDate(0, 0, 15),
-	}
-
-	inboundExample6 = &inboundDto.CreateInbound{
-		Tag:      fmt.Sprintf("inbound-%s", port3),
-		Protocol: "http",
-		Port:     port3,
-		Domain:   "googoo.com",
-		UserID:   userID5,
-		VPNType:  entity.XRAY_VPN,
-		IsActive: false,
-		IsBlock:  true,
-		Start:    time.Now().AddDate(0, 0, -15),
-		End:      time.Now().AddDate(0, 0, 15),
-	}
-
-	inboundExample7 = &inboundDto.CreateInbound{
-		Tag:      fmt.Sprintf("inbound-%s", port3),
-		Protocol: "http",
-		Port:     port3,
-		Domain:   "googoo.com",
-		UserID:   userID6,
-		VPNType:  entity.XRAY_VPN,
-		IsActive: true,
-		IsBlock:  false,
-		Start:    time.Now().AddDate(0, -2, 0),
-		End:      time.Now().AddDate(0, -1, 0),
-	}
-)
-
 func TestMain(m *testing.M) {
-	cfg, err := config.Load("config_test.yaml")
-	if err != nil {
-		os.Exit(1)
+	config := &sqllite.DBConfig{
+		Dialect:    "sqlite3",
+		Path:       "test.db",
+		Migrations: "./repository/sqllite/migrations",
 	}
-	db := sqllite.New(&cfg.DB)
 
-	migrate := migrate.New(&cfg.DB)
-
+	migrate := migrate.New(config)
 	migrate.UP()
+
+	db := sqllite.New(config)
 
 	inboundRepo = New(db)
 
 	code := m.Run()
+
+	migrate.DOWN()
+
 	os.Exit(code)
 }
 
 func TestCreateInbound(t *testing.T) {
-	ret, err := inboundRepo.Create(inboundExample1)
+	ret, err := inboundRepo.Create(inbound1)
 	if err != nil {
 		t.Errorf("something wrong has happend the problem was %v", err)
 	}
-	if ret.Domain != inboundExample1.Domain ||
-		ret.Port != inboundExample1.Port ||
+	if ret.Domain != inbound1.Domain ||
+		ret.Port != inbound1.Port ||
 		ret.IsActive != false ||
-		ret.IsBlock != inboundExample1.IsBlock ||
-		ret.UserID != inboundExample1.UserID ||
-		ret.VPNType != inboundExample1.VPNType {
+		ret.IsBlock != inbound1.IsBlock ||
+		ret.UserID != inbound1.UserID ||
+		ret.VPNType != inbound1.VPNType {
 		t.Error("data wasn't saved currectly")
 	}
 
-	inboundRepo.Delete(ret.ID)
+	inboundRepo.DeleteAll()
 }
 
 func TestChangeStatus(t *testing.T) {
-	ret, err := inboundRepo.Create(inboundExample1)
+	ret, err := inboundRepo.Create(inbound1)
 	if err != nil {
 		t.Errorf("something wrong has happend the problem was %v", err)
 	}
@@ -163,63 +59,64 @@ func TestChangeStatus(t *testing.T) {
 	if err != nil {
 		t.Errorf("error has happend that was %v", err)
 	}
-	inboundRepo.Delete(ret.ID)
+	inboundRepo.DeleteAll()
 }
 
 func TestFilterInbounds(t *testing.T) {
-	i1, _ := inboundRepo.Create(inboundExample1)
-	i2, _ := inboundRepo.Create(inboundExample2)
-	i3, _ := inboundRepo.Create(inboundExample3)
-	i4, _ := inboundRepo.Create(inboundExample4)
-	inbounds1, err := inboundRepo.Filter(&inboundDto.FilterInbound{Port: port2})
+	inboundRepo.Create(inbound1)
+	inboundRepo.Create(inbound2)
+	inboundRepo.Create(inbound3)
+	inboundRepo.Create(inbound4)
+
+	inbounds, err := inboundRepo.Filter(&inboundDto.FilterInbound{Port: port2})
 	if err != nil {
 		t.Errorf("1. the problem has occured that is %v", err)
 	}
-	if len(inbounds1) != 2 {
-		t.Errorf("1. the number of items must be %v but got %v items", 2, len(inbounds1))
+	if len(inbounds) != 2 {
+		t.Errorf("1. the number of items must be %v but got %v items", 2, len(inbounds))
 	}
 
-	inbounds2, err := inboundRepo.Filter(&inboundDto.FilterInbound{Protocol: "vmess"})
+	inbounds, err = inboundRepo.Filter(&inboundDto.FilterInbound{Protocol: "vmess"})
 	if err != nil {
 		t.Errorf("2. the problem has occured that is %v", err)
 	}
-	if len(inbounds2) != 2 {
-		t.Errorf("2. the number of items must be %v but got %v items", 2, len(inbounds2))
+	if len(inbounds) != 2 {
+		t.Errorf("2. the number of items must be %v but got %v items", 2, len(inbounds))
 	}
 
-	inbounds3, err := inboundRepo.Filter(&inboundDto.FilterInbound{Domain: "google.com"})
+	inbounds, err = inboundRepo.Filter(&inboundDto.FilterInbound{Domain: "google.com"})
 	if err != nil {
 		t.Errorf("3. the problem has occured that is %v", err)
 	}
-	if len(inbounds3) != 1 {
-		t.Errorf("3. the number of items must be %v but got %v items", 1, len(inbounds3))
+	if len(inbounds) != 1 {
+		t.Errorf("3. the number of items must be %v but got %v items", 1, len(inbounds))
 	}
 
-	inbounds4, err := inboundRepo.Filter(&inboundDto.FilterInbound{UserID: userID2, Port: port2})
+	inbounds, err = inboundRepo.Filter(&inboundDto.FilterInbound{UserID: userID2, Port: port2})
 	if err != nil {
 		t.Errorf("4. the problem has occured that is %v", err)
 	}
-	if len(inbounds4) != 2 {
-		t.Errorf("4. the number of items must be %v but got %v items", 2, len(inbounds4))
+	if len(inbounds) != 2 {
+		t.Errorf("4. the number of items must be %v but got %v items", 2, len(inbounds))
 	}
 
 	isAvailableT := true
-	inbounds5, err := inboundRepo.Filter(&inboundDto.FilterInbound{IsActice: &isAvailableT})
+	inbounds, err = inboundRepo.Filter(&inboundDto.FilterInbound{IsActive: &isAvailableT})
 	if err != nil {
 		t.Errorf("5. the problem has occured that is %v", err)
 	}
-	if len(inbounds5) != 1 {
-		t.Errorf("5. the number of items must be %v but got %v items", 1, len(inbounds5))
+	if len(inbounds) != 1 {
+		t.Errorf("5. the number of items must be %v but got %v items", 1, len(inbounds))
 	}
 
-	deleteInbounds(i1.ID, i2.ID, i3.ID, i4.ID)
+	inboundRepo.DeleteAll()
 }
 
 func TestRertriveFaultyInbounds(t *testing.T) {
-	i4, _ := inboundRepo.Create(inboundExample4)
-	i5, _ := inboundRepo.Create(inboundExample5)
-	i6, _ := inboundRepo.Create(inboundExample6)
-	i7, _ := inboundRepo.Create(inboundExample7)
+	inboundRepo.Create(inbound4)
+	inboundRepo.Create(inbound5)
+	inboundRepo.Create(inbound6)
+	inboundRepo.Create(inbound7)
 
 	inbounds, err := inboundRepo.RetriveFaultyInbounds()
 	if err != nil {
@@ -247,11 +144,39 @@ func TestRertriveFaultyInbounds(t *testing.T) {
 		t.Error("we didn't get the userID6")
 	}
 
-	deleteInbounds(i4.ID, i5.ID, i6.ID, i7.ID)
+	inboundRepo.DeleteAll()
 }
 
-func deleteInbounds(ids ...int) {
-	for _, id := range ids {
-		inboundRepo.Delete(id)
+func TestCouningUsedDataEachDomian(t *testing.T) {
+	inboundRepo.Create(inbound3)
+	inboundRepo.Create(inbound4)
+	inboundRepo.Create(inbound5)
+	inboundRepo.Create(inbound6)
+	inboundRepo.Create(inbound7)
+	inboundRepo.Create(inbound8)
+	inboundRepo.Create(inbound9)
+
+	sumery, err := inboundRepo.CountingUsedPortEachHost()
+	if err != nil {
+		t.Error(err.Error())
 	}
+	if len(sumery) != 2 {
+		t.Errorf("we expeted the len of mapSumery be 2 bug we got %v", len(sumery))
+	}
+
+	mapSumery := map[string]uint16{}
+
+	for _, data := range sumery {
+		mapSumery[data.domain] = data.count
+	}
+
+	if count, ok := mapSumery["twitter.com"]; ok && count != 1 {
+		t.Errorf("the count of twitter.com must be 1 but we got %v", count)
+	}
+
+	if count, ok := mapSumery["googoo.com"]; ok && count != 3 {
+		t.Errorf("the count of googoo.com must be 3 but we got %v", count)
+	}
+
+	inboundRepo.DeleteAll()
 }

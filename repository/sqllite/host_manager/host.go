@@ -63,6 +63,21 @@ func (h *Host) Delete(id int) error {
 	return nil
 }
 
+func (h *Host) DeleteAll() error {
+	sql := "DELETE FROM hosts"
+	res, err := h.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+	}
+
+	_, err = res.RowsAffected()
+	if err != nil {
+		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+	}
+
+	return nil
+}
+
 func (h *Host) Filter(inpt *hostmanagerDto.FilterHosts) ([]*entity.Host, error) {
 	query := h.makeQuery(inpt)
 	rows, err := h.db.Conn().Query(query)
@@ -126,7 +141,7 @@ func (i *Host) scan(rows *sql.Rows) (*entity.Host, error) {
 	if err != nil {
 		return host, momoError.DebuggingErrorf("error has occured err: %v", err)
 	}
-	status, er := entity.MapTuStatus(hostStatusString)
+	status, er := entity.MapHostStatusToEnum(hostStatusString)
 	if err != nil {
 		return nil, er
 	}

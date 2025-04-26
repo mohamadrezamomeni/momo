@@ -22,7 +22,7 @@ func (v *VPN) Create(inpt *vpnManagerDto.Add_VPN) (*entity.VPN, error) {
 	INSERT INTO vpns (domain, is_active, api_port, vpn_type, user_count)
 	VALUES (?, ?, ?, ?, ?)
 	RETURNING id
-	`, inpt.Domain, inpt.IsActive, inpt.ApiPort, vpn.VPNTypeString(), inpt.UserCount).Scan(
+	`, inpt.Domain, inpt.IsActive, inpt.ApiPort, entity.VPNTypeString(vpn.VPNType), inpt.UserCount).Scan(
 		&vpn.ID,
 	)
 	if err != nil {
@@ -45,6 +45,20 @@ func (i *VPN) Delete(id int) error {
 	if rowsAffected == 0 {
 		return momoError.Error("None of the records have been affected.")
 	}
+	return nil
+}
+
+func (i *VPN) DeleteAll() error {
+	sql := "DELETE FROM vpns"
+	res, err := i.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+	}
+	_, err = res.RowsAffected()
+	if err != nil {
+		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+	}
+
 	return nil
 }
 
@@ -93,8 +107,8 @@ func (v *VPN) Filter(inpt *vpnManagerDto.FilterVPNs) ([]*entity.VPN, error) {
 		if err != nil {
 			return []*entity.VPN{}, momoError.DebuggingErrorf("error has occured err: %v", err)
 		}
-		vpnTypeEnum, err := entity.ConvertStringVPNTypeToEnum(vpnType)
-		if err != nil {
+		vpnTypeEnum := entity.ConvertStringVPNTypeToEnum(vpnType)
+		if vpnTypeEnum == entity.UknownVPNType {
 			return []*entity.VPN{}, momoError.DebuggingErrorf("fail to convert vpnType %s to enum", vpnType)
 		}
 		vpn.VPNType = vpnTypeEnum
@@ -111,25 +125,15 @@ func (v *VPN) makeSQlFilter(inpt *vpnManagerDto.FilterVPNs) string {
 	t := reflect.TypeOf(*inpt)
 	subQueries := make([]string, 0)
 
-	convertKeysToColumns := func(k string) string {
-		switch k {
-		case "Domain":
-			return "domain"
-		case "IsActive":
-			return "is_active"
-		case "VPNType":
-			return "vpn_type"
-		}
-		return ""
-	}
-
 	for i := 0; i < t.NumField(); i++ {
 		v := val.Field(i)
 		field := t.Field(i)
-		if v.Kind() == reflect.Pointer && !v.IsNil() && v.Elem().Kind() == reflect.Bool {
-			subQueries = append(subQueries, fmt.Sprintf("%s = %v", convertKeysToColumns(field.Name), v.Elem().Bool()))
-		} else if v.Kind() == reflect.String && v.String() != "" {
-			subQueries = append(subQueries, fmt.Sprintf("%s = '%s'", convertKeysToColumns(field.Name), v.String()))
+		if v.Kind() == reflect.Pointer && !v.IsNil() && v.Elem().Kind() == reflect.Bool && field.Name == "IsActive" {
+			subQueries = append(subQueries, fmt.Sprintf("is_active = %v", v.Elem().Bool()))
+		} else if v.Kind() == reflect.String && v.String() != "" && field.Name == "Domain" {
+			subQueries = append(subQueries, fmt.Sprintf("domain = '%s'", v.String()))
+		} else if field.Name == "VPNType" && v.Int() != 0 {
+			subQueries = append(subQueries, fmt.Sprintf("vpn_type = '%s'", entity.VPNTypeString(int(v.Int()))))
 		}
 	}
 	joinSQL := strings.Join(subQueries, " AND ")
@@ -137,6 +141,5 @@ func (v *VPN) makeSQlFilter(inpt *vpnManagerDto.FilterVPNs) string {
 	if len(joinSQL) > 0 {
 		sql += fmt.Sprintf(" WHERE %s", joinSQL)
 	}
-
 	return sql
 }

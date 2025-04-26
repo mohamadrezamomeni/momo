@@ -6,7 +6,6 @@ import (
 
 	hostmanagerDto "momo/dto/repository/host_manager"
 	"momo/entity"
-	"momo/pkg/config"
 	"momo/repository/migrate"
 	"momo/repository/sqllite"
 )
@@ -14,66 +13,25 @@ import (
 var hostRepo *Host
 
 func TestMain(m *testing.M) {
-	cfg, err := config.Load("config_test.yaml")
-	if err != nil {
-		os.Exit(1)
+	config := &sqllite.DBConfig{
+		Dialect:    "sqlite3",
+		Path:       "test.db",
+		Migrations: "./repository/sqllite/migrations",
 	}
-	db := sqllite.New(&cfg.DB)
 
-	migrate := migrate.New(&cfg.DB)
-
+	migrate := migrate.New(config)
 	migrate.UP()
+
+	db := sqllite.New(config)
 
 	hostRepo = New(db)
 
 	code := m.Run()
+
+	migrate.DOWN()
+
 	os.Exit(code)
 }
-
-var (
-	hostExample1 = &hostmanagerDto.AddHost{
-		Domain:         "google.com",
-		Port:           "62789",
-		Status:         entity.Deactive,
-		StartRangePort: 1000,
-		EndRangePort:   2000,
-	}
-	hostExample2 = &hostmanagerDto.AddHost{
-		Domain:         "yahoo.com",
-		Port:           "62780",
-		Status:         entity.High,
-		StartRangePort: 2500,
-		EndRangePort:   3000,
-	}
-	hostExample3 = &hostmanagerDto.AddHost{
-		Domain:         "facebook.com",
-		Port:           "62780",
-		Status:         entity.Deactive,
-		StartRangePort: 2000,
-		EndRangePort:   5000,
-	}
-	hostExample4 = &hostmanagerDto.AddHost{
-		Domain:         "twitter.com",
-		Port:           "62780",
-		Status:         entity.Medium,
-		StartRangePort: 1000,
-		EndRangePort:   2000,
-	}
-	hostExample5 = &hostmanagerDto.AddHost{
-		Domain:         "github.com",
-		Port:           "62780",
-		Status:         entity.Low,
-		StartRangePort: 1000,
-		EndRangePort:   2000,
-	}
-	hostExample6 = &hostmanagerDto.AddHost{
-		Domain:         "gitlab.com",
-		Port:           "62780",
-		Status:         entity.High,
-		StartRangePort: 1000,
-		EndRangePort:   2000,
-	}
-)
 
 func TestCreateHost(t *testing.T) {
 	host, err := hostRepo.Create(hostExample1)
@@ -88,14 +46,14 @@ func TestCreateHost(t *testing.T) {
 		t.Error("the out put of creating was wrong")
 	}
 
-	hostRepo.Delete(host.ID)
+	hostRepo.DeleteAll()
 }
 
 func TestFilterHosts(t *testing.T) {
-	h1, _ := hostRepo.Create(hostExample2)
-	h2, _ := hostRepo.Create(hostExample3)
-	h3, _ := hostRepo.Create(hostExample4)
-	h4, _ := hostRepo.Create(hostExample5)
+	hostRepo.Create(hostExample2)
+	hostRepo.Create(hostExample3)
+	hostRepo.Create(hostExample4)
+	hostRepo.Create(hostExample5)
 
 	hosts, err := hostRepo.Filter(&hostmanagerDto.FilterHosts{})
 	if err != nil {
@@ -160,7 +118,7 @@ func TestFilterHosts(t *testing.T) {
 		t.Errorf("we expected 3 items but we got %v", len(hosts))
 	}
 
-	deleteHosts(h1.ID, h2.ID, h3.ID, h4.ID)
+	hostRepo.DeleteAll()
 }
 
 func TestUpdateHost(t *testing.T) {
@@ -172,11 +130,5 @@ func TestUpdateHost(t *testing.T) {
 	if err != nil {
 		t.Errorf("error has happend that was %e", err)
 	}
-	deleteHosts(h1.ID)
-}
-
-func deleteHosts(ids ...int) {
-	for _, id := range ids {
-		hostRepo.Delete(id)
-	}
+	hostRepo.DeleteAll()
 }

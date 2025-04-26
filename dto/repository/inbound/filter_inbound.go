@@ -4,7 +4,7 @@ import "momo/entity"
 
 type FilterInbound struct {
 	Protocol string
-	IsActice *bool
+	IsActive *bool
 	Domain   string
 	VPNType  entity.VPNType
 	Port     string

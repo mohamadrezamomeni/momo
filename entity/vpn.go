@@ -1,9 +1,5 @@
 package entity
 
-import (
-	momoError "momo/pkg/error"
-)
-
 type VPN struct {
 	ID        int
 	Domain    string
@@ -17,7 +13,7 @@ type VPNType = int
 
 const (
 	XRAY_VPN VPNType = iota + 1
-	UknownVPNTYPe
+	UknownVPNType
 )
 
 func VPNTypeString(vpnType int) string {
@@ -29,11 +25,11 @@ func VPNTypeString(vpnType int) string {
 	}
 }
 
-func ConvertStringVPNTypeToEnum(key string) (int, error) {
+func ConvertStringVPNTypeToEnum(key string) int {
 	switch key {
 	case "xray":
-		return XRAY_VPN, nil
+		return XRAY_VPN
 	default:
-		return UknownVPNTYPe, momoError.Error("unexpected vpn_type's value")
+		return UknownVPNType
 	}
 }

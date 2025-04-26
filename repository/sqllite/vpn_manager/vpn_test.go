@@ -6,69 +6,47 @@ import (
 
 	vpnManagerDto "momo/dto/repository/vpn_manager"
 	"momo/entity"
-	"momo/pkg/config"
 	"momo/repository/migrate"
 	"momo/repository/sqllite"
 )
 
-var (
-	vpnRepo *VPN
-
-	vpnExample1 = &vpnManagerDto.Add_VPN{
-		Domain:   "joi.com",
-		ApiPort:  "62733",
-		VPNType:  entity.XRAY_VPN,
-		IsActive: false,
-	}
-
-	vpnExample2 = &vpnManagerDto.Add_VPN{
-		Domain:   "joi.com",
-		ApiPort:  "62733",
-		VPNType:  entity.XRAY_VPN,
-		IsActive: true,
-	}
-
-	vpnExample3 = &vpnManagerDto.Add_VPN{
-		Domain:   "jordan.com",
-		ApiPort:  "62733",
-		VPNType:  entity.XRAY_VPN,
-		IsActive: true,
-	}
-)
-
 func TestMain(m *testing.M) {
-	cfg, err := config.Load("config_test.yaml")
-	if err != nil {
-		os.Exit(1)
+	config := &sqllite.DBConfig{
+		Dialect:    "sqlite3",
+		Path:       "test.db",
+		Migrations: "./repository/sqllite/migrations",
 	}
-	db := sqllite.New(&cfg.DB)
 
-	migrate := migrate.New(&cfg.DB)
-
+	migrate := migrate.New(config)
 	migrate.UP()
+
+	db := sqllite.New(config)
 
 	vpnRepo = New(db)
 
 	code := m.Run()
+
+	migrate.DOWN()
+
 	os.Exit(code)
 }
 
 func TestCreateVPN(t *testing.T) {
-	v1, err := vpnRepo.Create(vpnExample1)
+	v1, err := vpnRepo.Create(vpn1)
+	defer vpnRepo.DeleteAll()
 	if err != nil {
 		t.Errorf("error has happend that was %v", err)
 	}
-	if v1.ApiPort != vpnExample1.ApiPort ||
-		v1.Domain != vpnExample1.Domain ||
-		v1.VPNType != vpnExample1.VPNType {
+	if v1.ApiPort != vpn1.ApiPort ||
+		v1.Domain != vpn1.Domain ||
+		v1.VPNType != vpn1.VPNType {
 		t.Error("the output wasn't matched by original data")
 	}
-
-	deleteVPNs(v1.ID)
 }
 
 func TestChangeStatus(t *testing.T) {
-	v1, _ := vpnRepo.Create(vpnExample1)
+	v1, _ := vpnRepo.Create(vpn1)
+	defer vpnRepo.DeleteAll()
 
 	err := vpnRepo.activeVPN(v1.ID)
 	if err != nil {
@@ -79,14 +57,13 @@ func TestChangeStatus(t *testing.T) {
 	if err != nil {
 		t.Fatalf("the error has happend that was %v", err)
 	}
-	deleteVPNs(v1.ID)
 }
 
 func TestFilterVPNs(t *testing.T) {
-	v1, _ := vpnRepo.Create(vpnExample1)
-	v2, _ := vpnRepo.Create(vpnExample2)
-	v3, _ := vpnRepo.Create(vpnExample3)
-
+	defer vpnRepo.DeleteAll()
+	vpnRepo.Create(vpn1)
+	vpnRepo.Create(vpn2)
+	vpnRepo.Create(vpn3)
 	isActication := true
 	vpns, err := vpnRepo.Filter(&vpnManagerDto.FilterVPNs{
 		IsActive: &isActication,
@@ -131,13 +108,5 @@ func TestFilterVPNs(t *testing.T) {
 
 	if len(vpns) != 2 {
 		t.Errorf("4. the number of vpns must be 2 but the result was %v", len(vpns))
-	}
-
-	deleteVPNs(v1.ID, v2.ID, v3.ID)
-}
-
-func deleteVPNs(ids ...int) {
-	for _, id := range ids {
-		vpnRepo.Delete(id)
 	}
 }

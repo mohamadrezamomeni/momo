@@ -43,6 +43,21 @@ func (u *User) Delete(id string) error {
 	return nil
 }
 
+func (u *User) DeleteAll() error {
+	sql := "DELETE FROM users"
+	res, err := u.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+	}
+
+	_, err = res.RowsAffected()
+	if err != nil {
+		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+	}
+
+	return nil
+}
+
 func (u *User) FilterUsers(q *dto.FilterUsers) ([]*entity.User, error) {
 	query, err := u.generateFilterUserQuery(q)
 	if err != nil {

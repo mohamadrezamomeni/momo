@@ -27,7 +27,7 @@ func HostStatusString(status HostStatus) string {
 	}
 }
 
-func MapTuStatus(statusString string) (HostStatus, error) {
+func MapHostStatusToEnum(statusString string) (HostStatus, error) {
 	switch statusString {
 	case HighStr:
 		return High, nil
