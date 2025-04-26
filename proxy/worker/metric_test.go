@@ -1,24 +1,13 @@
-package metric
+package worker
 
 import (
-	"os"
 	"testing"
 
 	"momo/entity"
 )
 
-var ps *ProxyMetric
-
-func TestMain(m *testing.M) {
-	ps, _ = New(&Config{Address: "localhost", Port: "666"})
-
-	code := m.Run()
-	ps.Close()
-	os.Exit(code)
-}
-
 func TestGetMetric(t *testing.T) {
-	rank, status, err := ps.GetMetric()
+	rank, status, err := pw.GetMetric()
 	if err != nil {
 		t.Errorf("something has happend we couldn't get metric the problem was %v", err)
 	}

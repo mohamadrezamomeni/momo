@@ -1,4 +1,4 @@
-package metric
+package worker
 
 type Config struct {
 	Address string
