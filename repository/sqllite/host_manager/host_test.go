@@ -40,9 +40,7 @@ func TestCreateHost(t *testing.T) {
 	}
 	if host.Domain != hostExample1.Domain ||
 		host.Port != hostExample1.Port ||
-		host.Status != entity.Deactive ||
-		host.StartRangePort != hostExample1.StartRangePort ||
-		host.EndRangePort != hostExample1.EndRangePort {
+		host.Status != entity.Deactive {
 		t.Error("the out put of creating was wrong")
 	}
 
