@@ -14,10 +14,10 @@ import (
 )
 
 type Inbound struct {
-	inboundRepo inboundRepo
+	inboundRepo InboundRepo
 	vpnService  VpnService
-	userService userService
-	hostService hostService
+	userService IserService
+	hostService HostService
 }
 
 type VpnProxy interface {
@@ -31,11 +31,11 @@ type VpnService interface {
 	MakeProxy() (VpnProxy, error)
 }
 
-type userService interface {
+type IserService interface {
 	FindByID(string) (*entity.User, error)
 }
 
-type inboundRepo interface {
+type InboundRepo interface {
 	RetriveFaultyInbounds() ([]*entity.Inbound, error)
 	Active(id int) error
 	DeActive(id int) error
@@ -43,15 +43,15 @@ type inboundRepo interface {
 	FindInboundIsNotAssigned()
 }
 
-type hostService interface {
+type HostService interface {
 	FindRightHost(entity.HostStatus) (string, string, error)
 }
 
 func New(
-	repo inboundRepo,
+	repo InboundRepo,
 	vpnService VpnService,
-	userService userService,
-	hostService hostService,
+	userService IserService,
+	hostService HostService,
 ) *Inbound {
 	return &Inbound{
 		inboundRepo: repo,

@@ -7,17 +7,17 @@ import (
 	utils "momo/pkg/utils"
 )
 
-type hostRepo interface {
+type HostRepo interface {
 	Create(*hostRepoDto.AddHost) (*entity.Host, error)
 	Filter(*hostRepoDto.FilterHosts) ([]*entity.Host, error)
 	Update(int, *hostRepoDto.UpdateHost) error
 }
 
 type Host struct {
-	hostRepo hostRepo
+	hostRepo HostRepo
 }
 
-func New(hostRepo hostRepo) *Host {
+func New(hostRepo HostRepo) *Host {
 	return &Host{
 		hostRepo: hostRepo,
 	}

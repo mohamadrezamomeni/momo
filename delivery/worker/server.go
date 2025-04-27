@@ -18,20 +18,20 @@ import (
 type Server struct {
 	port.UnimplementedPortServer
 	metric.UnimplementedMetricServer
-	metricSvc metricService
-	portSvc   portService
+	metricSvc MetricService
+	portSvc   PortService
 	address   string
 }
 
-type metricService interface {
+type MetricService interface {
 	GetMetric() (int, entity.HostStatus, error)
 }
 
-type portService interface {
+type PortService interface {
 	GetAvailablePort() (string, error)
 }
 
-func New(metricSvc metricService, portSvc portService, metricConfig WorkerConfig) *Server {
+func New(metricSvc MetricService, portSvc PortService, metricConfig WorkerConfig) *Server {
 	address := fmt.Sprintf("%s:%s", metricConfig.Address, metricConfig.Port)
 	return &Server{
 		UnimplementedMetricServer: metric.UnimplementedMetricServer{},

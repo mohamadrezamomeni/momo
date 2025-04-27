@@ -6,15 +6,15 @@ import (
 	vpnProxy "momo/proxy/vpn"
 )
 
-type vpnRepo interface {
+type VPNRepo interface {
 	Filter(*vpnManagerDto.FilterVPNs) ([]*entity.VPN, error)
 }
 
 type VPNService struct {
-	vpnRepo vpnRepo
+	vpnRepo VPNRepo
 }
 
-func New(repo vpnRepo) *VPNService {
+func New(repo VPNRepo) *VPNService {
 	return &VPNService{
 		vpnRepo: repo,
 	}
