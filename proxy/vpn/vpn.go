@@ -57,7 +57,7 @@ func addToVPN(cfg *VPNConfig, v chan<- *VPN, errs chan<- error) {
 			Address: cfg.Domain,
 			ApiPort: cfg.Port,
 		})
-		if err != nil {
+		if err == nil {
 			v <- &VPN{
 				VPNType: entity.XRAY_VPN,
 				V:       x,
