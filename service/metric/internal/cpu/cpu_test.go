@@ -1,17 +1,14 @@
 package cpu
 
-import "testing"
-
-func TestNewCpuMetric(t *testing.T) {
-	_, err := New()
-	if err != nil {
-		t.Fatalf("error to initialize cpu Metric the problem was %v", err)
-	}
-}
+import (
+	"testing"
+)
 
 func TestGetCpuMetric(t *testing.T) {
-	cpuMetric, _ := New()
-
+	cpuMetric, err := New()
+	if err != nil {
+		t.Fatalf("cpu metric isn't initiazed")
+	}
 	cpuFreeUsed := cpuMetric.GetCpuFreePercentage()
 
 	if cpuFreeUsed < 0 {
