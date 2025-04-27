@@ -22,6 +22,7 @@ func main() {
 	metricSvc := metricService.New(&cfg.Metric)
 
 	portSvc := portService.New(&cfg.PortAssignment)
+
 	server := workerServer.New(metricSvc, portSvc, cfg.WorkerServer)
 
 	server.Start()

@@ -26,7 +26,7 @@ func New(hostRepo hostRepo) *Host {
 func (h *Host) FindRightHost(status entity.HostStatus) (string, string, error) {
 	host, err := h.findAppropriateHostByStatus([]entity.HostStatus{status})
 	if err != nil {
-		return "", "", nil
+		return "", "", err
 	}
 
 	return host.Domain, host.Port, nil
