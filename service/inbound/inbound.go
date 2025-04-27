@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"time"
 
-	proxyVpnDto "momo/dto/proxy/vpn"
 	vpnProxyDto "momo/dto/proxy/vpn"
 	inboundRepoDto "momo/dto/repository/inbound"
 	dto "momo/dto/service/inbound"
 	"momo/entity"
 	"momo/pkg/utils"
-	"momo/proxy/vpn/serializer"
 	workerProxy "momo/proxy/worker"
+
+	vpnProxy "momo/proxy/vpn"
 
 	"github.com/google/uuid"
 )
@@ -23,15 +23,8 @@ type Inbound struct {
 	hostService HostService
 }
 
-type VpnProxy interface {
-	AddInbound(*proxyVpnDto.Inbound, int) error
-	Close()
-	DisableInbound(*proxyVpnDto.Inbound, int) error
-	GetTraffic(*proxyVpnDto.Inbound, int) (*serializer.Traffic, error)
-}
-
 type VpnService interface {
-	MakeProxy() (VpnProxy, error)
+	MakeProxy() (*vpnProxy.ProxyVPN, error)
 }
 
 type UserService interface {
@@ -142,23 +135,22 @@ func (i *Inbound) assignDomainToInbound(inbound *entity.Inbound, host *entity.Ho
 	}
 }
 
-func (i *Inbound) ApplyChangesToInbounds() error {
+func (i *Inbound) ApplyChangesToInbounds() {
 	inbounds, err := i.inboundRepo.RetriveFaultyInbounds()
 	if err != nil {
-		return err
+		return
 	}
 	proxy, err := i.vpnService.MakeProxy()
 	if err != nil {
-		return err
+		return
 	}
 	defer proxy.Close()
 	for _, inbound := range inbounds {
 		i.applyChangeToInbound(inbound, proxy)
 	}
-	return nil
 }
 
-func (i *Inbound) applyChangeToInbound(inbound *entity.Inbound, vpnProxy VpnProxy) {
+func (i *Inbound) applyChangeToInbound(inbound *entity.Inbound, vpnProxy *vpnProxy.ProxyVPN) {
 	if i.mustItBeActive(inbound) {
 		i.activeInbound(inbound, inbound.VPNType, vpnProxy)
 	} else {
@@ -176,7 +168,7 @@ func (i *Inbound) mustItBeActive(inbound *entity.Inbound) bool {
 	return false
 }
 
-func (i *Inbound) deActiveInbound(inbound *entity.Inbound, vpnType entity.VPNType, vpnProxy VpnProxy) error {
+func (i *Inbound) deActiveInbound(inbound *entity.Inbound, vpnType entity.VPNType, vpnProxy *vpnProxy.ProxyVPN) error {
 	info, err := i.getInfo(inbound)
 	if err != nil {
 		return err
@@ -189,7 +181,7 @@ func (i *Inbound) deActiveInbound(inbound *entity.Inbound, vpnType entity.VPNTyp
 	return i.inboundRepo.DeActive(inbound.ID)
 }
 
-func (i *Inbound) activeInbound(inbound *entity.Inbound, vpnType entity.VPNType, vpnProxy VpnProxy) error {
+func (i *Inbound) activeInbound(inbound *entity.Inbound, vpnType entity.VPNType, vpnProxy *vpnProxy.ProxyVPN) error {
 	info, err := i.getInfo(inbound)
 	if err != nil {
 		return err
