@@ -65,10 +65,8 @@ func TestFindByUsername(t *testing.T) {
 		user.LastName != user1.LastName ||
 		user.ID != userCreated.ID {
 		t.Error("something went wrong to compare results")
-		userRepo.Delete(userCreated.ID)
 		return
 	}
-	userRepo.Delete(userCreated.ID)
 }
 
 func TestFindByID(t *testing.T) {

@@ -127,20 +127,13 @@ func (u *User) FindUserByID(ID string) (*entity.User, error) {
 }
 
 func (u *User) findUser(key string, value string) (*entity.User, error) {
-	var id string
-	var firstName string
-	var lastName string
-	var username string
+	var user *entity.User = &entity.User{}
+
 	var createdAt interface{}
 	s := fmt.Sprintf("SELECT * FROM users WHERE %s='%s' LIMIT 1", key, value)
-	err := u.db.Conn().QueryRow(s).Scan(&id, &username, &createdAt, &lastName, &firstName)
+	err := u.db.Conn().QueryRow(s).Scan(&user.ID, &user.Username, &createdAt, &user.LastName, &user.FirstName)
 	if err == nil {
-		return &entity.User{
-			ID:        id,
-			FirstName: firstName,
-			LastName:  lastName,
-			Username:  username,
-		}, err
+		return user, nil
 	}
 	if err == sql.ErrNoRows {
 		return &entity.User{}, err
