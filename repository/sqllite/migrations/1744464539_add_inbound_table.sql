@@ -11,6 +11,8 @@ CREATE TABLE `inbounds` (
         `is_block` boolean default false,
         `start` TIMESTAMP NOT NULL,
         `end` TIMESTAMP NOT NULL,
+        `is_notified` boolean default false,
+        `is_assigned` boolean default false,
         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

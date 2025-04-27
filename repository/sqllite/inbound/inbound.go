@@ -33,6 +33,8 @@ func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error
 	if err != nil {
 		return nil, momoError.Errorf("somoething went wrong to save inbound error: %v", err)
 	}
+	inbound.IsAssigned = false
+	inbound.IsNotified = false
 	inbound.VPNType = inpt.VPNType
 	return inbound, nil
 }
@@ -204,6 +206,8 @@ func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
 		&inbound.IsBlock,
 		&inbound.Start,
 		&inbound.End,
+		&inbound.IsNotified,
+		&inbound.IsAssigned,
 		&createdAt,
 		&updatedAt,
 	)
