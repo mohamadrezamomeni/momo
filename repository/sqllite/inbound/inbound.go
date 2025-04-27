@@ -40,6 +40,39 @@ func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error
 	return inbound, nil
 }
 
+func (i *Inbound) FindInboundByID(id int) (*entity.Inbound, error) {
+	var createdAt, updatedAt interface{}
+	var inbound *entity.Inbound = &entity.Inbound{}
+	var vpnType string
+	s := fmt.Sprintf("SELECT * FROM inbounds WHERE id=%v LIMIT 1", id)
+	err := i.db.Conn().QueryRow(s).Scan(
+		&inbound.ID,
+		&inbound.Protocol,
+		&inbound.IsActive,
+		&inbound.Domain,
+		&vpnType,
+		&inbound.Port,
+		&inbound.UserID,
+		&inbound.Tag,
+		&inbound.IsBlock,
+		&inbound.Start,
+		&inbound.End,
+		&inbound.IsNotified,
+		&inbound.IsAssigned,
+		&createdAt,
+		&updatedAt,
+	)
+
+	if err == nil {
+		inbound.VPNType = entity.ConvertStringVPNTypeToEnum(vpnType)
+		return inbound, nil
+	}
+	if err == sql.ErrNoRows {
+		return nil, err
+	}
+	return nil, momoError.Errorf("some thing went wrong please follow the problem - error: %v", err)
+}
+
 func (i *Inbound) Delete(id int) error {
 	sql := fmt.Sprintf("DELETE FROM inbounds WHERE id=%v", id)
 	res, err := i.db.Conn().Exec(sql)
@@ -206,6 +239,21 @@ func (i *Inbound) FindInboundIsNotAssigned() ([]*entity.Inbound, error) {
 		inbounds = append(inbounds, inbound)
 	}
 	return inbounds, nil
+}
+
+func (i *Inbound) UpdateDomainPort(id int, domain string, port string) error {
+	sql := fmt.Sprintf(
+		"UPDATE inbounds SET domain = '%s', port = '%s' WHERE id = %v",
+		domain,
+		port,
+		id,
+	)
+
+	_, err := i.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.DebuggingErrorf("something bad has happend the error was %v", err)
+	}
+	return nil
 }
 
 func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {

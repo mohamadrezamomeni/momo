@@ -198,3 +198,32 @@ func TestInboundsIsNotAssigned(t *testing.T) {
 	}
 	inboundRepo.DeleteAll()
 }
+
+func TestFindInboundByUserID(t *testing.T) {
+	inboundCreated, _ := inboundRepo.Create(inbound10)
+	defer inboundRepo.DeleteAll()
+	inbound, err := inboundRepo.FindInboundByID(inboundCreated.ID)
+	if err != nil {
+		t.Fatalf("the query was field the problem was %v", err)
+	}
+	if inbound.UserID != inbound10.UserID || inboundCreated.ID != inbound.ID {
+		t.Fatalf("the query has answerd wrong")
+	}
+}
+
+func TestUpdateInbound(t *testing.T) {
+	inboundCreated, _ := inboundRepo.Create(inbound10)
+	defer inboundRepo.DeleteAll()
+	newDomain := "facebook.com"
+	newPort := "2020"
+	err := inboundRepo.UpdateDomainPort(inboundCreated.ID, newDomain, newPort)
+	if err != nil {
+		t.Fatalf("update has field the problem was %v", err)
+	}
+
+	inbound, _ := inboundRepo.FindInboundByID(inboundCreated.ID)
+
+	if inbound.Domain != newDomain || inbound.Port != newPort {
+		t.Fatalf("update hasn't worked carefuly")
+	}
+}
