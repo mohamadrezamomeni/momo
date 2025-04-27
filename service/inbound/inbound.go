@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"time"
 
+	proxyVpnDto "momo/dto/proxy/vpn"
 	vpnProxyDto "momo/dto/proxy/vpn"
 	inboundRepoDto "momo/dto/repository/inbound"
 	dto "momo/dto/service/inbound"
 	"momo/entity"
 	"momo/pkg/utils"
-	vpnSerializer "momo/proxy/vpn/serializer"
+	"momo/proxy/vpn/serializer"
 	workerProxy "momo/proxy/worker"
 
 	"github.com/google/uuid"
@@ -18,22 +19,22 @@ import (
 type Inbound struct {
 	inboundRepo InboundRepo
 	vpnService  VpnService
-	userService IserService
+	userService UserService
 	hostService HostService
 }
 
 type VpnProxy interface {
-	AddInbound(*vpnProxyDto.Inbound, entity.VPNType) error
-	DisableInbound(*vpnProxyDto.Inbound, entity.VPNType) error
-	GetTraffic(*vpnProxyDto.Inbound, entity.VPNType) (*vpnSerializer.Traffic, error)
+	AddInbound(*proxyVpnDto.Inbound, int) error
 	Close()
+	DisableInbound(*proxyVpnDto.Inbound, int) error
+	GetTraffic(*proxyVpnDto.Inbound, int) (*serializer.Traffic, error)
 }
 
 type VpnService interface {
 	MakeProxy() (VpnProxy, error)
 }
 
-type IserService interface {
+type UserService interface {
 	FindByID(string) (*entity.User, error)
 }
 
@@ -53,7 +54,7 @@ type HostService interface {
 func New(
 	repo InboundRepo,
 	vpnService VpnService,
-	userService IserService,
+	userService UserService,
 	hostService HostService,
 ) *Inbound {
 	return &Inbound{

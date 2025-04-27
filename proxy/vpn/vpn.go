@@ -2,7 +2,6 @@ package vpn
 
 import (
 	proxyVpnDto "momo/dto/proxy/vpn"
-	vpnProxyDto "momo/dto/proxy/vpn"
 	"momo/entity"
 	momoError "momo/pkg/error"
 	"momo/proxy/vpn/internal/xray"
@@ -10,10 +9,10 @@ import (
 )
 
 type IVPN interface {
-	Add(*vpnProxyDto.Inbound) error
-	Disable(*vpnProxyDto.Inbound) error
-	GetTraffic(*vpnProxyDto.Inbound) (*vpnSerializer.Traffic, error)
-	DoesExist(*vpnProxyDto.Inbound) (bool, error)
+	Add(*proxyVpnDto.Inbound) error
+	Disable(*proxyVpnDto.Inbound) error
+	GetTraffic(*proxyVpnDto.Inbound) (*vpnSerializer.Traffic, error)
+	DoesExist(*proxyVpnDto.Inbound) (bool, error)
 	GetAddress() string
 	Test() error
 	Close()
@@ -77,7 +76,7 @@ func (p *ProxyVPN) retriveVPN(address string, VPNType entity.VPNType) IVPN {
 	return nil
 }
 
-func (p *ProxyVPN) AddInbound(inpt *proxyVpnDto.Inbound, VPNType entity.VPNType) (err error) {
+func (p *ProxyVPN) AddInbound(inpt *proxyVpnDto.Inbound, VPNType entity.VPNType) error {
 	v := p.retriveVPN(inpt.Address, VPNType)
 	if v == nil {
 		return momoError.DebuggingErrorf("%v vpn has'nt been introuduced with address %s", VPNType, inpt.Address)
@@ -85,7 +84,7 @@ func (p *ProxyVPN) AddInbound(inpt *proxyVpnDto.Inbound, VPNType entity.VPNType)
 	return v.Add(inpt)
 }
 
-func (p *ProxyVPN) DisableInbound(inpt *proxyVpnDto.Inbound, VPNType entity.VPNType) (err error) {
+func (p *ProxyVPN) DisableInbound(inpt *proxyVpnDto.Inbound, VPNType entity.VPNType) error {
 	v := p.retriveVPN(inpt.Address, VPNType)
 	if v == nil {
 		return momoError.DebuggingErrorf("%v vpn has'nt been introuduced with address %s", VPNType, inpt.Address)
