@@ -180,3 +180,21 @@ func TestCouningUsedDataEachDomian(t *testing.T) {
 
 	inboundRepo.DeleteAll()
 }
+
+func TestInboundsIsNotAssigned(t *testing.T) {
+	inboundRepo.Create(inbound10)
+	inboundRepo.Create(inbound11)
+
+	inbounds, err := inboundRepo.FindInboundIsNotAssigned()
+	if err != nil {
+		t.Fatalf("someting went wront the problem was %v", err)
+	}
+
+	if len(inbounds) != 1 {
+		t.Fatalf("we expected we got 1 items but we got %v", len(inbounds))
+	}
+	if inbounds[0].UserID != userID8 {
+		t.Fatalf("the answer was wrong")
+	}
+	inboundRepo.DeleteAll()
+}

@@ -35,6 +35,7 @@ type inboundRepo interface {
 	Active(id int) error
 	DeActive(id int) error
 	Create(*inboundRepoDto.CreateInbound) (entity.Inbound, error)
+	FindInboundIsNotAssigned()
 }
 
 type hostService interface {

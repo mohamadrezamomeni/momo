@@ -56,7 +56,7 @@ func TestFindByUsername(t *testing.T) {
 
 	user, err := userRepo.FindUserByUsername(user1.Username)
 	if err != nil {
-		t.Errorf("findByUsername needs troubleshooting error: %v", err)
+		t.Fatalf("findByUsername needs troubleshooting error: %v", err)
 		userRepo.Delete(userCreated.ID)
 		return
 	}

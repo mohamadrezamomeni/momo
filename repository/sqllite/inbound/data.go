@@ -27,6 +27,8 @@ var (
 	userID5 = uuid.New().String()
 	userID6 = uuid.New().String()
 	userID7 = uuid.New().String()
+	userID8 = uuid.New().String()
+	userID9 = uuid.New().String()
 
 	inbound1 = &inboundDto.CreateInbound{
 		Tag:      fmt.Sprintf("inbound-%s", port1),
@@ -140,5 +142,35 @@ var (
 		VPNType:  entity.XRAY_VPN,
 		Start:    utils.GetDateTime("2024-04-21 14:30:00"),
 		End:      utils.GetDateTime("2024-04-22 14:30:00"),
+	}
+
+	inbound10 = &inboundDto.CreateInbound{
+		Tag:        fmt.Sprintf("inbound-%s", port2),
+		Protocol:   "http",
+		Port:       port7,
+		Domain:     "gogoo.com",
+		UserID:     userID8,
+		IsBlock:    true,
+		IsActive:   true,
+		IsNotified: false,
+		IsAssigned: false,
+		VPNType:    entity.XRAY_VPN,
+		Start:      utils.GetDateTime("2024-04-21 14:30:00"),
+		End:        utils.GetDateTime("2024-04-22 14:30:00"),
+	}
+
+	inbound11 = &inboundDto.CreateInbound{
+		Tag:        fmt.Sprintf("inbound-%s", port2),
+		Protocol:   "http",
+		Port:       port7,
+		Domain:     "twitter.com",
+		UserID:     userID9,
+		IsBlock:    true,
+		IsActive:   true,
+		IsAssigned: true,
+		IsNotified: false,
+		VPNType:    entity.XRAY_VPN,
+		Start:      utils.GetDateTime("2024-04-21 14:30:00"),
+		End:        utils.GetDateTime("2024-04-22 14:30:00"),
 	}
 )

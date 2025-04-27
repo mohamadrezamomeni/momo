@@ -191,6 +191,23 @@ func (i *Inbound) CountingUsedPortEachHost() ([]*struct {
 	return summeries, nil
 }
 
+func (i *Inbound) FindInboundIsNotAssigned() ([]*entity.Inbound, error) {
+	query := "SELECT * FROM inbounds WHERE is_assigned = false"
+	rows, err := i.db.Conn().Query(query)
+	if err != nil {
+		return nil, momoError.Errorf("the problem has occured the problem was %v", err)
+	}
+	inbounds := make([]*entity.Inbound, 0)
+	for rows.Next() {
+		inbound, err := i.scan(rows)
+		if err != nil {
+			return nil, momoError.DebuggingErrorf("rows isn't scaned the problem was %v", err)
+		}
+		inbounds = append(inbounds, inbound)
+	}
+	return inbounds, nil
+}
+
 func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
 	inbound := &entity.Inbound{}
 	var createdAt, updatedAt interface{}
