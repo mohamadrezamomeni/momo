@@ -9,9 +9,9 @@ import (
 )
 
 type MemoMetric struct {
-	memTotal     uint64
-	memFree      uint64
-	memAvailable uint64
+	MemTotal     uint64
+	MemFree      uint64
+	MemAvailable uint64
 }
 
 func New() (*MemoMetric, error) {
@@ -23,9 +23,9 @@ func New() (*MemoMetric, error) {
 	memTotal, memFree, memAvailable, err := extractData(dataRaw)
 
 	return &MemoMetric{
-		memTotal:     memTotal,
-		memFree:      memFree,
-		memAvailable: memAvailable,
+		MemTotal:     memTotal,
+		MemFree:      memFree,
+		MemAvailable: memAvailable,
 	}, nil
 }
 
