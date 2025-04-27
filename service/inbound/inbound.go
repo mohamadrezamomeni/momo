@@ -9,6 +9,8 @@ import (
 	dto "momo/dto/service/inbound"
 	"momo/entity"
 	vpnSerializer "momo/proxy/vpn/serializer"
+
+	"github.com/google/uuid"
 )
 
 type Inbound struct {
@@ -54,15 +56,10 @@ func New(
 }
 
 func (i *Inbound) Create(inpt *dto.CreateInbound) error {
-	host, port, err := i.hostService.FindRightHost(inpt.ServerType)
-	if err != nil {
-		return err
-	}
-
-	_, err = i.inboundRepo.Create(&inboundRepoDto.CreateInbound{
-		Tag:      fmt.Sprintf("inbound-%s", port),
-		Port:     port,
-		Domain:   host,
+	_, err := i.inboundRepo.Create(&inboundRepoDto.CreateInbound{
+		Tag:      fmt.Sprintf("inbound-%s", uuid.New().String()),
+		Port:     "",
+		Domain:   "",
 		IsActive: false,
 		IsBlock:  false,
 		UserID:   inpt.UserID,

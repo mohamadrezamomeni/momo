@@ -15,10 +15,11 @@ import (
 func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error) {
 	inbound := &entity.Inbound{}
 	err := i.db.Conn().QueryRow(`
-	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_active, start, end, is_block)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-	RETURNING id, protocol, is_active, domain, port, user_id, tag, is_block, start, end
-	`, inpt.Protocol, inpt.Domain, entity.VPNTypeString(inpt.VPNType), inpt.Port, inpt.UserID, inpt.Tag, inpt.IsActive, inpt.Start, inpt.End, inpt.IsBlock).Scan(
+	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_active, start, end, is_block, is_assigned, is_notified)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	RETURNING id, protocol, is_active, domain, port, user_id, tag, is_block, start, end, is_notified, is_assigned
+	`, inpt.Protocol,
+		inpt.Domain, entity.VPNTypeString(inpt.VPNType), inpt.Port, inpt.UserID, inpt.Tag, inpt.IsActive, inpt.Start, inpt.End, inpt.IsBlock, inpt.IsAssigned, inpt.IsNotified).Scan(
 		&inbound.ID,
 		&inbound.Protocol,
 		&inbound.IsActive,
@@ -29,12 +30,12 @@ func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error
 		&inbound.IsBlock,
 		&inbound.Start,
 		&inbound.End,
+		&inbound.IsNotified,
+		&inbound.IsAssigned,
 	)
 	if err != nil {
 		return nil, momoError.Errorf("somoething went wrong to save inbound error: %v", err)
 	}
-	inbound.IsAssigned = false
-	inbound.IsNotified = false
 	inbound.VPNType = inpt.VPNType
 	return inbound, nil
 }
