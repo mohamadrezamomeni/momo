@@ -4,7 +4,6 @@ import (
 	hostRepoDto "momo/dto/repository/host_manager"
 	"momo/entity"
 	momoError "momo/pkg/error"
-	utils "momo/pkg/utils"
 )
 
 type HostRepo interface {
@@ -23,16 +22,16 @@ func New(hostRepo HostRepo) *Host {
 	}
 }
 
-func (h *Host) FindRightHost(status entity.HostStatus) (string, string, error) {
-	host, err := h.findAppropriateHostByStatus([]entity.HostStatus{status})
+func (h *Host) FindRightHosts(status entity.HostStatus) ([]*entity.Host, error) {
+	hosts, err := h.findAppropriateHostByStatus([]entity.HostStatus{status})
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
 
-	return host.Domain, host.Port, nil
+	return hosts, nil
 }
 
-func (h *Host) findAppropriateHostByStatus(statuses []entity.HostStatus) (*entity.Host, error) {
+func (h *Host) findAppropriateHostByStatus(statuses []entity.HostStatus) ([]*entity.Host, error) {
 	hosts, err := h.hostRepo.Filter(
 		&hostRepoDto.FilterHosts{
 			Statuses: statuses,
@@ -65,15 +64,15 @@ func (h *Host) findAppropriateHostByStatus(statuses []entity.HostStatus) (*entit
 	}
 
 	if len(highHosts) != 0 {
-		return highHosts[utils.GetRandom(0, len(highHosts))], nil
+		return highHosts, nil
 	}
 
 	if len(mediumHosts) != 0 {
-		return highHosts[utils.GetRandom(0, len(mediumHosts))], nil
+		return mediumHosts, nil
 	}
 
 	if len(lowHosts) != 0 {
-		return highHosts[utils.GetRandom(0, len(lowHosts))], nil
+		return lowHosts, nil
 	}
 	return nil, momoError.Error("appropriate server isn't selected")
 }
