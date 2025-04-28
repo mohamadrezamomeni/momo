@@ -1,9 +1,12 @@
 package host
 
 import (
+	"sync"
+
 	hostRepoDto "momo/dto/repository/host_manager"
 	"momo/entity"
 	momoError "momo/pkg/error"
+	"momo/proxy/worker"
 )
 
 type HostRepo interface {
@@ -29,6 +32,40 @@ func (h *Host) FindRightHosts(status entity.HostStatus) ([]*entity.Host, error) 
 	}
 
 	return hosts, nil
+}
+
+func (h *Host) ResolvePorts(
+	host *entity.Host,
+	requiredPorts int,
+	portsUsed []string,
+	wg *sync.WaitGroup,
+	ch chan<- struct {
+		domain string
+		ports  []string
+	},
+) {
+	defer wg.Done()
+
+	wp, err := worker.New(&worker.Config{
+		Address: host.Domain,
+		Port:    host.Port,
+	})
+	if err != nil {
+		return
+	}
+
+	ports, err := wp.GetAvailablePorts(uint32(requiredPorts), portsUsed)
+	if err != nil {
+		return
+	}
+
+	ch <- struct {
+		domain string
+		ports  []string
+	}{
+		domain: host.Domain,
+		ports:  ports,
+	}
 }
 
 func (h *Host) findAppropriateHostByStatus(statuses []entity.HostStatus) ([]*entity.Host, error) {

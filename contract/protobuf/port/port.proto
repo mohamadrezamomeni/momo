@@ -5,13 +5,16 @@ package port;
 option go_package = "contract/gogrpc/port";
 
 message PortAssignResponse {
-    string  port = 1;
+    repeated string  ports = 1;
 }
 
 message PortAssignRequest {
+
+    repeated string portsUsed = 1;
+    uint32 requestNumberOfPort = 2;
 }
 
 
 service Port {
-    rpc GetAvailablePort(PortAssignRequest) returns (PortAssignResponse);
+    rpc GetAvailablePorts(PortAssignRequest) returns (PortAssignResponse);
 }

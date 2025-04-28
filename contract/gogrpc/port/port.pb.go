@@ -23,7 +23,7 @@ const (
 
 type PortAssignResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Port          string                 `protobuf:"bytes,1,opt,name=port,proto3" json:"port,omitempty"`
+	Ports         []string               `protobuf:"bytes,1,rep,name=ports,proto3" json:"ports,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -58,17 +58,19 @@ func (*PortAssignResponse) Descriptor() ([]byte, []int) {
 	return file_contract_protobuf_port_port_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *PortAssignResponse) GetPort() string {
+func (x *PortAssignResponse) GetPorts() []string {
 	if x != nil {
-		return x.Port
+		return x.Ports
 	}
-	return ""
+	return nil
 }
 
 type PortAssignRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	PortsUsed           []string               `protobuf:"bytes,1,rep,name=portsUsed,proto3" json:"portsUsed,omitempty"`
+	RequestNumberOfPort uint32                 `protobuf:"varint,2,opt,name=requestNumberOfPort,proto3" json:"requestNumberOfPort,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *PortAssignRequest) Reset() {
@@ -101,16 +103,32 @@ func (*PortAssignRequest) Descriptor() ([]byte, []int) {
 	return file_contract_protobuf_port_port_proto_rawDescGZIP(), []int{1}
 }
 
+func (x *PortAssignRequest) GetPortsUsed() []string {
+	if x != nil {
+		return x.PortsUsed
+	}
+	return nil
+}
+
+func (x *PortAssignRequest) GetRequestNumberOfPort() uint32 {
+	if x != nil {
+		return x.RequestNumberOfPort
+	}
+	return 0
+}
+
 var File_contract_protobuf_port_port_proto protoreflect.FileDescriptor
 
 const file_contract_protobuf_port_port_proto_rawDesc = "" +
 	"\n" +
-	"!contract/protobuf/port/port.proto\x12\x04port\"(\n" +
-	"\x12PortAssignResponse\x12\x12\n" +
-	"\x04port\x18\x01 \x01(\tR\x04port\"\x13\n" +
-	"\x11PortAssignRequest2M\n" +
-	"\x04Port\x12E\n" +
-	"\x10GetAvailablePort\x12\x17.port.PortAssignRequest\x1a\x18.port.PortAssignResponseB\x16Z\x14contract/gogrpc/portb\x06proto3"
+	"!contract/protobuf/port/port.proto\x12\x04port\"*\n" +
+	"\x12PortAssignResponse\x12\x14\n" +
+	"\x05ports\x18\x01 \x03(\tR\x05ports\"c\n" +
+	"\x11PortAssignRequest\x12\x1c\n" +
+	"\tportsUsed\x18\x01 \x03(\tR\tportsUsed\x120\n" +
+	"\x13requestNumberOfPort\x18\x02 \x01(\rR\x13requestNumberOfPort2N\n" +
+	"\x04Port\x12F\n" +
+	"\x11GetAvailablePorts\x12\x17.port.PortAssignRequest\x1a\x18.port.PortAssignResponseB\x16Z\x14contract/gogrpc/portb\x06proto3"
 
 var (
 	file_contract_protobuf_port_port_proto_rawDescOnce sync.Once
@@ -130,8 +148,8 @@ var file_contract_protobuf_port_port_proto_goTypes = []any{
 	(*PortAssignRequest)(nil),  // 1: port.PortAssignRequest
 }
 var file_contract_protobuf_port_port_proto_depIdxs = []int32{
-	1, // 0: port.Port.GetAvailablePort:input_type -> port.PortAssignRequest
-	0, // 1: port.Port.GetAvailablePort:output_type -> port.PortAssignResponse
+	1, // 0: port.Port.GetAvailablePorts:input_type -> port.PortAssignRequest
+	0, // 1: port.Port.GetAvailablePorts:output_type -> port.PortAssignResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

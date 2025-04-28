@@ -28,7 +28,7 @@ type MetricService interface {
 }
 
 type PortService interface {
-	GetAvailablePort() (string, error)
+	GetAvailablePorts(uint32, []string) ([]string, error)
 }
 
 func New(metricSvc MetricService, portSvc PortService, metricConfig WorkerConfig) *Server {
@@ -64,12 +64,12 @@ func (s *Server) GetMetric(ctx context.Context, req *metric.MetricRequest) (*met
 	}, nil
 }
 
-func (s *Server) GetAvailablePort(ctx context.Context, req *port.PortAssignRequest) (*port.PortAssignResponse, error) {
-	p, err := s.portSvc.GetAvailablePort()
+func (s *Server) GetAvailablePorts(ctx context.Context, req *port.PortAssignRequest) (*port.PortAssignResponse, error) {
+	ports, err := s.portSvc.GetAvailablePorts(req.RequestNumberOfPort, req.PortsUsed)
 	if err != nil {
 		return nil, status.Errorf(codes.Unavailable, "invalid input: %v", err)
 	}
 	return &port.PortAssignResponse{
-		Port: p,
+		Ports: ports,
 	}, nil
 }

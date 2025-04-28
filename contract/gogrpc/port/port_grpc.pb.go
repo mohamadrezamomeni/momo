@@ -19,14 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Port_GetAvailablePort_FullMethodName = "/port.Port/GetAvailablePort"
+	Port_GetAvailablePorts_FullMethodName = "/port.Port/GetAvailablePorts"
 )
 
 // PortClient is the client API for Port service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PortClient interface {
-	GetAvailablePort(ctx context.Context, in *PortAssignRequest, opts ...grpc.CallOption) (*PortAssignResponse, error)
+	GetAvailablePorts(ctx context.Context, in *PortAssignRequest, opts ...grpc.CallOption) (*PortAssignResponse, error)
 }
 
 type portClient struct {
@@ -37,10 +37,10 @@ func NewPortClient(cc grpc.ClientConnInterface) PortClient {
 	return &portClient{cc}
 }
 
-func (c *portClient) GetAvailablePort(ctx context.Context, in *PortAssignRequest, opts ...grpc.CallOption) (*PortAssignResponse, error) {
+func (c *portClient) GetAvailablePorts(ctx context.Context, in *PortAssignRequest, opts ...grpc.CallOption) (*PortAssignResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PortAssignResponse)
-	err := c.cc.Invoke(ctx, Port_GetAvailablePort_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, Port_GetAvailablePorts_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (c *portClient) GetAvailablePort(ctx context.Context, in *PortAssignRequest
 // All implementations must embed UnimplementedPortServer
 // for forward compatibility.
 type PortServer interface {
-	GetAvailablePort(context.Context, *PortAssignRequest) (*PortAssignResponse, error)
+	GetAvailablePorts(context.Context, *PortAssignRequest) (*PortAssignResponse, error)
 	mustEmbedUnimplementedPortServer()
 }
 
@@ -62,8 +62,8 @@ type PortServer interface {
 // pointer dereference when methods are called.
 type UnimplementedPortServer struct{}
 
-func (UnimplementedPortServer) GetAvailablePort(context.Context, *PortAssignRequest) (*PortAssignResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAvailablePort not implemented")
+func (UnimplementedPortServer) GetAvailablePorts(context.Context, *PortAssignRequest) (*PortAssignResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAvailablePorts not implemented")
 }
 func (UnimplementedPortServer) mustEmbedUnimplementedPortServer() {}
 func (UnimplementedPortServer) testEmbeddedByValue()              {}
@@ -86,20 +86,20 @@ func RegisterPortServer(s grpc.ServiceRegistrar, srv PortServer) {
 	s.RegisterService(&Port_ServiceDesc, srv)
 }
 
-func _Port_GetAvailablePort_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Port_GetAvailablePorts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PortAssignRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PortServer).GetAvailablePort(ctx, in)
+		return srv.(PortServer).GetAvailablePorts(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Port_GetAvailablePort_FullMethodName,
+		FullMethod: Port_GetAvailablePorts_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PortServer).GetAvailablePort(ctx, req.(*PortAssignRequest))
+		return srv.(PortServer).GetAvailablePorts(ctx, req.(*PortAssignRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -112,8 +112,8 @@ var Port_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*PortServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetAvailablePort",
-			Handler:    _Port_GetAvailablePort_Handler,
+			MethodName: "GetAvailablePorts",
+			Handler:    _Port_GetAvailablePorts_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

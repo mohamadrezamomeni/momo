@@ -2,14 +2,16 @@ package inbound
 
 import (
 	"fmt"
+	"math/rand"
+	"sync"
 	"time"
+
+	"momo/entity"
+	"momo/pkg/utils"
 
 	vpnProxyDto "momo/dto/proxy/vpn"
 	inboundRepoDto "momo/dto/repository/inbound"
 	dto "momo/dto/service/inbound"
-	"momo/entity"
-	"momo/pkg/utils"
-	workerProxy "momo/proxy/worker"
 
 	vpnProxy "momo/proxy/vpn"
 
@@ -38,10 +40,24 @@ type InboundRepo interface {
 	DeActive(id int) error
 	Create(*inboundRepoDto.CreateInbound) (*entity.Inbound, error)
 	FindInboundIsNotAssigned() ([]*entity.Inbound, error)
+	GetListOfPortsByDomain() ([]struct {
+		Domain string
+		Ports  []string
+	}, error)
 }
 
 type HostService interface {
 	FindRightHosts(entity.HostStatus) ([]*entity.Host, error)
+	ResolvePorts(
+		*entity.Host,
+		int,
+		[]string,
+		*sync.WaitGroup,
+		chan<- struct {
+			domain string
+			ports  []string
+		},
+	)
 }
 
 func New(
@@ -76,63 +92,82 @@ func (i *Inbound) Create(inpt *dto.CreateInbound) error {
 	return nil
 }
 
-func (i *Inbound) AssignDomainToInbounds() error {
+func (i *Inbound) AssignDomainToInbounds() {
 	inbounds, err := i.inboundRepo.FindInboundIsNotAssigned()
 	if err != nil {
-		return err
-	}
-	hosts, err := i.hostService.FindRightHosts(entity.High)
-
-	workerErrors := make(chan struct{})
-	assigns := make(chan struct {
-		inboundID int
-		port      string
-		domain    string
-	})
-	for _, inbound := range inbounds {
-		host := hosts[utils.GetRandom(0, len(hosts))]
-		go i.assignDomainToInbound(inbound, host, assigns, workerErrors)
-	}
-
-	for j := 0; j < len(inbounds); j++ {
-		select {
-		case data := <-assigns:
-			i.inboundRepo.UpdateDomainPort(data.inboundID, data.domain, data.port)
-		case <-workerErrors:
-		}
-	}
-
-	return nil
-}
-
-func (i *Inbound) assignDomainToInbound(inbound *entity.Inbound, host *entity.Host, assigns chan<- struct {
-	inboundID int
-	port      string
-	domain    string
-}, workerErrors chan<- struct{},
-) {
-	wp, err := workerProxy.New(&workerProxy.Config{
-		Address: host.Domain,
-		Port:    host.Port,
-	})
-	if err != nil {
-		workerErrors <- struct{}{}
 		return
 	}
-	defer wp.Close()
-	port, err := wp.GetAvailablePort()
+
+	hosts, err := i.hostService.FindRightHosts(entity.High)
 	if err != nil {
-		workerErrors <- struct{}{}
+		return
 	}
-	assigns <- struct {
-		inboundID int
-		port      string
-		domain    string
-	}{
-		inboundID: inbound.ID,
-		port:      port,
-		domain:    host.Domain,
+
+	portUserSummery, err := i.summeryDomainPorts()
+	if err != nil {
+		return
 	}
+
+	ch := make(chan struct {
+		domain string
+		ports  []string
+	})
+
+	var wg sync.WaitGroup
+	seen := map[string]struct{}{}
+
+	for _, host := range hosts {
+		if _, ok := seen[host.Domain]; ok {
+			continue
+		}
+
+		seen[host.Domain] = struct{}{}
+
+		go i.hostService.ResolvePorts(
+			host,
+			len(inbounds),
+			portUserSummery[host.Domain],
+			&wg,
+			ch,
+		)
+	}
+
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+
+	hostPortPairs := [][2]string{}
+
+	for item := range ch {
+		hostPortPairs = append(hostPortPairs, i.makeHostPairWiPort(item.domain, item.ports)...)
+	}
+	hostPortPairs = i.shuffleHostPortPairs(hostPortPairs)
+
+	for j := 0; j < utils.Min(len(inbounds), len(hostPortPairs)); j++ {
+		hostPort := hostPortPairs[j]
+		inbound := inbounds[j]
+		host, port := hostPort[0], hostPort[1]
+		i.inboundRepo.UpdateDomainPort(inbound.ID, host, port)
+	}
+	return
+}
+
+func (i *Inbound) shuffleHostPortPairs(hostPortPairs [][2]string) [][2]string {
+	rand := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	rand.Shuffle(len(hostPortPairs), func(i, j int) {
+		hostPortPairs[i], hostPortPairs[j] = hostPortPairs[j], hostPortPairs[i]
+	})
+	return hostPortPairs
+}
+
+func (i *Inbound) makeHostPairWiPort(host string, ports []string) [][2]string {
+	hostPortPairs := [][2]string{}
+	for _, port := range ports {
+		hostPortPairs = append(hostPortPairs, [2]string{host, port})
+	}
+	return hostPortPairs
 }
 
 func (i *Inbound) ApplyChangesToInbounds() {
@@ -148,6 +183,18 @@ func (i *Inbound) ApplyChangesToInbounds() {
 	for _, inbound := range inbounds {
 		i.applyChangeToInbound(inbound, proxy)
 	}
+}
+
+func (i *Inbound) summeryDomainPorts() (map[string][]string, error) {
+	summery, err := i.inboundRepo.GetListOfPortsByDomain()
+	if err != nil {
+		return nil, err
+	}
+	res := map[string][]string{}
+	for _, item := range summery {
+		res[item.Domain] = item.Ports
+	}
+	return res, nil
 }
 
 func (i *Inbound) applyChangeToInbound(inbound *entity.Inbound, vpnProxy *vpnProxy.ProxyVPN) {

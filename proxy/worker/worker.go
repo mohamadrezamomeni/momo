@@ -3,12 +3,17 @@ package worker
 import (
 	"fmt"
 
+	metric "momo/contract/gogrpc/metric"
+	port "momo/contract/gogrpc/port"
+
 	"google.golang.org/grpc"
 )
 
 type ProxyWorker struct {
-	conn    *grpc.ClientConn
-	address string
+	conn         *grpc.ClientConn
+	portClient   port.PortClient
+	metricClient metric.MetricClient
+	address      string
 }
 
 func New(cfg *Config) (*ProxyWorker, error) {
@@ -19,8 +24,10 @@ func New(cfg *Config) (*ProxyWorker, error) {
 	}
 
 	return &ProxyWorker{
-		conn:    conn,
-		address: address,
+		portClient:   port.NewPortClient(conn),
+		metricClient: metric.NewMetricClient(conn),
+		conn:         conn,
+		address:      address,
 	}, nil
 }
 

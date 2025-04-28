@@ -1,11 +1,22 @@
 package worker
 
-import momoError "momo/pkg/error"
+import (
+	"context"
+	"time"
 
-func (pw *ProxyWorker) GetAvailablePort() (string, error) {
-	port, err := pw.GetAvailablePort()
+	pb "momo/contract/gogrpc/port"
+	momoError "momo/pkg/error"
+)
+
+func (pw *ProxyWorker) GetAvailablePorts(requestNumberOfPorts uint32, portsUsed []string) ([]string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	res, err := pw.portClient.GetAvailablePorts(ctx, &pb.PortAssignRequest{
+		RequestNumberOfPort: requestNumberOfPorts,
+		PortsUsed:           portsUsed,
+	})
 	if err != nil {
-		momoError.Errorf("error has happend the port hasn't assigned the problem was %v", err)
+		return nil, momoError.Errorf("faild to request the error was %v", err)
 	}
-	return port, nil
+	return res.Ports, nil
 }
