@@ -227,3 +227,32 @@ func TestUpdateInbound(t *testing.T) {
 		t.Fatalf("update hasn't worked carefuly")
 	}
 }
+
+func TestGetListOfPortsByDomain(t *testing.T) {
+	inboundRepo.Create(inbound12)
+	inboundRepo.Create(inbound13)
+	inboundRepo.Create(inbound14)
+
+	defer inboundRepo.DeleteAll()
+
+	summery, err := inboundRepo.GetListOfPortsByDomain()
+	if err != nil {
+		t.Fatalf("the problem has happend that was %v", err)
+	}
+	if len(summery) != 2 {
+		t.Fatalf("result was wrong we expected the number of items are 2 but we got %d", len(summery))
+	}
+
+	mapSummery := map[string][]string{}
+	for _, item := range summery {
+		mapSummery[item.Domain] = item.Ports
+	}
+
+	if ports, ok := mapSummery["twitter.com"]; !ok || len(ports) != 2 {
+		t.Fatalf("output was wrong.")
+	}
+
+	if ports, ok := mapSummery["google.com"]; !ok || len(ports) != 1 {
+		t.Fatalf("output was wrong.")
+	}
+}

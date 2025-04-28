@@ -106,6 +106,45 @@ func (i *Inbound) DeleteAll() error {
 	return nil
 }
 
+func (i *Inbound) GetListOfPortsByDomain() ([]struct {
+	Domain string
+	Ports  []string
+}, error,
+) {
+	sql := "SELECT domain, GROUP_CONCAT(port) AS ports FROM inbounds GROUP BY domain"
+	rows, err := i.db.Conn().Query(sql)
+	if err != nil {
+		return nil, momoError.DebuggingErrorf("something went wrong, the problem was: %v", err)
+	}
+	defer rows.Close()
+
+	var res []struct {
+		Domain string
+		Ports  []string
+	}
+
+	for rows.Next() {
+		var domain, portsStr string
+		if err := rows.Scan(&domain, &portsStr); err != nil {
+			return nil, momoError.DebuggingErrorf("error scanning row: %v", err)
+		}
+
+		res = append(res, struct {
+			Domain string
+			Ports  []string
+		}{
+			Domain: domain,
+			Ports:  strings.Split(portsStr, ","),
+		})
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, momoError.DebuggingErrorf("error iterating rows: %v", err)
+	}
+
+	return res, nil
+}
+
 func (i *Inbound) changeStatus(id int, state bool) error {
 	sql := fmt.Sprintf("UPDATE inbounds SET is_active = %v WHERE id = %v", state, id)
 

@@ -173,4 +173,49 @@ var (
 		Start:      utils.GetDateTime("2024-04-21 14:30:00"),
 		End:        utils.GetDateTime("2024-04-22 14:30:00"),
 	}
+
+	inbound12 = &inboundDto.CreateInbound{
+		Tag:        fmt.Sprintf("inbound-%s", port2),
+		Protocol:   "http",
+		Port:       port6,
+		Domain:     "twitter.com",
+		UserID:     userID9,
+		IsBlock:    true,
+		IsActive:   true,
+		IsAssigned: true,
+		IsNotified: false,
+		VPNType:    entity.XRAY_VPN,
+		Start:      utils.GetDateTime("2024-04-21 14:30:00"),
+		End:        utils.GetDateTime("2024-04-22 14:30:00"),
+	}
+
+	inbound13 = &inboundDto.CreateInbound{
+		Tag:        fmt.Sprintf("inbound-%s", port2),
+		Protocol:   "http",
+		Port:       port7,
+		Domain:     "twitter.com",
+		UserID:     userID9,
+		IsBlock:    true,
+		IsActive:   true,
+		IsAssigned: true,
+		IsNotified: false,
+		VPNType:    entity.XRAY_VPN,
+		Start:      utils.GetDateTime("2024-04-21 14:30:00"),
+		End:        utils.GetDateTime("2024-04-22 14:30:00"),
+	}
+
+	inbound14 = &inboundDto.CreateInbound{
+		Tag:        fmt.Sprintf("inbound-%s", port2),
+		Protocol:   "http",
+		Port:       port6,
+		Domain:     "google.com",
+		UserID:     userID9,
+		IsBlock:    true,
+		IsActive:   true,
+		IsAssigned: true,
+		IsNotified: false,
+		VPNType:    entity.XRAY_VPN,
+		Start:      utils.GetDateTime("2024-04-21 14:30:00"),
+		End:        utils.GetDateTime("2024-04-22 14:30:00"),
+	}
 )
