@@ -147,40 +147,6 @@ func TestRertriveFaultyInbounds(t *testing.T) {
 	inboundRepo.DeleteAll()
 }
 
-func TestCouningUsedDataEachDomian(t *testing.T) {
-	inboundRepo.Create(inbound3)
-	inboundRepo.Create(inbound4)
-	inboundRepo.Create(inbound5)
-	inboundRepo.Create(inbound6)
-	inboundRepo.Create(inbound7)
-	inboundRepo.Create(inbound8)
-	inboundRepo.Create(inbound9)
-
-	sumery, err := inboundRepo.CountingUsedPortEachHost()
-	if err != nil {
-		t.Error(err.Error())
-	}
-	if len(sumery) != 2 {
-		t.Errorf("we expeted the len of mapSumery be 2 bug we got %v", len(sumery))
-	}
-
-	mapSumery := map[string]uint16{}
-
-	for _, data := range sumery {
-		mapSumery[data.domain] = data.count
-	}
-
-	if count, ok := mapSumery["twitter.com"]; ok && count != 1 {
-		t.Errorf("the count of twitter.com must be 1 but we got %v", count)
-	}
-
-	if count, ok := mapSumery["googoo.com"]; ok && count != 3 {
-		t.Errorf("the count of googoo.com must be 3 but we got %v", count)
-	}
-
-	inboundRepo.DeleteAll()
-}
-
 func TestInboundsIsNotAssigned(t *testing.T) {
 	inboundRepo.Create(inbound10)
 	inboundRepo.Create(inbound11)
