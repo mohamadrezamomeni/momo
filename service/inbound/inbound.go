@@ -54,8 +54,8 @@ type HostService interface {
 		[]string,
 		*sync.WaitGroup,
 		chan<- struct {
-			domain string
-			ports  []string
+			Domain string
+			Ports  []string
 		},
 	)
 }
@@ -109,8 +109,8 @@ func (i *Inbound) AssignDomainToInbounds() {
 	}
 
 	ch := make(chan struct {
-		domain string
-		ports  []string
+		Domain string
+		Ports  []string
 	})
 
 	var wg sync.WaitGroup
@@ -140,7 +140,7 @@ func (i *Inbound) AssignDomainToInbounds() {
 	hostPortPairs := [][2]string{}
 
 	for item := range ch {
-		hostPortPairs = append(hostPortPairs, i.makeHostPairWiPort(item.domain, item.ports)...)
+		hostPortPairs = append(hostPortPairs, i.makeHostPairWiPort(item.Domain, item.Ports)...)
 	}
 	hostPortPairs = i.shuffleHostPortPairs(hostPortPairs)
 

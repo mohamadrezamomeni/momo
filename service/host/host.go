@@ -40,8 +40,8 @@ func (h *Host) ResolvePorts(
 	portsUsed []string,
 	wg *sync.WaitGroup,
 	ch chan<- struct {
-		domain string
-		ports  []string
+		Domain string
+		Ports  []string
 	},
 ) {
 	defer wg.Done()
@@ -60,11 +60,11 @@ func (h *Host) ResolvePorts(
 	}
 
 	ch <- struct {
-		domain string
-		ports  []string
+		Domain string
+		Ports  []string
 	}{
-		domain: host.Domain,
-		ports:  ports,
+		Domain: host.Domain,
+		Ports:  ports,
 	}
 }
 
