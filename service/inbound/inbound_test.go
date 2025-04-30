@@ -65,14 +65,10 @@ func TestHealingUpInbounds(t *testing.T) {
 	inboundSvc.HealingUpInbound(ret1, proxy)
 
 	inboundEnableInpt := utils.ReadPrivateField(proxy, "addInboundData")
-	inboundEnableVPNtypeInpt := utils.ReadPrivateField(proxy, "addInboundVPNType")
 	disableInpt := utils.ReadPrivateField(proxy, "disableInboundData")
-	inboundDisablenableVPNtypeInpt := utils.ReadPrivateField(proxy, "disableInboundVPNType")
 
 	if reflect.ValueOf(inboundEnableInpt).IsNil() ||
-		inboundEnableVPNtypeInpt != 1 ||
-		!reflect.ValueOf(disableInpt).IsNil() ||
-		inboundDisablenableVPNtypeInpt != 0 {
+		!reflect.ValueOf(disableInpt).IsNil() {
 		t.Error("the proxy is wrong")
 	}
 	proxy.Close()
@@ -80,14 +76,10 @@ func TestHealingUpInbounds(t *testing.T) {
 	inboundSvc.HealingUpInbound(ret2, proxy)
 
 	inboundEnableInpt = utils.ReadPrivateField(proxy, "addInboundData")
-	inboundEnableVPNtypeInpt = utils.ReadPrivateField(proxy, "addInboundVPNType")
 	disableInpt = utils.ReadPrivateField(proxy, "disableInboundData")
-	inboundDisablenableVPNtypeInpt = utils.ReadPrivateField(proxy, "disableInboundVPNType")
 
 	if !reflect.ValueOf(inboundEnableInpt).IsNil() ||
-		inboundEnableVPNtypeInpt != 0 ||
-		reflect.ValueOf(disableInpt).IsNil() ||
-		inboundDisablenableVPNtypeInpt != 1 {
+		reflect.ValueOf(disableInpt).IsNil() {
 		t.Error("the proxy is wrong")
 	}
 
@@ -96,14 +88,10 @@ func TestHealingUpInbounds(t *testing.T) {
 	inboundSvc.HealingUpInbound(ret3, proxy)
 
 	inboundEnableInpt = utils.ReadPrivateField(proxy, "addInboundData")
-	inboundEnableVPNtypeInpt = utils.ReadPrivateField(proxy, "addInboundVPNType")
 	disableInpt = utils.ReadPrivateField(proxy, "disableInboundData")
-	inboundDisablenableVPNtypeInpt = utils.ReadPrivateField(proxy, "disableInboundVPNType")
 
 	if !reflect.ValueOf(inboundEnableInpt).IsNil() ||
-		inboundEnableVPNtypeInpt != 0 ||
-		reflect.ValueOf(disableInpt).IsNil() ||
-		inboundDisablenableVPNtypeInpt != 1 {
+		reflect.ValueOf(disableInpt).IsNil() {
 		t.Error("the proxy is wrong")
 	}
 

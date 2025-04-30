@@ -200,9 +200,9 @@ func (i *Inbound) summeryDomainPorts() (map[string][]string, error) {
 
 func (i *Inbound) HealingUpInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) {
 	if i.mustItBeActive(inbound) {
-		i.activeInbound(inbound, inbound.VPNType, vpnProxy)
+		i.activeInbound(inbound, vpnProxy)
 	} else {
-		i.deActiveInbound(inbound, inbound.VPNType, vpnProxy)
+		i.deActiveInbound(inbound, vpnProxy)
 	}
 }
 
@@ -216,12 +216,12 @@ func (i *Inbound) mustItBeActive(inbound *entity.Inbound) bool {
 	return false
 }
 
-func (i *Inbound) deActiveInbound(inbound *entity.Inbound, vpnType entity.VPNType, vpnProxy vpnProxy.IProxyVPN) error {
+func (i *Inbound) deActiveInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) error {
 	info, err := i.getInfo(inbound)
 	if err != nil {
 		return err
 	}
-	err = vpnProxy.DisableInbound(info, vpnType)
+	err = vpnProxy.DisableInbound(info)
 	if err != nil {
 		return err
 	}
@@ -229,12 +229,12 @@ func (i *Inbound) deActiveInbound(inbound *entity.Inbound, vpnType entity.VPNTyp
 	return i.inboundRepo.DeActive(inbound.ID)
 }
 
-func (i *Inbound) activeInbound(inbound *entity.Inbound, vpnType entity.VPNType, vpnProxy vpnProxy.IProxyVPN) error {
+func (i *Inbound) activeInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) error {
 	info, err := i.getInfo(inbound)
 	if err != nil {
 		return err
 	}
-	err = vpnProxy.AddInbound(info, vpnType)
+	err = vpnProxy.AddInbound(info)
 	if err != nil {
 		return err
 	}
@@ -253,6 +253,7 @@ func (i *Inbound) getInfo(inbound *entity.Inbound) (*vpnProxyDto.Inbound, error)
 			ID:       user.ID,
 			Level:    "0",
 		},
+		VPNType: inbound.VPNType,
 		Address: inbound.Domain,
 		Port:    inbound.Port,
 		Tag:     inbound.Tag,

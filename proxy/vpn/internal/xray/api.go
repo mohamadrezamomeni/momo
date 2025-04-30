@@ -3,6 +3,7 @@ package xray
 import (
 	"fmt"
 
+	"momo/entity"
 	momoError "momo/pkg/error"
 
 	vpnProxyDto "momo/dto/proxy/vpn"
@@ -40,6 +41,10 @@ func New(cfg *XrayConfig) (*Xray, error) {
 		apiPort: cfg.ApiPort,
 		conn:    conn,
 	}, nil
+}
+
+func (x *Xray) GetType() entity.VPNType {
+	return entity.XRAY_VPN
 }
 
 func (x *Xray) GetAddress() string {
