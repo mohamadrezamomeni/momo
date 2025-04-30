@@ -20,7 +20,7 @@ func New(repo VPNRepo) *VPNService {
 	}
 }
 
-func (v *VPNService) MakeProxy() (*vpnProxy.ProxyVPN, error) {
+func (v *VPNService) MakeProxy() (vpnProxy.IProxyVPN, error) {
 	vpns, err := v.vpnRepo.Filter(&vpnManagerDto.FilterVPNs{})
 	if err != nil {
 		return nil, err

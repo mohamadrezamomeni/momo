@@ -26,7 +26,7 @@ type Inbound struct {
 }
 
 type VpnService interface {
-	MakeProxy() (*vpnProxy.ProxyVPN, error)
+	MakeProxy() (vpnProxy.IProxyVPN, error)
 }
 
 type UserService interface {
@@ -197,7 +197,7 @@ func (i *Inbound) summeryDomainPorts() (map[string][]string, error) {
 	return res, nil
 }
 
-func (i *Inbound) applyChangeToInbound(inbound *entity.Inbound, vpnProxy *vpnProxy.ProxyVPN) {
+func (i *Inbound) applyChangeToInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) {
 	if i.mustItBeActive(inbound) {
 		i.activeInbound(inbound, inbound.VPNType, vpnProxy)
 	} else {
@@ -215,7 +215,7 @@ func (i *Inbound) mustItBeActive(inbound *entity.Inbound) bool {
 	return false
 }
 
-func (i *Inbound) deActiveInbound(inbound *entity.Inbound, vpnType entity.VPNType, vpnProxy *vpnProxy.ProxyVPN) error {
+func (i *Inbound) deActiveInbound(inbound *entity.Inbound, vpnType entity.VPNType, vpnProxy vpnProxy.IProxyVPN) error {
 	info, err := i.getInfo(inbound)
 	if err != nil {
 		return err
@@ -228,7 +228,7 @@ func (i *Inbound) deActiveInbound(inbound *entity.Inbound, vpnType entity.VPNTyp
 	return i.inboundRepo.DeActive(inbound.ID)
 }
 
-func (i *Inbound) activeInbound(inbound *entity.Inbound, vpnType entity.VPNType, vpnProxy *vpnProxy.ProxyVPN) error {
+func (i *Inbound) activeInbound(inbound *entity.Inbound, vpnType entity.VPNType, vpnProxy vpnProxy.IProxyVPN) error {
 	info, err := i.getInfo(inbound)
 	if err != nil {
 		return err

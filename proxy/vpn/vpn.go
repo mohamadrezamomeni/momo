@@ -29,7 +29,14 @@ type ProxyVPN struct {
 	vpns []*VPN
 }
 
-func New(cfgs []*VPNConfig) *ProxyVPN {
+type IProxyVPN interface {
+	AddInbound(inpt *proxyVpnDto.Inbound, VPNType entity.VPNType) error
+	DisableInbound(inpt *proxyVpnDto.Inbound, VPNType entity.VPNType) error
+	GetTraffic(inpt *proxyVpnDto.Inbound, VPNType entity.VPNType) (*vpnSerializer.Traffic, error)
+	Close()
+}
+
+func New(cfgs []*VPNConfig) IProxyVPN {
 	vpns := make([]*VPN, 0)
 	v := make(chan *VPN, len(cfgs))
 
