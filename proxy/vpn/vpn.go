@@ -30,9 +30,9 @@ type ProxyVPN struct {
 }
 
 type IProxyVPN interface {
-	AddInbound(inpt *proxyVpnDto.Inbound, VPNType entity.VPNType) error
-	DisableInbound(inpt *proxyVpnDto.Inbound, VPNType entity.VPNType) error
-	GetTraffic(inpt *proxyVpnDto.Inbound, VPNType entity.VPNType) (*vpnSerializer.Traffic, error)
+	AddInbound(*proxyVpnDto.Inbound, entity.VPNType) error
+	DisableInbound(*proxyVpnDto.Inbound, entity.VPNType) error
+	GetTraffic(*proxyVpnDto.Inbound, entity.VPNType) (*vpnSerializer.Traffic, error)
 	Close()
 }
 
