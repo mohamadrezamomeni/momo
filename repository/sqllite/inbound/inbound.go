@@ -215,7 +215,7 @@ func (i *Inbound) makeQueryFilter(inpt *inboundDto.FilterInbound) string {
 }
 
 func (i *Inbound) RetriveFaultyInbounds() ([]*entity.Inbound, error) {
-	query := "SELECT * FROM inbounds WHERE (end < ?) OR (is_block = true AND is_active = true) OR (is_block = false AND start >= ? AND ? <= end AND is_active = false)"
+	query := "SELECT * FROM inbounds WHERE (is_active = true AND end < ?) OR (is_block = true AND is_active = true) OR (is_block = false AND start >= ? AND ? <= end AND is_active = false)"
 	now := time.Now()
 	rows, err := i.db.Conn().Query(query, now, now, now)
 
