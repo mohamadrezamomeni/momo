@@ -1,6 +1,8 @@
 package vpn
 
 import (
+	"sync"
+
 	proxyVpnDto "momo/dto/proxy/vpn"
 	"momo/entity"
 	momoError "momo/pkg/error"
@@ -30,26 +32,31 @@ type ProxyVPN struct {
 func New(cfgs []*VPNConfig) *ProxyVPN {
 	vpns := make([]*VPN, 0)
 	v := make(chan *VPN, len(cfgs))
-	errs := make(chan error, len(cfgs))
+
+	var wg sync.WaitGroup
 
 	for i := 0; i < len(cfgs); i++ {
 		cfg := cfgs[i]
-		go addToVPN(cfg, v, errs)
+		wg.Add(1)
+		go addToVPN(cfg, v, &wg)
 	}
 
-	for i := 0; i < len(cfgs); i++ {
-		select {
-		case vpn := <-v:
-			vpns = append(vpns, vpn)
-		case <-errs:
-		}
+	go func() {
+		wg.Wait()
+		close(v)
+	}()
+
+	for vpn := range v {
+		vpns = append(vpns, vpn)
 	}
+
 	return &ProxyVPN{
 		vpns: vpns,
 	}
 }
 
-func addToVPN(cfg *VPNConfig, v chan<- *VPN, errs chan<- error) {
+func addToVPN(cfg *VPNConfig, v chan<- *VPN, wg *sync.WaitGroup) {
+	defer wg.Done()
 	switch cfg.VPNType {
 	case entity.XRAY_VPN:
 		x, err := xray.New(&xray.XrayConfig{
@@ -61,8 +68,6 @@ func addToVPN(cfg *VPNConfig, v chan<- *VPN, errs chan<- error) {
 				VPNType: entity.XRAY_VPN,
 				V:       x,
 			}
-		} else {
-			errs <- err
 		}
 	}
 }
