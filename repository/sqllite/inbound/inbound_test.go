@@ -117,6 +117,7 @@ func TestRertriveFaultyInbounds(t *testing.T) {
 	inboundRepo.Create(inbound5)
 	inboundRepo.Create(inbound6)
 	inboundRepo.Create(inbound7)
+	inboundRepo.Create(inbound15)
 
 	inbounds, err := inboundRepo.RetriveFaultyInbounds()
 	if err != nil {

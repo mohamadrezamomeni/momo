@@ -210,7 +210,7 @@ func (i *Inbound) mustItBeActive(inbound *entity.Inbound) bool {
 	if now := time.Now(); inbound.IsBlock == false &&
 		((now.Before(inbound.End) || now.Equal(inbound.End)) &&
 			(now.After(inbound.Start) || now.Equal(inbound.Start))) &&
-		inbound.IsActive {
+		!inbound.IsActive {
 		return true
 	}
 	return false

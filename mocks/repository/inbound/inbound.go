@@ -25,6 +25,7 @@ func (i *MockInbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, e
 	i.id += 1
 	inbound := &entity.Inbound{
 		ID:         i.id,
+		VPNType:    entity.XRAY_VPN,
 		Protocol:   inpt.Protocol,
 		Tag:        inpt.Tag,
 		IsActive:   inpt.IsActive,
