@@ -19,7 +19,7 @@ func registerInboundSvc() (*Inbound, *inboundRepository.MockInbound) {
 	return inboundSvc, inboundRepo
 }
 
-func TestApplyDomain(t *testing.T) {
+func TestApplyDomainAndPortToInbounds(t *testing.T) {
 	inboundSvc, inboundRepo := registerInboundSvc()
 
 	inboundCreated1, _ := inboundRepo.Create(inbound1)
