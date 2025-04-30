@@ -1,4 +1,4 @@
-package repository
+package inbound
 
 import (
 	"fmt"
@@ -10,17 +10,21 @@ import (
 
 type MockInbound struct {
 	inbounds []*entity.Inbound
+	id       int
 }
 
 func New() *MockInbound {
 	inbounds := make([]*entity.Inbound, 0)
 	return &MockInbound{
 		inbounds: inbounds,
+		id:       0,
 	}
 }
 
 func (i *MockInbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error) {
+	i.id += 1
 	inbound := &entity.Inbound{
+		ID:         i.id,
 		Protocol:   inpt.Protocol,
 		Tag:        inpt.Tag,
 		IsActive:   inpt.IsActive,
@@ -139,6 +143,7 @@ func (i *MockInbound) UpdateDomainPort(id int, domain string, port string) error
 		if inbound.ID == id {
 			inbound.Domain = domain
 			inbound.Port = port
+			inbound.IsAssigned = true
 		}
 	}
 	return nil

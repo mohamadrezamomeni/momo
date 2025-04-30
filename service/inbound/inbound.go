@@ -117,6 +117,7 @@ func (i *Inbound) AssignDomainToInbounds() {
 	seen := map[string]struct{}{}
 
 	for _, host := range hosts {
+		wg.Add(1)
 		if _, ok := seen[host.Domain]; ok {
 			continue
 		}
@@ -142,8 +143,8 @@ func (i *Inbound) AssignDomainToInbounds() {
 	for item := range ch {
 		hostPortPairs = append(hostPortPairs, i.makeHostPairWiPort(item.Domain, item.Ports)...)
 	}
-	hostPortPairs = i.shuffleHostPortPairs(hostPortPairs)
 
+	hostPortPairs = i.shuffleHostPortPairs(hostPortPairs)
 	for j := 0; j < utils.Min(len(inbounds), len(hostPortPairs)); j++ {
 		hostPort := hostPortPairs[j]
 		inbound := inbounds[j]
