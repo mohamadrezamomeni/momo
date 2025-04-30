@@ -13,7 +13,7 @@ type Scheduler struct {
 }
 
 type InboundService interface {
-	ApplyChangesToInbounds()
+	HealingUpInbounds()
 }
 
 func New(inboundSvc InboundService) *Scheduler {
@@ -26,7 +26,7 @@ func New(inboundSvc InboundService) *Scheduler {
 func (s *Scheduler) Start(done <-chan struct{}, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	s.sch.Cron("*/10 * * * *").Do(s.inboundSvc.ApplyChangesToInbounds)
+	s.sch.Cron("*/10 * * * *").Do(s.inboundSvc.HealingUpInbounds)
 
 	s.sch.StartAsync()
 

@@ -171,7 +171,7 @@ func (i *Inbound) makeHostPairWiPort(host string, ports []string) [][2]string {
 	return hostPortPairs
 }
 
-func (i *Inbound) ApplyChangesToInbounds() {
+func (i *Inbound) HealingUpInbounds() {
 	inbounds, err := i.inboundRepo.RetriveFaultyInbounds()
 	if err != nil {
 		return
@@ -182,7 +182,7 @@ func (i *Inbound) ApplyChangesToInbounds() {
 	}
 	defer proxy.Close()
 	for _, inbound := range inbounds {
-		i.applyChangeToInbound(inbound, proxy)
+		i.HealingUpInbound(inbound, proxy)
 	}
 }
 
@@ -198,7 +198,7 @@ func (i *Inbound) summeryDomainPorts() (map[string][]string, error) {
 	return res, nil
 }
 
-func (i *Inbound) applyChangeToInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) {
+func (i *Inbound) HealingUpInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) {
 	if i.mustItBeActive(inbound) {
 		i.activeInbound(inbound, inbound.VPNType, vpnProxy)
 	} else {
