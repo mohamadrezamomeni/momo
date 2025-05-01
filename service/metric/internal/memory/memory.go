@@ -9,27 +9,25 @@ import (
 )
 
 type MemoMetric struct {
-	MemTotal     uint64
-	MemFree      uint64
-	MemAvailable uint64
+	memInfoPath string
 }
 
-func New() (*MemoMetric, error) {
-	dataRaw, err := getData()
+func New() *MemoMetric {
+	return &MemoMetric{
+		memInfoPath: "/proc/meminfo",
+	}
+}
+
+func (m *MemoMetric) GetData() (uint64, uint64, uint64, error) {
+	dataRaw, err := m.getData()
 	if err != nil {
-		return nil, err
+		return 0, 0, 0, err
 	}
 
-	memTotal, memFree, memAvailable, err := extractData(dataRaw)
-
-	return &MemoMetric{
-		MemTotal:     memTotal,
-		MemFree:      memFree,
-		MemAvailable: memAvailable,
-	}, nil
+	return m.extractData(dataRaw)
 }
 
-func extractData(dataRaw string) (uint64, uint64, uint64, error) {
+func (m *MemoMetric) extractData(dataRaw string) (uint64, uint64, uint64, error) {
 	var memTotal, memFree, memAvailable uint64
 	for _, line := range strings.Split(dataRaw, "\n") {
 		fields := strings.Fields(line)
@@ -56,8 +54,8 @@ func extractData(dataRaw string) (uint64, uint64, uint64, error) {
 	return memTotal, memFree, memAvailable, nil
 }
 
-func getData() (string, error) {
-	data, err := os.ReadFile("/proc/meminfo")
+func (m *MemoMetric) getData() (string, error) {
+	data, err := os.ReadFile(m.memInfoPath)
 	if err != nil {
 		return "", momoError.DebuggingErrorf("error to open /proc/meminfo the problem was %v", err)
 	}
