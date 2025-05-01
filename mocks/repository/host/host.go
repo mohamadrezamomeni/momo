@@ -53,3 +53,12 @@ func (h *Host) Update(id int, inpt *hostRepoDto.UpdateHost) error {
 func (h *Host) Filter(inpt *hostRepoDto.FilterHosts) ([]*entity.Host, error) {
 	return h.hosts, nil
 }
+
+func (h *Host) FindByID(id int) (*entity.Host, error) {
+	for _, host := range h.hosts {
+		if host.ID == id {
+			return host, nil
+		}
+	}
+	return nil, nil
+}

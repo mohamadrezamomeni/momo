@@ -39,7 +39,7 @@ func TestFindRightHosts(t *testing.T) {
 func TestResolvePorts(t *testing.T) {
 	hostSvc, hostRepo := registerHostSrv()
 
-	inboundCreated1, _ := hostRepo.Create(host1)
+	hostCreated1, _ := hostRepo.Create(host1)
 	ch := make(chan struct {
 		Domain string
 		Ports  []string
@@ -47,7 +47,7 @@ func TestResolvePorts(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go hostSvc.ResolvePorts(
-		inboundCreated1,
+		hostCreated1,
 		3,
 		[]string{"12345"},
 		&wg,
@@ -61,7 +61,26 @@ func TestResolvePorts(t *testing.T) {
 
 	data := <-ch
 
-	if data.Domain != inboundCreated1.Domain || len(data.Ports) != 3 {
+	if data.Domain != hostCreated1.Domain || len(data.Ports) != 3 {
 		t.Fatalf("error has happend the date that was sent was wrong")
+	}
+}
+
+func TestMonitorHosts(t *testing.T) {
+	hostSvc, hostRepo := registerHostSrv()
+
+	hostCreated1, _ := hostRepo.Create(host4)
+	hostCreated2, _ := hostRepo.Create(host5)
+	hostCreated3, _ := hostRepo.Create(host6)
+	hostSvc.MonitorHosts()
+
+	hostFound1, _ := hostRepo.FindByID(hostCreated1.ID)
+	hostFound2, _ := hostRepo.FindByID(hostCreated2.ID)
+	hostFound3, _ := hostRepo.FindByID(hostCreated3.ID)
+	hosts := []*entity.Host{hostFound1, hostFound2, hostFound3}
+	for _, host := range hosts {
+		if host.Rank != 10 || host.Status != entity.High {
+			t.Fatalf("host hasn't updated")
+		}
 	}
 }

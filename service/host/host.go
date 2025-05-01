@@ -8,7 +8,7 @@ import (
 type WorkerProxy interface {
 	Close()
 	GetAvailablePorts(uint32, []string) ([]string, error)
-	GetMetric() (uint32, string, error)
+	GetMetric() (uint32, entity.HostStatus, error)
 }
 
 type WorkerFactor func(string, string) (WorkerProxy, error)
@@ -17,6 +17,7 @@ type HostRepo interface {
 	Create(*hostRepoDto.AddHost) (*entity.Host, error)
 	Filter(*hostRepoDto.FilterHosts) ([]*entity.Host, error)
 	Update(int, *hostRepoDto.UpdateHost) error
+	FindByID(int) (*entity.Host, error)
 }
 
 type Host struct {
