@@ -4,5 +4,5 @@ import "momo/entity"
 
 type UpdateHost struct {
 	Status entity.HostStatus
-	Rank   int
+	Rank   uint32
 }
