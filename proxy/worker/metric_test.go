@@ -14,8 +14,7 @@ func TestGetMetric(t *testing.T) {
 	if rank < 0 {
 		t.Error("rank is wrong.")
 	}
-	hostStatus, _ := entity.MapHostStatusToEnum(status)
-	if hostStatus == entity.Uknown {
+	if status == entity.Uknown {
 		t.Fatal("we got unkhon status")
 	}
 }
