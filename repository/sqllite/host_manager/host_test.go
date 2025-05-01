@@ -53,6 +53,8 @@ func TestFilterHosts(t *testing.T) {
 	hostRepo.Create(hostExample4)
 	hostRepo.Create(hostExample5)
 
+	defer hostRepo.DeleteAll()
+
 	hosts, err := hostRepo.Filter(&hostmanagerDto.FilterHosts{})
 	if err != nil {
 		t.Errorf("1.something wrong has happend that was %v", err)
@@ -115,8 +117,6 @@ func TestFilterHosts(t *testing.T) {
 	if len(hosts) != 3 {
 		t.Errorf("we expected 3 items but we got %v", len(hosts))
 	}
-
-	hostRepo.DeleteAll()
 }
 
 func TestUpdateHost(t *testing.T) {
@@ -129,4 +129,20 @@ func TestUpdateHost(t *testing.T) {
 		t.Errorf("error has happend that was %e", err)
 	}
 	hostRepo.DeleteAll()
+}
+
+func TestFindByID(t *testing.T) {
+	hostRepo.Create(hostExample1)
+	host2, _ := hostRepo.Create(hostExample2)
+
+	defer hostRepo.DeleteAll()
+
+	hostFounded, err := hostRepo.FindByID(host2.ID)
+	if err != nil {
+		t.Fatalf("error has happend that was %v", err)
+	}
+
+	if hostFounded.ID != host2.ID {
+		t.Fatal("this method has answerd wrongly")
+	}
 }

@@ -29,6 +29,33 @@ func (h *Host) Create(inpt *hostmanagerDto.AddHost) (*entity.Host, error) {
 	return host, nil
 }
 
+func (h *Host) FindByID(id int) (*entity.Host, error) {
+	query := fmt.Sprintf("SELECT * FROM hosts WHERE id = %d LIMIT 1", id)
+	host := &entity.Host{}
+	var hostStatusString string
+	var createdAt, updatedAt interface{}
+
+	row := h.db.Conn().QueryRow(query)
+	err := row.Scan(
+		&host.ID,
+		&host.Domain,
+		&host.Port,
+		&hostStatusString,
+		&host.Rank,
+		&createdAt,
+		&updatedAt,
+	)
+	if err != nil {
+		return nil, momoError.Errorf("some thing went wrong please follow the problem - error: %v", err)
+	}
+	status, er := entity.MapHostStatusToEnum(hostStatusString)
+	if err != nil {
+		return nil, er
+	}
+	host.Status = status
+	return host, nil
+}
+
 func (h *Host) Update(id int, inpt *hostmanagerDto.UpdateHost) error {
 	sql := fmt.Sprintf(
 		"UPDATE hosts SET status = '%s', rank = %v WHERE id = %v",
