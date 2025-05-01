@@ -9,40 +9,45 @@ import (
 )
 
 type CpuMetric struct {
-	idle  uint64
-	total uint64
+	statFilePath string
 }
 
-func New() (*CpuMetric, error) {
-	data, err := readFileProcStat()
+func New() *CpuMetric {
+	return &CpuMetric{
+		statFilePath: "/proc/stat",
+	}
+}
+
+func (c *CpuMetric) getData() (uint64, uint64, error) {
+	data, err := c.readFileProcStat()
 	if err != nil {
-		return nil, momoError.DebuggingErrorf("something went wrong to open /proc/stat the problem was %v", err)
+		return 0, 0, momoError.DebuggingErrorf("something went wrong to open /proc/stat the problem was %v", err)
 	}
 
-	line, err := getCpuInfoLine(data)
+	line, err := c.getCpuInfoLine(data)
 
 	items := strings.Fields(line)
 	if len(items) < 5 {
-		return nil, momoError.DebuggingErrorf("we got unexpected error in proct/stat content")
+		return 0, 0, momoError.DebuggingErrorf("we got unexpected error in proct/stat content")
 	}
-	idle, err := getIdle(items)
-	total, err := getTotal(items)
+	idle, err := c.getIdle(items)
+	total, err := c.getTotal(items)
 	if err != nil {
-		return nil, err
+		return 0, 0, err
 	}
 
-	return &CpuMetric{idle: idle, total: total}, nil
+	return total, idle, nil
 }
 
-func readFileProcStat() ([]byte, error) {
-	data, err := os.ReadFile("/proc/stat")
+func (c *CpuMetric) readFileProcStat() ([]byte, error) {
+	data, err := os.ReadFile(c.statFilePath)
 	if err != nil {
 		return nil, momoError.DebuggingErrorf("something went wrong to open /proc/stat the problem was %v", err)
 	}
 	return data, nil
 }
 
-func getCpuInfoLine(data []byte) (string, error) {
+func (c *CpuMetric) getCpuInfoLine(data []byte) (string, error) {
 	lines := strings.Split(string(data), "\n")
 
 	totalCpuline := ""
@@ -57,7 +62,7 @@ func getCpuInfoLine(data []byte) (string, error) {
 	return totalCpuline, nil
 }
 
-func getIdle(items []string) (uint64, error) {
+func (c *CpuMetric) getIdle(items []string) (uint64, error) {
 	idleStr := items[4]
 	v, err := strconv.ParseUint(idleStr, 10, 64)
 	if err != nil {
@@ -66,7 +71,7 @@ func getIdle(items []string) (uint64, error) {
 	return v, nil
 }
 
-func getTotal(items []string) (uint64, error) {
+func (c *CpuMetric) getTotal(items []string) (uint64, error) {
 	var total uint64 = 0
 	for _, item := range items[1:] {
 		v, err := strconv.ParseUint(item, 10, 64)

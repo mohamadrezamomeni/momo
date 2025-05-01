@@ -1,5 +1,9 @@
 package cpu
 
-func (m *CpuMetric) GetCpuFreePercentage() uint64 {
-	return m.idle / m.total * 100
+func (c *CpuMetric) GetCpuFreePercentage() (float64, error) {
+	total, idle, err := c.getData()
+	if err != nil {
+		return 0, err
+	}
+	return (float64(idle) / float64(total)) * 100, nil
 }
