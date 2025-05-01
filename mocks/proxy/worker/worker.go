@@ -12,8 +12,8 @@ func (mwp *MockWorkerProxy) GetAvailablePorts(requiredPorts uint32, portsUsed []
 	return ans, nil
 }
 
-func (mwp *MockWorkerProxy) GetMetric() (uint32, string, error) {
-	return 10, string(entity.High), nil
+func (mwp *MockWorkerProxy) GetMetric() (uint32, entity.HostStatus, error) {
+	return 10, entity.High, nil
 }
 
 func (mwp *MockWorkerProxy) Close() {}
