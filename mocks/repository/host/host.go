@@ -49,3 +49,7 @@ func (h *Host) Update(id int, inpt *hostRepoDto.UpdateHost) error {
 	}
 	return nil
 }
+
+func (h *Host) Filter(inpt *hostRepoDto.FilterHosts) ([]*entity.Host, error) {
+	return h.hosts, nil
+}
