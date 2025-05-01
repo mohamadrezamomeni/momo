@@ -69,7 +69,7 @@ func getServices(cfg *sqllite.DBConfig) (
 	hostRepo := hostManagerSqlite.New(db)
 	vpnRepo := vpnSqlite.New(db)
 
-	hostSvc := hostService.New(hostRepo)
+	hostSvc := hostService.New(hostRepo, hostService.AdaptedWorkerFactory)
 	vpnSvc := vpnService.New(vpnRepo)
 	userSvc := userService.New(userRepo)
 

@@ -5,8 +5,15 @@ import (
 
 	hostRepoDto "momo/dto/repository/host_manager"
 	"momo/entity"
-	"momo/proxy/worker"
 )
+
+type WorkerProxy interface {
+	Close()
+	GetAvailablePorts(uint32, []string) ([]string, error)
+	GetMetric() (uint32, string, error)
+}
+
+type WorkerFactor func(string, string) (WorkerProxy, error)
 
 type HostRepo interface {
 	Create(*hostRepoDto.AddHost) (*entity.Host, error)
@@ -15,12 +22,14 @@ type HostRepo interface {
 }
 
 type Host struct {
-	hostRepo HostRepo
+	hostRepo        HostRepo
+	workerFactorNew WorkerFactor
 }
 
-func New(hostRepo HostRepo) *Host {
+func New(hostRepo HostRepo, workerFactorNew WorkerFactor) *Host {
 	return &Host{
-		hostRepo: hostRepo,
+		hostRepo:        hostRepo,
+		workerFactorNew: workerFactorNew,
 	}
 }
 
@@ -49,10 +58,7 @@ func (h *Host) ResolvePorts(
 ) {
 	defer wg.Done()
 
-	wp, err := worker.New(&worker.Config{
-		Address: host.Domain,
-		Port:    host.Port,
-	})
+	wp, err := h.workerFactorNew(host.Domain, host.Port)
 	if err != nil {
 		return
 	}
