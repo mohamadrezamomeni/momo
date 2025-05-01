@@ -68,7 +68,7 @@ func (p *Port) isPortAvailable(port string) bool {
 }
 
 func (p *Port) isPortBusy(port string) bool {
-	addr := fmt.Sprintf("127.0.0.1:%d", port)
+	addr := fmt.Sprintf("127.0.0.1:%s", port)
 	listen, err := net.Listen("tcp", addr)
 	if err != nil {
 		return true
@@ -124,7 +124,7 @@ func (p *Port) store(port string) {
 	idx, _ := p.findPortInBytes(input, port)
 
 	lines := strings.Split(string(input), "\n")
-	line := fmt.Sprintf("%d %d\n", time.Now().Unix(), port)
+	line := fmt.Sprintf("%d %s\n", time.Now().Unix(), port)
 
 	if idx != -1 {
 		lines[idx] = line
