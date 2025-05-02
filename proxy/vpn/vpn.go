@@ -30,6 +30,7 @@ type IProxyVPN interface {
 	DisableInbound(*proxyVpnDto.Inbound) error
 	GetTraffic(*proxyVpnDto.Inbound) (*vpnSerializer.Traffic, error)
 	Close()
+	Test(*proxyVpnDto.Monitor) error
 }
 
 func New(cfgs []*VPNConfig) IProxyVPN {
@@ -103,6 +104,14 @@ func (p *ProxyVPN) GetTraffic(inpt *proxyVpnDto.Inbound) (*vpnSerializer.Traffic
 		return &vpnSerializer.Traffic{}, momoError.DebuggingErrorf("%v vpn has'nt been introuduced with address %s", inpt.VPNType, inpt.Address)
 	}
 	return v.GetTraffic(inpt)
+}
+
+func (p *ProxyVPN) Test(inpt *proxyVpnDto.Monitor) error {
+	v := p.retriveVPN(inpt.Address, inpt.VPNType)
+	if v == nil {
+		return momoError.DebuggingErrorf("%v vpn has'nt been introuduced with address %s", inpt.VPNType, inpt.Address)
+	}
+	return v.Test()
 }
 
 func (p *ProxyVPN) Close() {

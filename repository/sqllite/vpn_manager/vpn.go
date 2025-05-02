@@ -62,11 +62,11 @@ func (i *VPN) DeleteAll() error {
 	return nil
 }
 
-func (v *VPN) activeVPN(id int) error {
+func (v *VPN) ActiveVPN(id int) error {
 	return v.updateActivationVPN(id, true)
 }
 
-func (v *VPN) deactiveVPN(id int) error {
+func (v *VPN) DeactiveVPN(id int) error {
 	return v.updateActivationVPN(id, false)
 }
 

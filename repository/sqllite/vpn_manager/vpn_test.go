@@ -48,12 +48,12 @@ func TestChangeStatus(t *testing.T) {
 	v1, _ := vpnRepo.Create(vpn1)
 	defer vpnRepo.DeleteAll()
 
-	err := vpnRepo.activeVPN(v1.ID)
+	err := vpnRepo.ActiveVPN(v1.ID)
 	if err != nil {
 		t.Fatalf("the error has happend that was %v", err)
 	}
 
-	err = vpnRepo.deactiveVPN(v1.ID)
+	err = vpnRepo.DeactiveVPN(v1.ID)
 	if err != nil {
 		t.Fatalf("the error has happend that was %v", err)
 	}

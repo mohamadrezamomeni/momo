@@ -1,6 +1,8 @@
 package vpn
 
 import (
+	"fmt"
+
 	proxyVpnDto "momo/dto/proxy/vpn"
 	"momo/entity"
 	vpnSerializer "momo/proxy/vpn/serializer"
@@ -15,6 +17,8 @@ type MockProxy struct {
 
 	getTrafficInboundData    *proxyVpnDto.Inbound
 	getTrafficInboundVPNType entity.VPNType
+
+	Count int
 }
 
 func (mp *MockProxy) AddInbound(inpt *proxyVpnDto.Inbound) error {
@@ -33,6 +37,16 @@ func (mp *MockProxy) GetTraffic(inpt *proxyVpnDto.Inbound) (*vpnSerializer.Traff
 		Download: 20,
 		Upload:   20,
 	}, nil
+}
+
+func (mp *MockProxy) Test(inpt *proxyVpnDto.Monitor) error {
+	defer func() {
+		mp.Count += 1
+	}()
+	if mp.Count%2 == 0 {
+		return fmt.Errorf("")
+	}
+	return nil
 }
 
 func (mp *MockProxy) Close() {
