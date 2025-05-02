@@ -68,8 +68,25 @@ func TestGetTraffic(t *testing.T) {
 }
 
 func TestInboundDoesntExist(t *testing.T) {
-	res, err := xrayU.getUsers(inboundDoesntExist)
-	if err == nil || (res != nil && len(res.Usernames) != 0) {
+	_, err := xrayU.getUsers(inboundDoesntExist)
+	if err == nil {
+		t.Error("error could be existed. It was unexpected situation")
+	}
+
+	xrayU.addInbound(&dto.AddInbound{
+		Port:     portInbound,
+		Tag:      inboundDoesntExist,
+		Protocol: protocolInbound,
+		User: &dto.InboundUser{
+			Username: usernameInbound,
+			Level:    level,
+			UUID:     uuidInbound,
+		},
+	})
+
+	xrayU.removeInbound(&dto.RemoveInbound{Tag: inboundDoesntExist})
+	data, _ := xrayU.getUsers(inboundDoesntExist)
+	if data != nil && len(data.Usernames) > 0 {
 		t.Error("error could be existed. It was unexpected situation")
 	}
 }
