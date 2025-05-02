@@ -9,7 +9,7 @@ import (
 func TestGetMetric(t *testing.T) {
 	rank, status, err := pw.GetMetric()
 	if err != nil {
-		t.Errorf("something has happend we couldn't get metric the problem was %v", err)
+		t.Fatalf("something has happend we couldn't get metric the problem was %v", err)
 	}
 	if rank < 0 {
 		t.Error("rank is wrong.")
