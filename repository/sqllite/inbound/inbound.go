@@ -13,6 +13,8 @@ import (
 )
 
 func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error) {
+	scope := "inboundRepository.create"
+
 	inbound := &entity.Inbound{}
 	err := i.db.Conn().QueryRow(`
 	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_active, start, end, is_block, is_assigned, is_notified)
@@ -34,13 +36,15 @@ func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error
 		&inbound.IsAssigned,
 	)
 	if err != nil {
-		return nil, momoError.Errorf("somoething went wrong to save inbound error: %v", err)
+		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *inpt)
 	}
 	inbound.VPNType = inpt.VPNType
 	return inbound, nil
 }
 
 func (i *Inbound) FindInboundByID(id int) (*entity.Inbound, error) {
+	scope := "inboundRepository.FindInboundByID"
+
 	var createdAt, updatedAt interface{}
 	var inbound *entity.Inbound = &entity.Inbound{}
 	var vpnType string
@@ -68,39 +72,43 @@ func (i *Inbound) FindInboundByID(id int) (*entity.Inbound, error) {
 		return inbound, nil
 	}
 	if err == sql.ErrNoRows {
-		return nil, err
+		return nil, momoError.Wrap(err).Scope(scope).Errorf("the id is %d", id)
 	}
-	return nil, momoError.Errorf("some thing went wrong please follow the problem - error: %v", err)
+	return nil, momoError.Wrap(err).Scope(scope).Errorf("the id is %d", id)
 }
 
 func (i *Inbound) Delete(id int) error {
+	scope := "inboundRepository.FindInboundByID"
+
 	sql := fmt.Sprintf("DELETE FROM inbounds WHERE id=%v", id)
 	res, err := i.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d", id)
 	}
 
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
-		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d", id)
 	}
 
 	if rowsAffected == 0 {
-		return momoError.Error("None of the records have been affected.")
+		return momoError.Scope(scope).Errorf("no row is affected")
 	}
 	return nil
 }
 
 func (i *Inbound) DeleteAll() error {
+	scope := "inboundRepository.DeleteAll"
+
 	sql := "DELETE FROM inbounds"
 	res, err := i.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).ErrorWrite()
 	}
 
 	_, err = res.RowsAffected()
 	if err != nil {
-		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).ErrorWrite()
 	}
 
 	return nil
@@ -111,11 +119,14 @@ func (i *Inbound) GetListOfPortsByDomain() ([]struct {
 	Ports  []string
 }, error,
 ) {
+	scope := "inboundRepository.GetListOfPortsByDomain"
+
 	sql := "SELECT domain, GROUP_CONCAT(port) AS ports FROM inbounds GROUP BY domain"
 	rows, err := i.db.Conn().Query(sql)
 	if err != nil {
-		return nil, momoError.DebuggingErrorf("something went wrong, the problem was: %v", err)
+		return nil, momoError.Wrap(err).Scope(scope).DebuggingError()
 	}
+
 	defer rows.Close()
 
 	var res []struct {
@@ -126,7 +137,7 @@ func (i *Inbound) GetListOfPortsByDomain() ([]struct {
 	for rows.Next() {
 		var domain, portsStr string
 		if err := rows.Scan(&domain, &portsStr); err != nil {
-			return nil, momoError.DebuggingErrorf("error scanning row: %v", err)
+			return nil, momoError.Wrap(err).Scope(scope).DebuggingError()
 		}
 
 		res = append(res, struct {
@@ -139,18 +150,20 @@ func (i *Inbound) GetListOfPortsByDomain() ([]struct {
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, momoError.DebuggingErrorf("error iterating rows: %v", err)
+		return nil, momoError.Wrap(err).Scope(scope).DebuggingError()
 	}
 
 	return res, nil
 }
 
 func (i *Inbound) changeStatus(id int, state bool) error {
+	scope := "inboundRepository.changeStatus"
+
 	sql := fmt.Sprintf("UPDATE inbounds SET is_active = %v WHERE id = %v", state, id)
 
 	_, err := i.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.DebuggingErrorf("something bad has happend the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).DebuggingErrorf("the id is %d and the state is %v", id, state)
 	}
 	return nil
 }
@@ -164,11 +177,13 @@ func (i *Inbound) DeActive(id int) error {
 }
 
 func (i *Inbound) Filter(inpt *inboundDto.FilterInbound) ([]*entity.Inbound, error) {
+	scope := "inboundRepository.Filter"
+
 	query := i.makeQueryFilter(inpt)
 
 	rows, err := i.db.Conn().Query(query)
 	if err != nil {
-		return []*entity.Inbound{}, momoError.DebuggingErrorf("error has occured err: %v", err)
+		return nil, momoError.Wrap(err).Scope(scope).DebuggingErrorf("the input is %+v", *inpt)
 	}
 
 	inbounds := make([]*entity.Inbound, 0)
@@ -215,19 +230,21 @@ func (i *Inbound) makeQueryFilter(inpt *inboundDto.FilterInbound) string {
 }
 
 func (i *Inbound) RetriveFaultyInbounds() ([]*entity.Inbound, error) {
+	scope := "inboundRepository.RetriveFaultyInbounds"
+
 	query := "SELECT * FROM inbounds WHERE (is_active = true AND end < ?) OR (is_block = true AND is_active = true) OR (is_block = false AND start >= ? AND ? <= end AND is_active = false)"
 	now := time.Now()
 	rows, err := i.db.Conn().Query(query, now, now, now)
 
 	inbounds := make([]*entity.Inbound, 0)
 	if err != nil {
-		return inbounds, momoError.DebuggingErrorf("something wrong has happend the problem was %v", err)
+		return nil, momoError.Wrap(err).Scope(scope).DebuggingError()
 	}
 
 	for rows.Next() {
 		inbound, err := i.scan(rows)
 		if err != nil {
-			return inbounds, err
+			return nil, momoError.Wrap(err).Scope(scope).DebuggingError()
 		}
 		inbounds = append(inbounds, inbound)
 	}
@@ -236,16 +253,18 @@ func (i *Inbound) RetriveFaultyInbounds() ([]*entity.Inbound, error) {
 }
 
 func (i *Inbound) FindInboundIsNotAssigned() ([]*entity.Inbound, error) {
+	scope := "inboundRepository.FindInboundIsNotAssigned"
+
 	query := "SELECT * FROM inbounds WHERE is_assigned = false"
 	rows, err := i.db.Conn().Query(query)
 	if err != nil {
-		return nil, momoError.Errorf("the problem has occured the problem was %v", err)
+		return nil, momoError.Wrap(err).Scope(scope).ErrorWrite()
 	}
 	inbounds := make([]*entity.Inbound, 0)
 	for rows.Next() {
 		inbound, err := i.scan(rows)
 		if err != nil {
-			return nil, momoError.DebuggingErrorf("rows isn't scaned the problem was %v", err)
+			return nil, momoError.Wrap(err).Scope(scope).ErrorWrite()
 		}
 		inbounds = append(inbounds, inbound)
 	}
@@ -253,6 +272,8 @@ func (i *Inbound) FindInboundIsNotAssigned() ([]*entity.Inbound, error) {
 }
 
 func (i *Inbound) UpdateDomainPort(id int, domain string, port string) error {
+	scope := "inboundRepository.UpdateDomainPort"
+
 	sql := fmt.Sprintf(
 		"UPDATE inbounds SET domain = '%s', port = '%s' WHERE id = %v",
 		domain,
@@ -262,12 +283,14 @@ func (i *Inbound) UpdateDomainPort(id int, domain string, port string) error {
 
 	_, err := i.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.DebuggingErrorf("something bad has happend the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).Errorf("the id ids %d and the domain is %s and the port is %s", id, domain, port)
 	}
 	return nil
 }
 
 func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
+	scope := "inboundRepository.scan"
+
 	inbound := &entity.Inbound{}
 	var createdAt, updatedAt interface{}
 	var vpnType string
@@ -289,7 +312,7 @@ func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
 		&updatedAt,
 	)
 	if err != nil {
-		return inbound, momoError.DebuggingErrorf("error has occured err: %v", err)
+		return nil, momoError.Wrap(err).Scope(scope).ErrorWrite()
 	}
 	inbound.VPNType = entity.ConvertStringVPNTypeToEnum(vpnType)
 	return inbound, nil

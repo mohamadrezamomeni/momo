@@ -24,16 +24,17 @@ import (
 )
 
 func (x *Xray) addInbound(inpt *dto.AddInbound) (*serializer.AddInboundSerializer, error) {
+	scope := "xrayProxy.addInbound"
 	port, err := utils.ConvertToUint16(inpt.Port)
 	if err != nil {
-		return &serializer.AddInboundSerializer{}, momoError.Error("the port that is given is wrong")
+		return nil, momoError.Wrap(err).Scope(scope).ErrorWrite()
 	}
 
 	users := make([]*protocol.User, 0)
 	if inpt.User != nil {
 		level, err := utils.ConvertToUint32(inpt.User.Level)
 		if err != nil {
-			return &serializer.AddInboundSerializer{}, momoError.Error("user's level is wrong.")
+			return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", inpt)
 		}
 		user := &protocol.User{
 			Level: level,
@@ -67,7 +68,7 @@ func (x *Xray) addInbound(inpt *dto.AddInbound) (*serializer.AddInboundSerialize
 
 	_, err = x.hsClient.AddInbound(context.Background(), addInboundRequest)
 	if err != nil {
-		return &serializer.AddInboundSerializer{}, momoError.Errorf("the error has happend the problem was %v", err)
+		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", inpt)
 	}
 	return &serializer.AddInboundSerializer{}, nil
 }
@@ -80,16 +81,24 @@ func (x *Xray) isUserFilled(u *dto.InboundUser) bool {
 }
 
 func (x *Xray) removeInbound(inpt *dto.RemoveInbound) (*serializer.RemoveInbound, error) {
+	scope := "xrayProxy.removeInbound"
 	client := x.hsClient
 	_, err := client.RemoveInbound(context.Background(), &command.RemoveInboundRequest{
 		Tag: inpt.Tag,
 	})
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", inpt)
+	}
 	return &serializer.RemoveInbound{}, err
 }
 
 func (x *Xray) resetTraffic(tag string) error {
+	scope := "xrayProxy.resetTraffic"
 	_, err := x.getInboundTrafficWithoutBeigReseted(tag)
-	return err
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).Errorf("the input is %s", tag)
+	}
+	return nil
 }
 
 func (x *Xray) getInboundTrafficWithoutBeigReseted(tag string) (*serializer.ReceiveInboundTraffic, error) {
@@ -101,6 +110,8 @@ func (x *Xray) getInboundTrafficWithBeigReseted(tag string) (*serializer.Receive
 }
 
 func (x *Xray) receiveInboundTraffic(tag string, reset bool) (*serializer.ReceiveInboundTraffic, error) {
+	scope := "xrayProxy.receiveInboundTraffic"
+
 	ptn := fmt.Sprintf("inbound>>>%s>>>traffic", tag)
 	resp, err := x.ssClient.QueryStats(context.Background(), &statsService.QueryStatsRequest{
 		Pattern: ptn,
@@ -108,13 +119,16 @@ func (x *Xray) receiveInboundTraffic(tag string, reset bool) (*serializer.Receiv
 	})
 	stats := resp.GetStat()
 	if err != nil {
-		return &serializer.ReceiveInboundTraffic{}, err
+		return nil, momoError.Wrap(err).Scope(scope).Errorf("the tag is %s and reset is %v", tag, reset)
 	}
 	if len(stats) == 0 {
-		return &serializer.ReceiveInboundTraffic{}, momoError.Error("result wasn't found")
+		return nil, momoError.Scope(scope).Errorf("the tag is %s and reset is %v", tag, reset)
 	}
 
 	data, err := x.convertStatsToMap(stats)
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).Errorf("the tag is %s and reset is %v", tag, reset)
+	}
 
 	return &serializer.ReceiveInboundTraffic{
 		UpLink:   data["uplink"],
@@ -123,6 +137,8 @@ func (x *Xray) receiveInboundTraffic(tag string, reset bool) (*serializer.Receiv
 }
 
 func (x *Xray) convertStatsToMap(stats []*statsService.Stat) (map[string]int64, error) {
+	scope := "xrayProxy.convertStatsToMap"
+
 	res := map[string]int64{}
 	for _, stat := range stats {
 		if strings.Contains(stat.Name, "uplink") {
@@ -130,7 +146,7 @@ func (x *Xray) convertStatsToMap(stats []*statsService.Stat) (map[string]int64, 
 		} else if strings.Contains(stat.Name, "downlink") {
 			res["downlink"] = x.getValStat(stat)
 		} else {
-			return map[string]int64{}, momoError.Error("something went wrong. we faced unexpected situation")
+			return map[string]int64{}, momoError.Scope(scope).Errorf("the input is %+v", stats)
 		}
 	}
 	return res, nil
@@ -144,9 +160,11 @@ func (x *Xray) getValStat(stat *statsService.Stat) int64 {
 }
 
 func (x *Xray) fakeReceiveInboundTraffic() error {
+	scope := "xrayProxy.fakeReceiveInboundTraffic"
+
 	_, err := x.ssClient.QueryStats(context.Background(), &statsService.QueryStatsRequest{})
 	if err != nil {
-		return momoError.Errorf("some thing wring that happend that was %v", err)
+		return momoError.Wrap(err).Scope(scope).ErrorWrite()
 	}
 
 	return nil

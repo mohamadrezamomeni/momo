@@ -15,7 +15,7 @@ var hostRepo *Host
 func TestMain(m *testing.M) {
 	config := &sqllite.DBConfig{
 		Dialect:    "sqlite3",
-		Path:       "test.db",
+		Path:       "test-host.db",
 		Migrations: "./repository/sqllite/migrations",
 	}
 
@@ -36,7 +36,7 @@ func TestMain(m *testing.M) {
 func TestCreateHost(t *testing.T) {
 	host, err := hostRepo.Create(hostExample1)
 	if err != nil {
-		t.Errorf("error has happend that was %v", err)
+		t.Fatalf("error has happend that was %v", err)
 	}
 	if host.Domain != hostExample1.Domain ||
 		host.Port != hostExample1.Port ||

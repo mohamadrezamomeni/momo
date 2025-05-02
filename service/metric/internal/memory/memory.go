@@ -55,9 +55,10 @@ func (m *MemoMetric) extractData(dataRaw string) (uint64, uint64, uint64, error)
 }
 
 func (m *MemoMetric) getData() (string, error) {
+	scope := "memoryMetric.getData"
 	data, err := os.ReadFile(m.memInfoPath)
 	if err != nil {
-		return "", momoError.DebuggingErrorf("error to open /proc/meminfo the problem was %v", err)
+		return "", momoError.Wrap(err).Scope(scope).DebuggingErrorf("the items must be 5")
 	}
 	return string(data), nil
 }

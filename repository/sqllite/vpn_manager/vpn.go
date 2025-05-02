@@ -11,6 +11,8 @@ import (
 )
 
 func (v *VPN) Create(inpt *vpnManagerDto.AddVPN) (*entity.VPN, error) {
+	scope := "vpnRepository.Create"
+
 	var vpn *entity.VPN = &entity.VPN{
 		Domain:    inpt.Domain,
 		IsActive:  inpt.IsActive,
@@ -26,37 +28,41 @@ func (v *VPN) Create(inpt *vpnManagerDto.AddVPN) (*entity.VPN, error) {
 		&vpn.ID,
 	)
 	if err != nil {
-		return vpn, momoError.DebuggingErrorf("something wrong has happend the problem was %v", err)
+		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *inpt)
 	}
 	return vpn, nil
 }
 
 func (i *VPN) Delete(id int) error {
+	scope := "vpnRepository.Delete"
+
 	sql := fmt.Sprintf("DELETE FROM vpns WHERE id = %v", id)
 	res, err := i.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d", id)
 	}
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
-		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d", id)
 	}
 
 	if rowsAffected == 0 {
-		return momoError.Error("None of the records have been affected.")
+		return momoError.Wrap(err).Scope(scope).Errorf("no row is affected", id)
 	}
 	return nil
 }
 
 func (i *VPN) DeleteAll() error {
+	scope := "vpnRepository.DeleteAll"
+
 	sql := "DELETE FROM vpns"
 	res, err := i.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).ErrorWrite()
 	}
 	_, err = res.RowsAffected()
 	if err != nil {
-		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).ErrorWrite()
 	}
 
 	return nil
@@ -71,21 +77,24 @@ func (v *VPN) DeactiveVPN(id int) error {
 }
 
 func (v *VPN) updateActivationVPN(id int, status bool) error {
+	scope := "vpnRepository.updateActivationVPN"
+
 	sql := fmt.Sprintf("UPDATE vpns SET is_active = %v WHERE id = %v", status, id)
 
 	_, err := v.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.DebuggingErrorf("something bad has happend the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d and the status is %v", id, status)
 	}
 	return nil
 }
 
 func (v *VPN) Filter(inpt *vpnManagerDto.FilterVPNs) ([]*entity.VPN, error) {
-	query := v.makeSQlFilter(inpt)
+	scope := "vpnRepository.Filter"
 
+	query := v.makeSQlFilter(inpt)
 	rows, err := v.db.Conn().Query(query)
 	if err != nil {
-		return []*entity.VPN{}, momoError.DebuggingErrorf("error has occured err: %v", err)
+		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *inpt)
 	}
 
 	vpns := make([]*entity.VPN, 0)
@@ -105,11 +114,12 @@ func (v *VPN) Filter(inpt *vpnManagerDto.FilterVPNs) ([]*entity.VPN, error) {
 			&updatedAt,
 		)
 		if err != nil {
-			return []*entity.VPN{}, momoError.DebuggingErrorf("error has occured err: %v", err)
+			return nil, momoError.Wrap(err).Scope(scope).Errorf("error to scand data, the input is %+v", *inpt)
 		}
+
 		vpnTypeEnum := entity.ConvertStringVPNTypeToEnum(vpnType)
 		if vpnTypeEnum == entity.UknownVPNType {
-			return []*entity.VPN{}, momoError.DebuggingErrorf("fail to convert vpnType %s to enum", vpnType)
+			return nil, momoError.Wrap(err).Scope(scope).Errorf("error to convert vpnType, the input is %+v", *inpt)
 		}
 		vpn.VPNType = vpnTypeEnum
 		vpns = append(vpns, vpn)

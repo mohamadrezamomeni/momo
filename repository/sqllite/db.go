@@ -19,11 +19,12 @@ func (s *SqlliteDB) Conn() *sql.DB {
 }
 
 func New(cfg *DBConfig) *SqlliteDB {
+	scope := "initializeDB"
 	root, _ := utils.GetRootOfProject()
 	path := filepath.Join(root, cfg.Path)
 	db, err := sql.Open(cfg.Dialect, path)
 	if err != nil {
-		panic(momoError.Errorf("ERROR: something went wrong with connectiong db: %s", err))
+		panic(momoError.Wrap(err).Scope(scope).Errorf("something went wrong to connect db and the address of db is  %s", path))
 	}
 	return &SqlliteDB{
 		db: db,

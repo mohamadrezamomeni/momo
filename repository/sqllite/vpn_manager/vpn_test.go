@@ -13,7 +13,7 @@ import (
 func TestMain(m *testing.M) {
 	config := &sqllite.DBConfig{
 		Dialect:    "sqlite3",
-		Path:       "test.db",
+		Path:       "test-vpn.db",
 		Migrations: "./repository/sqllite/migrations",
 	}
 

@@ -83,33 +83,41 @@ func (p *ProxyVPN) retriveVPN(address string, VPNType entity.VPNType) VPN {
 }
 
 func (p *ProxyVPN) AddInbound(inpt *proxyVpnDto.Inbound) error {
+	scope := "vpnProxy.addInbound"
+
 	v := p.retriveVPN(inpt.Address, inpt.VPNType)
 	if v == nil {
-		return momoError.DebuggingErrorf("%v vpn has'nt been introuduced with address %s", inpt.VPNType, inpt.Address)
+		return momoError.Scope(scope).DebuggingErrorf("the result wasn't found the input is %+v", inpt)
 	}
 	return v.Add(inpt)
 }
 
 func (p *ProxyVPN) DisableInbound(inpt *proxyVpnDto.Inbound) error {
+	scope := "vpnProxy.DisableInbound"
+
 	v := p.retriveVPN(inpt.Address, inpt.VPNType)
 	if v == nil {
-		return momoError.DebuggingErrorf("%v vpn has'nt been introuduced with address %s", inpt.VPNType, inpt.Address)
+		return momoError.Scope(scope).DebuggingErrorf("the result wasn't found the input is %+v", inpt)
 	}
 	return v.Disable(inpt)
 }
 
 func (p *ProxyVPN) GetTraffic(inpt *proxyVpnDto.Inbound) (*vpnSerializer.Traffic, error) {
+	scope := "vpnProxy.GetTraffic"
+
 	v := p.retriveVPN(inpt.Address, inpt.VPNType)
 	if v == nil {
-		return &vpnSerializer.Traffic{}, momoError.DebuggingErrorf("%v vpn has'nt been introuduced with address %s", inpt.VPNType, inpt.Address)
+		return nil, momoError.Scope(scope).DebuggingErrorf("the result wasn't found the input is %+v", inpt)
 	}
 	return v.GetTraffic(inpt)
 }
 
 func (p *ProxyVPN) Test(inpt *proxyVpnDto.Monitor) error {
+	scope := "vpnProxy.Test"
+
 	v := p.retriveVPN(inpt.Address, inpt.VPNType)
 	if v == nil {
-		return momoError.DebuggingErrorf("%v vpn has'nt been introuduced with address %s", inpt.VPNType, inpt.Address)
+		return momoError.Scope(scope).DebuggingErrorf("the result wasn't found the input is %+v", inpt)
 	}
 	return v.Test()
 }

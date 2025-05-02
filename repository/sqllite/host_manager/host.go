@@ -11,6 +11,7 @@ import (
 )
 
 func (h *Host) Create(inpt *hostmanagerDto.AddHost) (*entity.Host, error) {
+	scope := "hostRepository.create"
 	var host *entity.Host = &entity.Host{
 		Rank:   inpt.Rank,
 		Domain: inpt.Domain,
@@ -23,13 +24,15 @@ func (h *Host) Create(inpt *hostmanagerDto.AddHost) (*entity.Host, error) {
 	RETURNING id
 `, host.Domain, host.Port, entity.HostStatusString(host.Status), inpt.Rank).Scan(&host.ID)
 	if err != nil {
-		return &entity.Host{}, momoError.Errorf("somoething went wrong to save host error: %v", err)
+		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *inpt)
 	}
 
 	return host, nil
 }
 
 func (h *Host) FindByID(id int) (*entity.Host, error) {
+	scope := "hostRepository.FindByID"
+
 	query := fmt.Sprintf("SELECT * FROM hosts WHERE id = %d LIMIT 1", id)
 	host := &entity.Host{}
 	var hostStatusString string
@@ -46,7 +49,7 @@ func (h *Host) FindByID(id int) (*entity.Host, error) {
 		&updatedAt,
 	)
 	if err != nil {
-		return nil, momoError.Errorf("some thing went wrong please follow the problem - error: %v", err)
+		return nil, momoError.Wrap(err).Scope(scope).Errorf("the id is %d", id)
 	}
 	status, er := entity.MapHostStatusToEnum(hostStatusString)
 	if err != nil {
@@ -57,6 +60,8 @@ func (h *Host) FindByID(id int) (*entity.Host, error) {
 }
 
 func (h *Host) Update(id int, inpt *hostmanagerDto.UpdateHost) error {
+	scope := "hostRepository.Update"
+
 	sql := fmt.Sprintf(
 		"UPDATE hosts SET status = '%s', rank = %v WHERE id = %v",
 		entity.HostStatusString(inpt.Status),
@@ -65,49 +70,55 @@ func (h *Host) Update(id int, inpt *hostmanagerDto.UpdateHost) error {
 	)
 	_, err := h.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.DebuggingErrorf("error to update record %v the error was %v", id, err)
+		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d and data is %+v", id, *inpt)
 	}
 	return nil
 }
 
 func (h *Host) Delete(id int) error {
+	scope := "hostRepository.Delete"
+
 	sql := fmt.Sprintf("DELETE FROM hosts WHERE id=%v", id)
 	res, err := h.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).DebuggingErrorf("the id is %d", id)
 	}
 
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
-		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d", id)
 	}
 
 	if rowsAffected == 0 {
-		return momoError.Error("None of the records have been affected.")
+		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d, no row is deleted", id)
 	}
 	return nil
 }
 
 func (h *Host) DeleteAll() error {
+	scope := "hostRepository.DeleteAll"
+
 	sql := "DELETE FROM hosts"
 	res, err := h.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).DebuggingError()
 	}
 
 	_, err = res.RowsAffected()
 	if err != nil {
-		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).ErrorWrite()
 	}
 
 	return nil
 }
 
 func (h *Host) Filter(inpt *hostmanagerDto.FilterHosts) ([]*entity.Host, error) {
+	scope := "hostRepository.Filter"
+
 	query := h.makeQuery(inpt)
 	rows, err := h.db.Conn().Query(query)
 	if err != nil {
-		return []*entity.Host{}, momoError.DebuggingErrorf("error has occured err: %v", err)
+		return nil, momoError.Wrap(err).Scope(scope).DebuggingError()
 	}
 
 	hosts := make([]*entity.Host, 0)
@@ -115,7 +126,7 @@ func (h *Host) Filter(inpt *hostmanagerDto.FilterHosts) ([]*entity.Host, error) 
 	for rows.Next() {
 		host, err := h.scan(rows)
 		if err != nil {
-			return []*entity.Host{}, err
+			return nil, momoError.Wrap(err).Scope(scope).DebuggingErrorf("error to get row")
 		}
 		hosts = append(hosts, host)
 	}
@@ -148,6 +159,8 @@ func (h *Host) makeQueryByListOfSatus(statuses []entity.HostStatus) []string {
 }
 
 func (i *Host) scan(rows *sql.Rows) (*entity.Host, error) {
+	scope := "hostRepository.scan"
+
 	host := &entity.Host{}
 	var hostStatusString string
 	var createdAt, updatedAt interface{}
@@ -162,7 +175,7 @@ func (i *Host) scan(rows *sql.Rows) (*entity.Host, error) {
 		&updatedAt,
 	)
 	if err != nil {
-		return host, momoError.DebuggingErrorf("error has occured err: %v", err)
+		return host, momoError.Wrap(err).Scope(scope).DebuggingErrorf("error to get row")
 	}
 	status, er := entity.MapHostStatusToEnum(hostStatusString)
 	if err != nil {

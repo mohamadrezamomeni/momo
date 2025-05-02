@@ -19,16 +19,17 @@ func New() *CpuMetric {
 }
 
 func (c *CpuMetric) getData() (uint64, uint64, error) {
+	scope := "cpuMetric.getData"
 	data, err := c.readFileProcStat()
 	if err != nil {
-		return 0, 0, momoError.DebuggingErrorf("something went wrong to open /proc/stat the problem was %v", err)
+		return 0, 0, momoError.Wrap(err).Scope(scope).DebuggingError()
 	}
 
 	line, err := c.getCpuInfoLine(data)
 
 	items := strings.Fields(line)
 	if len(items) < 5 {
-		return 0, 0, momoError.DebuggingErrorf("we got unexpected error in proct/stat content")
+		return 0, 0, momoError.Scope(scope).DebuggingErrorf("the items must be 5")
 	}
 	idle, err := c.getIdle(items)
 	total, err := c.getTotal(items)
@@ -40,14 +41,18 @@ func (c *CpuMetric) getData() (uint64, uint64, error) {
 }
 
 func (c *CpuMetric) readFileProcStat() ([]byte, error) {
+	scope := "cpuMetric.readFileProcStat"
+
 	data, err := os.ReadFile(c.statFilePath)
 	if err != nil {
-		return nil, momoError.DebuggingErrorf("something went wrong to open /proc/stat the problem was %v", err)
+		return nil, momoError.Wrap(err).Scope(scope).DebuggingError()
 	}
 	return data, nil
 }
 
 func (c *CpuMetric) getCpuInfoLine(data []byte) (string, error) {
+	scope := "cpuMetric.getCpuInfoLine"
+
 	lines := strings.Split(string(data), "\n")
 
 	totalCpuline := ""
@@ -57,26 +62,30 @@ func (c *CpuMetric) getCpuInfoLine(data []byte) (string, error) {
 		}
 	}
 	if len(totalCpuline) == 0 {
-		return "", momoError.DebuggingError("the total cput info wasn't found")
+		return "", momoError.Scope(scope).DebuggingErrorf("the total cput info wasn't found")
 	}
 	return totalCpuline, nil
 }
 
 func (c *CpuMetric) getIdle(items []string) (uint64, error) {
+	scope := "cpuMetric.getIdle"
+
 	idleStr := items[4]
 	v, err := strconv.ParseUint(idleStr, 10, 64)
 	if err != nil {
-		return 0, momoError.DebuggingError("the problem was getting unexpected error while converting string to uint")
+		return 0, momoError.Wrap(err).Scope(scope).DebuggingErrorf("the problem was getting unexpected error while converting string to uint")
 	}
 	return v, nil
 }
 
 func (c *CpuMetric) getTotal(items []string) (uint64, error) {
+	scope := "cpuMetric.getTotal"
+
 	var total uint64 = 0
 	for _, item := range items[1:] {
 		v, err := strconv.ParseUint(item, 10, 64)
 		if err != nil {
-			return 0, momoError.DebuggingError("the problem was getting unexpected error while converting string to uint")
+			return 0, momoError.Wrap(err).Scope(scope).DebuggingErrorf("the problem was getting unexpected error while converting string to uint")
 		}
 
 		total += v

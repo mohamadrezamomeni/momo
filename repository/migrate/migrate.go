@@ -35,27 +35,30 @@ func New(cfg *sqllite.DBConfig) IMigrator {
 }
 
 func (m *Migrator) UP() {
+	scope := "migration.up"
 	db, err := sql.Open(m.dialect, m.path)
 	if err != nil {
-		panic(momoError.Errorf("unable to open sqllite db: %v", err))
+		panic(momoError.Wrap(err).Scope(scope).Errorf("error to connect db"))
 	}
 
 	n, err := migrate.Exec(db, m.dialect, m.migrations, migrate.Up)
 	if err != nil {
-		panic(momoError.Errorf("unable to apply migrations: %v", err))
+		panic(momoError.Wrap(err).Scope(scope).Errorf("unable to apply migrations: %v", err))
 	}
 	momoLogger.Infof("Applied %d migrations!", n)
 }
 
 func (m *Migrator) DOWN() {
+	scope := "migration.down"
+
 	db, err := sql.Open(m.dialect, m.path)
 	if err != nil {
-		panic(momoError.Errorf("unable to open sqllite db: %v", err))
+		panic(momoError.Wrap(err).Scope(scope).Errorf("error to connect db"))
 	}
 
 	n, err := migrate.Exec(db, m.dialect, m.migrations, migrate.Down)
 	if err != nil {
-		panic(momoError.Errorf("unable to undo migrations: %v", err))
+		panic(momoError.Wrap(err).Scope(scope).Errorf("unable to undo migrations: %v", err))
 	}
 	momoLogger.Infof("undo %d migrations!", n)
 }

@@ -27,9 +27,10 @@ type Xray struct {
 }
 
 func New(cfg *XrayConfig) (*Xray, error) {
+	scope := "xrayProxy.new"
 	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", cfg.Address, cfg.ApiPort), grpc.WithInsecure())
 	if err != nil {
-		return &Xray{}, momoError.Errorf("xray isnt accessable please check configuration")
+		return nil, momoError.Wrap(err).Scope(scope).Errorf("error to initiate xray with address %s:%s", cfg.Address, cfg.ApiPort)
 	}
 
 	return &Xray{

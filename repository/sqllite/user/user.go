@@ -12,6 +12,8 @@ import (
 )
 
 func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
+	scope := "userRepository.Create"
+
 	user := &entity.User{}
 	err := u.db.Conn().QueryRow(`
 	INSERT INTO users (username, lastName, firstName)
@@ -19,46 +21,52 @@ func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 	RETURNING id, username, lastName, firstName
 `, inpt.Username, inpt.LastName, inpt.FirstName).Scan(&user.ID, &user.Username, &user.LastName, &user.FirstName)
 	if err != nil {
-		return nil, momoError.Errorf("somoething went wrong to save user error: %v", err)
+		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *inpt)
 	}
 
 	return user, nil
 }
 
 func (u *User) Delete(id string) error {
+	scope := "userRepository.Delete"
+
 	sql := fmt.Sprintf("DELETE FROM users WHERE id='%s'", id)
 	res, err := u.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d", id)
 	}
 
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
-		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d", id)
 	}
 
 	if rowsAffected == 0 {
-		return momoError.Error("None of the records have been affected.")
+		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d, no row is affected", id)
 	}
 	return nil
 }
 
 func (u *User) DeleteAll() error {
+	scope := "userRepository.DeleteAll"
+
 	sql := "DELETE FROM users"
 	res, err := u.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).ErrorWrite()
 	}
 
 	_, err = res.RowsAffected()
 	if err != nil {
-		return momoError.Errorf("something went wrong to delete record follow error, the error was %v", err)
+		return momoError.Wrap(err).Scope(scope).ErrorWrite()
 	}
 
 	return nil
 }
 
 func (u *User) FilterUsers(q *dto.FilterUsers) ([]*entity.User, error) {
+	scope := "userRepository.FilterUsers"
+
 	query, err := u.generateFilterUserQuery(q)
 	if err != nil {
 		return []*entity.User{}, err
@@ -66,7 +74,7 @@ func (u *User) FilterUsers(q *dto.FilterUsers) ([]*entity.User, error) {
 
 	rows, err := u.db.Conn().Query(query)
 	if err != nil {
-		return []*entity.User{}, momoError.Errorf("error has occured err: %v", err)
+		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *q)
 	}
 	users := []*entity.User{}
 	for rows.Next() {
@@ -77,7 +85,7 @@ func (u *User) FilterUsers(q *dto.FilterUsers) ([]*entity.User, error) {
 		var createdAt interface{}
 		err = rows.Scan(&id, &username, &createdAt, &lastName, &firstName)
 		if err != nil {
-			momoError.DebuggingErrorf("error has occured err: %v", err)
+			return nil, momoError.Wrap(err).Scope(scope).Errorf("error to scan data, the input is %+v", *q)
 		}
 		users = append(users, &entity.User{ID: id, Username: username, FirstName: firstName, LastName: lastName})
 	}
@@ -85,6 +93,8 @@ func (u *User) FilterUsers(q *dto.FilterUsers) ([]*entity.User, error) {
 }
 
 func (u *User) generateFilterUserQuery(q *dto.FilterUsers) (string, error) {
+	scope := "userRepository.generateFilterUserQuery"
+
 	query := "SELECT * FROM `users`"
 
 	v := reflect.ValueOf(*q)
@@ -95,12 +105,7 @@ func (u *User) generateFilterUserQuery(q *dto.FilterUsers) (string, error) {
 		field := t.Field(i)
 		value := v.Field(i)
 		if k := value.Kind(); k != reflect.String {
-			return "", momoError.DebuggingErrorf(
-				"error has occured in filtering Field %-10s | Type: %-8s | Value: %v",
-				field.Name,
-				value.Kind(),
-				value.Interface(),
-			)
+			return "", momoError.Scope(scope).Errorf("error to scan data, the input is %+v", *q)
 		}
 		v := value.String()
 
@@ -127,6 +132,8 @@ func (u *User) FindUserByID(ID string) (*entity.User, error) {
 }
 
 func (u *User) findUser(key string, value string) (*entity.User, error) {
+	scope := "userRepository.findUser"
+
 	var user *entity.User = &entity.User{}
 
 	var createdAt interface{}
@@ -136,7 +143,7 @@ func (u *User) findUser(key string, value string) (*entity.User, error) {
 		return user, nil
 	}
 	if err == sql.ErrNoRows {
-		return &entity.User{}, err
+		return nil, momoError.Wrap(err).Scope(scope).Errorf("the key is %s and value is %s", key, value)
 	}
-	return &entity.User{}, momoError.Errorf("some thing went wrong please follow the problem - error: %v", err)
+	return nil, momoError.Wrap(err).Scope(scope).Errorf("the key is %s and value is %s", key, value)
 }

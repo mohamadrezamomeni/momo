@@ -18,13 +18,15 @@ func (h *Host) MonitorHosts() {
 }
 
 func (h *Host) monitorHost(host *entity.Host) (uint32, entity.HostStatus, error) {
+	scope := "hostService.metric.monitorHost"
+
 	wp, err := h.workerFactorNew(host.Domain, host.Port)
 	if err != nil {
-		return 0, entity.Uknown, momoError.Errorf("error to connect \"%s:%s\" and error was %v", host.Domain, host.Port, err)
+		return 0, entity.Uknown, momoError.Wrap(err).Scope(scope).Errorf("error to connect \"%s:%s\"", host.Domain, host.Port)
 	}
 	rank, status, err := wp.GetMetric()
 	if err != nil {
-		return 0, entity.Uknown, momoError.Errorf("error to connect \"%s:%s\" and error was %v", host.Domain, host.Port, err)
+		return 0, entity.Uknown, momoError.Wrap(err).Scope(scope).Errorf("error to connect \"%s:%s\"", host.Domain, host.Port)
 	}
 
 	return rank, status, nil

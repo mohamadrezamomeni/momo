@@ -16,9 +16,11 @@ import (
 )
 
 func (x *Xray) addUser(inpt *dto.AddUser) error {
+	scope := "xrayProxy.addUser"
+
 	level, err := utils.ConvertToUint32(inpt.Level)
 	if err != nil {
-		return momoError.Error("user's level is wrong.")
+		return momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *inpt)
 	}
 	_, err = x.hsClient.AlterInbound(context.Background(), &command.AlterInboundRequest{
 		Tag: inpt.Tag,
@@ -36,21 +38,28 @@ func (x *Xray) addUser(inpt *dto.AddUser) error {
 }
 
 func (x *Xray) removeUser(inpt *dto.RemoveUser) error {
+	scope := "xrayProxy.removeUser"
+
 	_, err := x.hsClient.AlterInbound(context.Background(), &command.AlterInboundRequest{
 		Tag: inpt.Tag,
 		Operation: serial.ToTypedMessage(&command.RemoveUserOperation{
 			Email: inpt.Username,
 		}),
 	})
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *inpt)
+	}
 	return err
 }
 
 func (x *Xray) getUsers(tag string) (*serializer.GetUsers, error) {
+	scope := "xrayProxy.getUsers"
+
 	res, err := x.hsClient.GetInboundUsers(context.Background(), &command.GetInboundUserRequest{
 		Tag: tag,
 	})
 	if err != nil {
-		return &serializer.GetUsers{}, momoError.Errorf("error has happend you can follow the problem the error was %v", err)
+		return nil, momoError.Wrap(err).Scope(scope).Errorf("the tag is %s", tag)
 	}
 	usernames := make([]string, 0)
 	for _, user := range res.Users {

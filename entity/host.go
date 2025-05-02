@@ -26,6 +26,7 @@ func HostStatusString(status HostStatus) string {
 }
 
 func MapHostStatusToEnum(statusString string) (HostStatus, error) {
+	scope := "entity.MapHostStatusToEnum"
 	switch statusString {
 	case HighStr:
 		return High, nil
@@ -36,7 +37,7 @@ func MapHostStatusToEnum(statusString string) (HostStatus, error) {
 	case DeactiveStr:
 		return Deactive, nil
 	default:
-		return Uknown, momoError.Errorf("the status of \"%s\" doesn't exist ", statusString)
+		return Uknown, momoError.Scope(scope).DebuggingErrorf("unexpected status %s ", statusString)
 	}
 }
 
