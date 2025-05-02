@@ -69,12 +69,8 @@ func TestGetTraffic(t *testing.T) {
 
 func TestInboundDoesntExist(t *testing.T) {
 	res, err := xrayU.getUsers(inboundDoesntExist)
-
-	if err == nil {
+	if err == nil || (res != nil && len(res.Usernames) != 0) {
 		t.Error("error could be existed. It was unexpected situation")
-	}
-	if len(res.Usernames) != 0 {
-		t.Error("the number of username must be 0")
 	}
 }
 
