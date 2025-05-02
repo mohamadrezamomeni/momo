@@ -8,21 +8,21 @@ import (
 var (
 	vpnRepo *VPN
 
-	vpn1 = &vpnManagerDto.Add_VPN{
+	vpn1 = &vpnManagerDto.AddVPN{
 		Domain:   "joi.com",
 		ApiPort:  "62733",
 		VPNType:  entity.XRAY_VPN,
 		IsActive: false,
 	}
 
-	vpn2 = &vpnManagerDto.Add_VPN{
+	vpn2 = &vpnManagerDto.AddVPN{
 		Domain:   "joi.com",
 		ApiPort:  "62733",
 		VPNType:  entity.XRAY_VPN,
 		IsActive: true,
 	}
 
-	vpn3 = &vpnManagerDto.Add_VPN{
+	vpn3 = &vpnManagerDto.AddVPN{
 		Domain:   "jordan.com",
 		ApiPort:  "62733",
 		VPNType:  entity.XRAY_VPN,

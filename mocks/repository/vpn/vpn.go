@@ -19,7 +19,7 @@ func New() *MockVPN {
 	}
 }
 
-func (mv *MockVPN) Create(inpt *vpnManagerDto.Add_VPN) (*entity.VPN, error) {
+func (mv *MockVPN) Create(inpt *vpnManagerDto.AddVPN) (*entity.VPN, error) {
 	vpn := &entity.VPN{
 		ID:        mv.id,
 		IsActive:  inpt.IsActive,

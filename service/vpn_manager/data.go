@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	vpn1 = &vpnManagerDto.Add_VPN{
+	vpn1 = &vpnManagerDto.AddVPN{
 		VPNType:   entity.XRAY_VPN,
 		Domain:    "twitter.com",
 		ApiPort:   "2002",
@@ -14,7 +14,7 @@ var (
 		IsActive:  true,
 	}
 
-	vpn2 = &vpnManagerDto.Add_VPN{
+	vpn2 = &vpnManagerDto.AddVPN{
 		VPNType:   entity.XRAY_VPN,
 		Domain:    "google.com",
 		ApiPort:   "2002",
@@ -22,7 +22,7 @@ var (
 		IsActive:  true,
 	}
 
-	vpn3 = &vpnManagerDto.Add_VPN{
+	vpn3 = &vpnManagerDto.AddVPN{
 		VPNType:   entity.XRAY_VPN,
 		Domain:    "facebook.com",
 		ApiPort:   "2002",

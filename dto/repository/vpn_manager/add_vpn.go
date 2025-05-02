@@ -4,7 +4,7 @@ import (
 	"momo/entity"
 )
 
-type Add_VPN struct {
+type AddVPN struct {
 	Domain    string
 	IsActive  bool
 	ApiPort   string

@@ -10,7 +10,7 @@ import (
 	momoError "momo/pkg/error"
 )
 
-func (v *VPN) Create(inpt *vpnManagerDto.Add_VPN) (*entity.VPN, error) {
+func (v *VPN) Create(inpt *vpnManagerDto.AddVPN) (*entity.VPN, error) {
 	var vpn *entity.VPN = &entity.VPN{
 		Domain:    inpt.Domain,
 		IsActive:  inpt.IsActive,
