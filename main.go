@@ -39,7 +39,7 @@ func main() {
 	migration := migrate.New(&cfg.DB)
 
 	migration.UP()
-	_, vpnSvc, _, inboundSvc := getServices(&cfg.DB)
+	hostSvc, vpnSvc, _, inboundSvc := getServices(&cfg.DB)
 
 	done := make(chan struct{})
 
@@ -47,7 +47,7 @@ func main() {
 
 	go func() {
 		wg.Add(1)
-		scheduler := scheduler.New(inboundSvc, vpnSvc)
+		scheduler := scheduler.New(inboundSvc, vpnSvc, hostSvc)
 		scheduler.Start(done, &wg)
 	}()
 
