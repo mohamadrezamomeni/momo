@@ -44,6 +44,8 @@ func TestCreate(t *testing.T) {
 
 	if userCreated.Username != user1.Username ||
 		userCreated.FirstName != user1.FirstName ||
+		userCreated.Password != user1.Password ||
+		userCreated.IsAdmin != user1.IsAdmin ||
 		userCreated.LastName != user1.LastName {
 		t.Error("user creation requires some troubleshooting")
 		return

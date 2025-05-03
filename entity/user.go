@@ -5,4 +5,6 @@ type User struct {
 	Username  string
 	LastName  string
 	FirstName string
+	IsAdmin   bool
+	Password  string
 }

@@ -16,10 +16,10 @@ func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 
 	user := &entity.User{}
 	err := u.db.Conn().QueryRow(`
-	INSERT INTO users (username, lastName, firstName)
-	VALUES (?, ?, ?)
-	RETURNING id, username, lastName, firstName
-`, inpt.Username, inpt.LastName, inpt.FirstName).Scan(&user.ID, &user.Username, &user.LastName, &user.FirstName)
+	INSERT INTO users (username, lastName, firstName, password, is_admin)
+	VALUES (?, ?, ?, ?, ?)
+	RETURNING id, username, lastName, firstName, is_admin, password
+`, inpt.Username, inpt.LastName, inpt.FirstName, inpt.Password, inpt.IsAdmin).Scan(&user.ID, &user.Username, &user.LastName, &user.FirstName, &user.IsAdmin, &user.Password)
 	if err != nil {
 		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *inpt)
 	}
@@ -78,16 +78,14 @@ func (u *User) FilterUsers(q *dto.FilterUsers) ([]*entity.User, error) {
 	}
 	users := []*entity.User{}
 	for rows.Next() {
-		var id string
-		var firstName string
-		var lastName string
-		var username string
+		user := &entity.User{}
+
 		var createdAt interface{}
-		err = rows.Scan(&id, &username, &createdAt, &lastName, &firstName)
+		err = rows.Scan(&user.ID, &user.Username, &createdAt, &user.LastName, &user.FirstName, &user.Password, &user.IsAdmin)
 		if err != nil {
 			return nil, momoError.Wrap(err).Scope(scope).Errorf("error to scan data, the input is %+v", *q)
 		}
-		users = append(users, &entity.User{ID: id, Username: username, FirstName: firstName, LastName: lastName})
+		users = append(users, nil)
 	}
 	return users, nil
 }
@@ -138,7 +136,15 @@ func (u *User) findUser(key string, value string) (*entity.User, error) {
 
 	var createdAt interface{}
 	s := fmt.Sprintf("SELECT * FROM users WHERE %s='%s' LIMIT 1", key, value)
-	err := u.db.Conn().QueryRow(s).Scan(&user.ID, &user.Username, &createdAt, &user.LastName, &user.FirstName)
+	err := u.db.Conn().QueryRow(s).Scan(
+		&user.ID,
+		&user.Username,
+		&createdAt,
+		&user.LastName,
+		&user.FirstName,
+		&user.Password,
+		&user.IsAdmin,
+	)
 	if err == nil {
 		return user, nil
 	}
