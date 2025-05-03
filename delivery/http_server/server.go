@@ -15,8 +15,6 @@ type Server struct {
 	metricHandler *metricHandler.Handler
 }
 
-type UserService interface{}
-
 func New(cfg *HTTPConfig) *Server {
 	return &Server{
 		router:        echo.New(),
