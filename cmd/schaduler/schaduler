@@ -2,10 +2,14 @@ package main
 
 import (
 	"log"
+	"os"
+	"os/signal"
+	"sync"
 
 	"github.com/mohamadrezamomeni/momo/pkg/config"
 	momoLog "github.com/mohamadrezamomeni/momo/pkg/log"
 	"github.com/mohamadrezamomeni/momo/repository/migrate"
+	"github.com/mohamadrezamomeni/momo/scheduler"
 
 	_ "github.com/mattn/go-sqlite3"
 
@@ -26,5 +30,21 @@ func main() {
 
 	migration.UP()
 
-	_, _, _, _ = serviceInitializer.GetServices(&cfg.DB)
+	hostSvc, vpnSvc, _, inboundSvc := serviceInitializer.GetServices(&cfg.DB)
+
+	done := make(chan struct{})
+
+	var wg sync.WaitGroup
+
+	go func() {
+		wg.Add(1)
+		scheduler := scheduler.New(inboundSvc, vpnSvc, hostSvc)
+		scheduler.Start(done, &wg)
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+	done <- struct{}{}
+	wg.Wait()
 }
