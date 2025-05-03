@@ -3,9 +3,10 @@ package vpnmanager
 import (
 	"testing"
 
-	"momo/adapter"
-	vpnProxyMock "momo/mocks/proxy/vpn"
-	vpnRepositoryMock "momo/mocks/repository/vpn"
+	"github.com/mohamadrezamomeni/momo/adapter"
+
+	vpnProxyMock "github.com/mohamadrezamomeni/momo/mocks/proxy/vpn"
+	vpnRepositoryMock "github.com/mohamadrezamomeni/momo/mocks/repository/vpn"
 )
 
 func register() (*VPNService, *vpnRepositoryMock.MockVPN) {

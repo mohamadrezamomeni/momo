@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"momo/proxy/vpn/internal/xray/dto"
+	"github.com/mohamadrezamomeni/momo/proxy/vpn/internal/xray/dto"
 
-	"momo/pkg/utils"
-	"momo/proxy/vpn/internal/xray/serializer"
+	"github.com/mohamadrezamomeni/momo/pkg/utils"
+	"github.com/mohamadrezamomeni/momo/proxy/vpn/internal/xray/serializer"
 
-	momoError "momo/pkg/error"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 
 	"github.com/xtls/xray-core/app/proxyman"
 	"github.com/xtls/xray-core/app/proxyman/command"

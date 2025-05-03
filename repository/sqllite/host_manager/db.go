@@ -1,6 +1,6 @@
 package hostmanager
 
-import "momo/repository/sqllite"
+import "github.com/mohamadrezamomeni/momo/repository/sqllite"
 
 type Host struct {
 	db *sqllite.SqlliteDB

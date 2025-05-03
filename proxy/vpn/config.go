@@ -1,6 +1,6 @@
 package vpn
 
-import "momo/entity"
+import "github.com/mohamadrezamomeni/momo/entity"
 
 type VPNConfig struct {
 	Port    string

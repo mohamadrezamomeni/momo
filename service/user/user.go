@@ -1,6 +1,6 @@
 package user
 
-import "momo/entity"
+import "github.com/mohamadrezamomeni/momo/entity"
 
 type UserRepo interface {
 	FindUserByID(string) (*entity.User, error)

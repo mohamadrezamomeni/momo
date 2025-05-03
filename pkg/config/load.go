@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"momo/pkg/utils"
+	"github.com/mohamadrezamomeni/momo/pkg/utils"
 
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"

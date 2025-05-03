@@ -1,9 +1,9 @@
 package host
 
 import (
-	"momo/adapter"
-	hostRepoDto "momo/dto/repository/host_manager"
-	"momo/entity"
+	"github.com/mohamadrezamomeni/momo/adapter"
+	hostRepoDto "github.com/mohamadrezamomeni/momo/dto/repository/host_manager"
+	"github.com/mohamadrezamomeni/momo/entity"
 )
 
 type WorkerFactor func(string, string) (adapter.WorkerProxy, error)

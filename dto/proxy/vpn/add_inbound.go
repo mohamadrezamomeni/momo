@@ -1,6 +1,6 @@
 package dto
 
-import "momo/entity"
+import "github.com/mohamadrezamomeni/momo/entity"
 
 type Inbound struct {
 	User     *User

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	momoLogger "momo/pkg/log"
+	momoLogger "github.com/mohamadrezamomeni/momo/pkg/log"
 )
 
 const empty = "empty"

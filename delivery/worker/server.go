@@ -6,9 +6,9 @@ import (
 	"log"
 	"net"
 
-	"momo/contract/gogrpc/metric"
-	"momo/contract/gogrpc/port"
-	"momo/entity"
+	"github.com/mohamadrezamomeni/momo/contract/gogrpc/metric"
+	"github.com/mohamadrezamomeni/momo/contract/gogrpc/port"
+	"github.com/mohamadrezamomeni/momo/entity"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

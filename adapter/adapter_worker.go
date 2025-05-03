@@ -1,8 +1,8 @@
 package adapter
 
 import (
-	"momo/entity"
-	workerProxy "momo/proxy/worker"
+	"github.com/mohamadrezamomeni/momo/entity"
+	workerProxy "github.com/mohamadrezamomeni/momo/proxy/worker"
 )
 
 type WorkerProxy interface {

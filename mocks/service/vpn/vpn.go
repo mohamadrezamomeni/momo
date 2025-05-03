@@ -1,8 +1,8 @@
 package vpn
 
 import (
-	"momo/adapter"
-	mockProxyVPN "momo/mocks/proxy/vpn"
+	"github.com/mohamadrezamomeni/momo/adapter"
+	mockProxyVPN "github.com/mohamadrezamomeni/momo/mocks/proxy/vpn"
 )
 
 type MockVPN struct{}

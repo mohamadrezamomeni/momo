@@ -1,8 +1,8 @@
 package hostmanager
 
 import (
-	hostmanagerDto "momo/dto/repository/host_manager"
-	"momo/entity"
+	hostmanagerDto "github.com/mohamadrezamomeni/momo/dto/repository/host_manager"
+	"github.com/mohamadrezamomeni/momo/entity"
 )
 
 var (

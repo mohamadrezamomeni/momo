@@ -6,15 +6,15 @@ import (
 	"sync"
 	"time"
 
-	"momo/adapter"
-	"momo/entity"
-	"momo/pkg/utils"
+	"github.com/mohamadrezamomeni/momo/adapter"
+	"github.com/mohamadrezamomeni/momo/entity"
+	"github.com/mohamadrezamomeni/momo/pkg/utils"
 
-	vpnProxyDto "momo/dto/proxy/vpn"
-	inboundRepoDto "momo/dto/repository/inbound"
-	dto "momo/dto/service/inbound"
+	vpnProxyDto "github.com/mohamadrezamomeni/momo/dto/proxy/vpn"
+	inboundRepoDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
+	dto "github.com/mohamadrezamomeni/momo/dto/service/inbound"
 
-	vpnProxy "momo/proxy/vpn"
+	vpnProxy "github.com/mohamadrezamomeni/momo/proxy/vpn"
 
 	"github.com/google/uuid"
 )

@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"momo/pkg/utils"
+	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
 
 func TestIntializeMemoryMetric(t *testing.T) {

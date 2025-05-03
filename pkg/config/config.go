@@ -1,9 +1,9 @@
 package config
 
 import (
-	workerServer "momo/delivery/worker"
-	"momo/pkg/log"
-	"momo/repository/sqllite"
+	workerServer "github.com/mohamadrezamomeni/momo/delivery/worker"
+	"github.com/mohamadrezamomeni/momo/pkg/log"
+	"github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
 
 type Config struct {

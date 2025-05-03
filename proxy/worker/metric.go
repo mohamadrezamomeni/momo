@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"momo/contract/gogrpc/metric"
-	"momo/entity"
-	momoError "momo/pkg/error"
+	"github.com/mohamadrezamomeni/momo/contract/gogrpc/metric"
+	"github.com/mohamadrezamomeni/momo/entity"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 )
 
 func (ps *ProxyWorker) GetMetric() (uint32, entity.HostStatus, error) {

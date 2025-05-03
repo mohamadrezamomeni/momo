@@ -4,12 +4,12 @@ import (
 	"database/sql"
 	"path/filepath"
 
-	"momo/repository/sqllite"
+	"github.com/mohamadrezamomeni/momo/repository/sqllite"
 
-	momoError "momo/pkg/error"
-	"momo/pkg/utils"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
+	"github.com/mohamadrezamomeni/momo/pkg/utils"
 
-	momoLogger "momo/pkg/log"
+	momoLogger "github.com/mohamadrezamomeni/momo/pkg/log"
 
 	migrate "github.com/rubenv/sql-migrate"
 )

@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"momo/pkg/utils"
+	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
 
 type Record struct {

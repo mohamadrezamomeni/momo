@@ -3,8 +3,8 @@ package inbound
 import (
 	"time"
 
-	inboundRepositoryDto "momo/dto/repository/inbound"
-	"momo/entity"
+	inboundRepositoryDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
+	"github.com/mohamadrezamomeni/momo/entity"
 
 	"github.com/google/uuid"
 )

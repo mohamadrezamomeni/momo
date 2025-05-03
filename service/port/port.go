@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"momo/delivery/worker"
-	"momo/pkg/utils"
+	"github.com/mohamadrezamomeni/momo/delivery/worker"
+	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
 
 type Port struct {

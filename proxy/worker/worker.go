@@ -3,8 +3,8 @@ package worker
 import (
 	"fmt"
 
-	metric "momo/contract/gogrpc/metric"
-	port "momo/contract/gogrpc/port"
+	metric "github.com/mohamadrezamomeni/momo/contract/gogrpc/metric"
+	port "github.com/mohamadrezamomeni/momo/contract/gogrpc/port"
 
 	"google.golang.org/grpc"
 )

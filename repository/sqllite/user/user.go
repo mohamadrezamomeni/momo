@@ -6,9 +6,9 @@ import (
 	"reflect"
 	"strings"
 
-	dto "momo/dto/repository/user"
-	"momo/entity"
-	momoError "momo/pkg/error"
+	dto "github.com/mohamadrezamomeni/momo/dto/repository/user"
+	"github.com/mohamadrezamomeni/momo/entity"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 )
 
 func (u *User) Create(inpt *dto.Create) (*entity.User, error) {

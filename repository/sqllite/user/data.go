@@ -1,6 +1,6 @@
 package user
 
-import userDto "momo/dto/repository/user"
+import userDto "github.com/mohamadrezamomeni/momo/dto/repository/user"
 
 var (
 	user1 = &userDto.Create{

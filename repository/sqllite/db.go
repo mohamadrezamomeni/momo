@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"path/filepath"
 
-	momoError "momo/pkg/error"
-	"momo/pkg/utils"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
+	"github.com/mohamadrezamomeni/momo/pkg/utils"
 
 	_ "github.com/mattn/go-sqlite3"
 )

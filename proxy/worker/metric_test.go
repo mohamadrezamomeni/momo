@@ -3,7 +3,7 @@ package worker
 import (
 	"testing"
 
-	"momo/entity"
+	"github.com/mohamadrezamomeni/momo/entity"
 )
 
 func TestGetMetric(t *testing.T) {

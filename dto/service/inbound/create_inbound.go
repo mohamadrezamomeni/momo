@@ -3,7 +3,7 @@ package inbound
 import (
 	"time"
 
-	"momo/entity"
+	"github.com/mohamadrezamomeni/momo/entity"
 )
 
 type CreateInbound struct {

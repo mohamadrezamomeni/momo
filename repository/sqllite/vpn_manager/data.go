@@ -1,8 +1,8 @@
 package vpnmanager
 
 import (
-	vpnManagerDto "momo/dto/repository/vpn_manager"
-	"momo/entity"
+	vpnManagerDto "github.com/mohamadrezamomeni/momo/dto/repository/vpn_manager"
+	"github.com/mohamadrezamomeni/momo/entity"
 )
 
 var (

@@ -1,4 +1,4 @@
-module momo
+module github.com/mohamadrezamomeni/momo
 
 go 1.24
 

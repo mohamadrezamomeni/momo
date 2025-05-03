@@ -3,9 +3,9 @@ package vpn
 import (
 	"fmt"
 
-	proxyVpnDto "momo/dto/proxy/vpn"
-	"momo/entity"
-	vpnSerializer "momo/proxy/vpn/serializer"
+	proxyVpnDto "github.com/mohamadrezamomeni/momo/dto/proxy/vpn"
+	"github.com/mohamadrezamomeni/momo/entity"
+	vpnSerializer "github.com/mohamadrezamomeni/momo/proxy/vpn/serializer"
 )
 
 type MockProxy struct {

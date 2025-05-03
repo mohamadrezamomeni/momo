@@ -4,10 +4,10 @@ import (
 	"os"
 	"testing"
 
-	vpnManagerDto "momo/dto/repository/vpn_manager"
-	"momo/entity"
-	"momo/repository/migrate"
-	"momo/repository/sqllite"
+	vpnManagerDto "github.com/mohamadrezamomeni/momo/dto/repository/vpn_manager"
+	"github.com/mohamadrezamomeni/momo/entity"
+	"github.com/mohamadrezamomeni/momo/repository/migrate"
+	"github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
 
 func TestMain(m *testing.M) {

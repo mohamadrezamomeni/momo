@@ -3,7 +3,7 @@ package host
 import (
 	"sync"
 
-	"momo/entity"
+	"github.com/mohamadrezamomeni/momo/entity"
 )
 
 func (h *Host) ResolvePorts(

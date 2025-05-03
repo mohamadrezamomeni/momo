@@ -3,11 +3,12 @@ package vpn
 import (
 	"sync"
 
-	proxyVpnDto "momo/dto/proxy/vpn"
-	"momo/entity"
-	momoError "momo/pkg/error"
-	"momo/proxy/vpn/internal/xray"
-	vpnSerializer "momo/proxy/vpn/serializer"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
+
+	proxyVpnDto "github.com/mohamadrezamomeni/momo/dto/proxy/vpn"
+	"github.com/mohamadrezamomeni/momo/entity"
+	"github.com/mohamadrezamomeni/momo/proxy/vpn/internal/xray"
+	vpnSerializer "github.com/mohamadrezamomeni/momo/proxy/vpn/serializer"
 )
 
 type VPN interface {

@@ -3,7 +3,7 @@ package xray
 import (
 	"testing"
 
-	"momo/proxy/vpn/internal/xray/dto"
+	"github.com/mohamadrezamomeni/momo/proxy/vpn/internal/xray/dto"
 )
 
 var (

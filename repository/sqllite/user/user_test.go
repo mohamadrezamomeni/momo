@@ -4,10 +4,10 @@ import (
 	"os"
 	"testing"
 
-	userDto "momo/dto/repository/user"
+	userDto "github.com/mohamadrezamomeni/momo/dto/repository/user"
 
-	"momo/repository/migrate"
-	"momo/repository/sqllite"
+	"github.com/mohamadrezamomeni/momo/repository/migrate"
+	"github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
 
 var userRepo *User

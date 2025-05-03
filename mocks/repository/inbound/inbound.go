@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	inboundDto "momo/dto/repository/inbound"
-	"momo/entity"
+	inboundDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
+	"github.com/mohamadrezamomeni/momo/entity"
 )
 
 type MockInbound struct {

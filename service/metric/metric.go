@@ -1,8 +1,8 @@
 package metric
 
 import (
-	metricServer "momo/delivery/worker"
-	"momo/entity"
+	metricServer "github.com/mohamadrezamomeni/momo/delivery/worker"
+	"github.com/mohamadrezamomeni/momo/entity"
 )
 
 type Metric struct {

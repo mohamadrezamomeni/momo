@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	inboundDto "momo/dto/repository/inbound"
-	"momo/entity"
-	"momo/pkg/utils"
+	inboundDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
+	"github.com/mohamadrezamomeni/momo/entity"
+	"github.com/mohamadrezamomeni/momo/pkg/utils"
 
 	"github.com/google/uuid"
 )

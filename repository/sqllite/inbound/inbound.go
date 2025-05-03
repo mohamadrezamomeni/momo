@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	inboundDto "momo/dto/repository/inbound"
-	"momo/entity"
-	momoError "momo/pkg/error"
+	inboundDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
+	"github.com/mohamadrezamomeni/momo/entity"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 )
 
 func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error) {

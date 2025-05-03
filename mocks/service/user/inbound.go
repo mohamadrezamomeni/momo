@@ -1,8 +1,8 @@
 package user
 
 import (
-	"momo/entity"
-	"momo/pkg/utils"
+	"github.com/mohamadrezamomeni/momo/entity"
+	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
 
 type MockUser struct{}

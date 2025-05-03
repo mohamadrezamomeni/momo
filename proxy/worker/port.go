@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	pb "momo/contract/gogrpc/port"
-	momoError "momo/pkg/error"
+	pb "github.com/mohamadrezamomeni/momo/contract/gogrpc/port"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 )
 
 func (pw *ProxyWorker) GetAvailablePorts(requestNumberOfPorts uint32, portsUsed []string) ([]string, error) {

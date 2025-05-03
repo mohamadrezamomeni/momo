@@ -1,6 +1,6 @@
 package inbound
 
-import "momo/repository/sqllite"
+import "github.com/mohamadrezamomeni/momo/repository/sqllite"
 
 type Inbound struct {
 	db *sqllite.SqlliteDB

@@ -1,6 +1,6 @@
 package worker
 
-import "momo/entity"
+import "github.com/mohamadrezamomeni/momo/entity"
 
 type MockWorkerProxy struct{}
 

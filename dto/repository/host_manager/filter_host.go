@@ -1,6 +1,6 @@
 package hostmanager
 
-import "momo/entity"
+import "github.com/mohamadrezamomeni/momo/entity"
 
 type FilterHosts struct {
 	Statuses []entity.HostStatus

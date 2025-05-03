@@ -5,11 +5,11 @@ import (
 	"testing"
 	"unsafe"
 
-	inboundRepository "momo/mocks/repository/inbound"
-	hostService "momo/mocks/service/host"
-	userService "momo/mocks/service/user"
-	vpnService "momo/mocks/service/vpn"
-	"momo/pkg/utils"
+	inboundRepository "github.com/mohamadrezamomeni/momo/mocks/repository/inbound"
+	hostService "github.com/mohamadrezamomeni/momo/mocks/service/host"
+	userService "github.com/mohamadrezamomeni/momo/mocks/service/user"
+	vpnService "github.com/mohamadrezamomeni/momo/mocks/service/vpn"
+	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
 
 func registerInboundSvc() (*Inbound, *inboundRepository.MockInbound, *vpnService.MockVPN) {

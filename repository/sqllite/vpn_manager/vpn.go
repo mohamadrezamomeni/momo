@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"strings"
 
-	vpnManagerDto "momo/dto/repository/vpn_manager"
-	"momo/entity"
-	momoError "momo/pkg/error"
+	vpnManagerDto "github.com/mohamadrezamomeni/momo/dto/repository/vpn_manager"
+	"github.com/mohamadrezamomeni/momo/entity"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 )
 
 func (v *VPN) Create(inpt *vpnManagerDto.AddVPN) (*entity.VPN, error) {

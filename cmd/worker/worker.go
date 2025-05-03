@@ -3,11 +3,11 @@ package main
 import (
 	"log"
 
-	workerServer "momo/delivery/worker"
-	"momo/pkg/config"
-	momoLogger "momo/pkg/log"
-	metricService "momo/service/metric"
-	portService "momo/service/port"
+	workerServer "github.com/mohamadrezamomeni/momo/delivery/worker"
+	"github.com/mohamadrezamomeni/momo/pkg/config"
+	momoLogger "github.com/mohamadrezamomeni/momo/pkg/log"
+	metricService "github.com/mohamadrezamomeni/momo/service/metric"
+	portService "github.com/mohamadrezamomeni/momo/service/port"
 )
 
 var configPath = "config.yaml"

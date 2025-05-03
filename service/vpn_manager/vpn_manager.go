@@ -1,10 +1,10 @@
 package vpnmanager
 
 import (
-	"momo/adapter"
-	vpnProxyDto "momo/dto/proxy/vpn"
-	vpnManagerDto "momo/dto/repository/vpn_manager"
-	"momo/entity"
+	"github.com/mohamadrezamomeni/momo/adapter"
+	vpnProxyDto "github.com/mohamadrezamomeni/momo/dto/proxy/vpn"
+	vpnManagerDto "github.com/mohamadrezamomeni/momo/dto/repository/vpn_manager"
+	"github.com/mohamadrezamomeni/momo/entity"
 )
 
 type VPNRepo interface {

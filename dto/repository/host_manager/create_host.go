@@ -1,6 +1,6 @@
 package hostmanager
 
-import "momo/entity"
+import "github.com/mohamadrezamomeni/momo/entity"
 
 type AddHost struct {
 	Domain string

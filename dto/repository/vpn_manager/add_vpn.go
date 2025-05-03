@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"momo/entity"
+	"github.com/mohamadrezamomeni/momo/entity"
 )
 
 type AddVPN struct {

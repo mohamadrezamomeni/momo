@@ -4,9 +4,9 @@ import (
 	"os"
 	"testing"
 
-	inboundDto "momo/dto/repository/inbound"
-	"momo/repository/migrate"
-	"momo/repository/sqllite"
+	inboundDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
+	"github.com/mohamadrezamomeni/momo/repository/migrate"
+	"github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
 
 var inboundRepo *Inbound

@@ -3,12 +3,12 @@ package xray
 import (
 	"fmt"
 
-	"momo/entity"
-	momoError "momo/pkg/error"
+	"github.com/mohamadrezamomeni/momo/entity"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 
-	vpnProxyDto "momo/dto/proxy/vpn"
-	"momo/proxy/vpn/internal/xray/dto"
-	vpnSerializer "momo/proxy/vpn/serializer"
+	vpnProxyDto "github.com/mohamadrezamomeni/momo/dto/proxy/vpn"
+	"github.com/mohamadrezamomeni/momo/proxy/vpn/internal/xray/dto"
+	vpnSerializer "github.com/mohamadrezamomeni/momo/proxy/vpn/serializer"
 
 	loggerService "github.com/xtls/xray-core/app/log/command"
 	handlerService "github.com/xtls/xray-core/app/proxyman/command"

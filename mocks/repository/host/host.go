@@ -1,8 +1,8 @@
 package host
 
 import (
-	hostRepoDto "momo/dto/repository/host_manager"
-	"momo/entity"
+	hostRepoDto "github.com/mohamadrezamomeni/momo/dto/repository/host_manager"
+	"github.com/mohamadrezamomeni/momo/entity"
 )
 
 type Host struct {

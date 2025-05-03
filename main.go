@@ -6,24 +6,24 @@ import (
 	"os/signal"
 	"sync"
 
-	"momo/adapter"
-	"momo/pkg/config"
-	momoLog "momo/pkg/log"
-	"momo/repository/migrate"
-	"momo/repository/sqllite"
-	"momo/scheduler"
+	"github.com/mohamadrezamomeni/momo/adapter"
+	"github.com/mohamadrezamomeni/momo/pkg/config"
+	momoLog "github.com/mohamadrezamomeni/momo/pkg/log"
+	"github.com/mohamadrezamomeni/momo/repository/migrate"
+	"github.com/mohamadrezamomeni/momo/repository/sqllite"
+	"github.com/mohamadrezamomeni/momo/scheduler"
 
 	_ "github.com/mattn/go-sqlite3"
 
-	hostManagerSqlite "momo/repository/sqllite/host_manager"
-	inboundSqlite "momo/repository/sqllite/inbound"
-	userSqlite "momo/repository/sqllite/user"
-	vpnSqlite "momo/repository/sqllite/vpn_manager"
+	hostManagerSqlite "github.com/mohamadrezamomeni/momo/repository/sqllite/host_manager"
+	inboundSqlite "github.com/mohamadrezamomeni/momo/repository/sqllite/inbound"
+	userSqlite "github.com/mohamadrezamomeni/momo/repository/sqllite/user"
+	vpnSqlite "github.com/mohamadrezamomeni/momo/repository/sqllite/vpn_manager"
 
-	hostService "momo/service/host"
-	inboundService "momo/service/inbound"
-	userService "momo/service/user"
-	vpnService "momo/service/vpn_manager"
+	hostService "github.com/mohamadrezamomeni/momo/service/host"
+	inboundService "github.com/mohamadrezamomeni/momo/service/inbound"
+	userService "github.com/mohamadrezamomeni/momo/service/user"
+	vpnService "github.com/mohamadrezamomeni/momo/service/vpn_manager"
 )
 
 var configPath = "config.yaml"

@@ -1,8 +1,8 @@
 package host
 
 import (
-	hostRepositoryDto "momo/dto/repository/host_manager"
-	"momo/entity"
+	hostRepositoryDto "github.com/mohamadrezamomeni/momo/dto/repository/host_manager"
+	"github.com/mohamadrezamomeni/momo/entity"
 )
 
 var (

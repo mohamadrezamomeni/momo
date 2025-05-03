@@ -1,7 +1,7 @@
 package vpnmanager
 
 import (
-	"momo/repository/sqllite"
+	"github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
 
 type VPN struct {

@@ -4,10 +4,10 @@ import (
 	"sync"
 	"testing"
 
-	"momo/adapter"
-	"momo/entity"
-	workerMock "momo/mocks/proxy/worker"
-	hostRepository "momo/mocks/repository/host"
+	"github.com/mohamadrezamomeni/momo/adapter"
+	"github.com/mohamadrezamomeni/momo/entity"
+	workerMock "github.com/mohamadrezamomeni/momo/mocks/proxy/worker"
+	hostRepository "github.com/mohamadrezamomeni/momo/mocks/repository/host"
 )
 
 func registerHostSrv() (*Host, *hostRepository.Host) {

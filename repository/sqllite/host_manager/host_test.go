@@ -4,10 +4,10 @@ import (
 	"os"
 	"testing"
 
-	hostmanagerDto "momo/dto/repository/host_manager"
-	"momo/entity"
-	"momo/repository/migrate"
-	"momo/repository/sqllite"
+	hostmanagerDto "github.com/mohamadrezamomeni/momo/dto/repository/host_manager"
+	"github.com/mohamadrezamomeni/momo/entity"
+	"github.com/mohamadrezamomeni/momo/repository/migrate"
+	"github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
 
 var hostRepo *Host

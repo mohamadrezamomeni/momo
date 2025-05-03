@@ -1,6 +1,6 @@
 package entity
 
-import momoError "momo/pkg/error"
+import momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 
 type Host struct {
 	Domain string

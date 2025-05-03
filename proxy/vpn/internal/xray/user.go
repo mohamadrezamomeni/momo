@@ -3,11 +3,11 @@ package xray
 import (
 	"context"
 
-	"momo/pkg/utils"
-	"momo/proxy/vpn/internal/xray/dto"
-	"momo/proxy/vpn/internal/xray/serializer"
+	"github.com/mohamadrezamomeni/momo/pkg/utils"
+	"github.com/mohamadrezamomeni/momo/proxy/vpn/internal/xray/dto"
+	"github.com/mohamadrezamomeni/momo/proxy/vpn/internal/xray/serializer"
 
-	momoError "momo/pkg/error"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 
 	"github.com/xtls/xray-core/app/proxyman/command"
 	"github.com/xtls/xray-core/common/protocol"

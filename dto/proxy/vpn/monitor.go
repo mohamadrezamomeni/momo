@@ -1,6 +1,6 @@
 package dto
 
-import "momo/entity"
+import "github.com/mohamadrezamomeni/momo/entity"
 
 type Monitor struct {
 	Address string

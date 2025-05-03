@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	momoError "momo/pkg/error"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 )
 
 type CpuMetric struct {

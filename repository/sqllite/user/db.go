@@ -1,7 +1,7 @@
 package user
 
 import (
-	"momo/repository/sqllite"
+	"github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
 
 type User struct {
