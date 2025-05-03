@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"momo/adapter"
 	"momo/entity"
 	"momo/pkg/utils"
 
@@ -26,7 +27,7 @@ type Inbound struct {
 }
 
 type VpnService interface {
-	MakeProxy() (vpnProxy.IProxyVPN, error)
+	MakeProxy() (adapter.ProxyVPN, error)
 }
 
 type UserService interface {

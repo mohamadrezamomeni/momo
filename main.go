@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"sync"
 
+	"momo/adapter"
 	"momo/pkg/config"
 	momoLog "momo/pkg/log"
 	"momo/repository/migrate"
@@ -69,8 +70,8 @@ func getServices(cfg *sqllite.DBConfig) (
 	hostRepo := hostManagerSqlite.New(db)
 	vpnRepo := vpnSqlite.New(db)
 
-	hostSvc := hostService.New(hostRepo, hostService.AdaptedWorkerFactory)
-	vpnSvc := vpnService.New(vpnRepo, vpnService.AdaptedVPNProxyFactory)
+	hostSvc := hostService.New(hostRepo, adapter.AdaptedWorkerFactory)
+	vpnSvc := vpnService.New(vpnRepo, adapter.AdaptedVPNProxyFactory)
 	userSvc := userService.New(userRepo)
 
 	inbouncSvc := inboundService.New(inboundRepo, vpnSvc, userSvc, hostSvc)

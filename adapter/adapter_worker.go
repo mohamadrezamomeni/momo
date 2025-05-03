@@ -1,6 +1,15 @@
-package host
+package adapter
 
-import workerProxy "momo/proxy/worker"
+import (
+	"momo/entity"
+	workerProxy "momo/proxy/worker"
+)
+
+type WorkerProxy interface {
+	Close()
+	GetAvailablePorts(uint32, []string) ([]string, error)
+	GetMetric() (uint32, entity.HostStatus, error)
+}
 
 func AdaptedWorkerFactory(address string, port string) (WorkerProxy, error) {
 	wp, err := workerProxy.New(&workerProxy.Config{

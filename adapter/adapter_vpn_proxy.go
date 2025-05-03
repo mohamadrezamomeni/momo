@@ -1,4 +1,4 @@
-package vpnmanager
+package adapter
 
 import (
 	proxyVpnDto "momo/dto/proxy/vpn"

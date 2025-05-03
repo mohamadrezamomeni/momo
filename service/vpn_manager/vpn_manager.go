@@ -1,10 +1,10 @@
 package vpnmanager
 
 import (
+	"momo/adapter"
 	vpnProxyDto "momo/dto/proxy/vpn"
 	vpnManagerDto "momo/dto/repository/vpn_manager"
 	"momo/entity"
-	vpnProxy "momo/proxy/vpn"
 )
 
 type VPNRepo interface {
@@ -13,7 +13,7 @@ type VPNRepo interface {
 	DeactiveVPN(int) error
 }
 
-type AdaptedVPNProxy func(adapterConfigs []*AdapterVPnProxyigFactoryConfig) ProxyVPN
+type AdaptedVPNProxy func(adapterConfigs []*adapter.AdapterVPnProxyigFactoryConfig) adapter.ProxyVPN
 
 type VPNService struct {
 	vpnRepo         VPNRepo
@@ -32,10 +32,10 @@ func (v *VPNService) MonitorVPNs() {
 	if err != nil {
 		return
 	}
-	cfgs := make([]*AdapterVPnProxyigFactoryConfig, 0)
+	cfgs := make([]*adapter.AdapterVPnProxyigFactoryConfig, 0)
 
 	for _, vpn := range vpns {
-		cfgs = append(cfgs, &AdapterVPnProxyigFactoryConfig{
+		cfgs = append(cfgs, &adapter.AdapterVPnProxyigFactoryConfig{
 			Port:    vpn.ApiPort,
 			Domain:  vpn.Domain,
 			VPNType: vpn.VPNType,
@@ -56,16 +56,16 @@ func (v *VPNService) MonitorVPNs() {
 	}
 }
 
-func (v *VPNService) MakeProxy() (vpnProxy.IProxyVPN, error) {
+func (v *VPNService) MakeProxy() (adapter.ProxyVPN, error) {
 	vpns, err := v.load()
 	if err != nil {
 		return nil, err
 	}
 
-	cfgs := make([]*AdapterVPnProxyigFactoryConfig, 0)
+	cfgs := make([]*adapter.AdapterVPnProxyigFactoryConfig, 0)
 
 	for _, vpn := range vpns {
-		cfgs = append(cfgs, &AdapterVPnProxyigFactoryConfig{
+		cfgs = append(cfgs, &adapter.AdapterVPnProxyigFactoryConfig{
 			Port:    vpn.ApiPort,
 			Domain:  vpn.Domain,
 			VPNType: vpn.VPNType,

@@ -4,6 +4,7 @@ import (
 	"sync"
 	"testing"
 
+	"momo/adapter"
 	"momo/entity"
 	workerMock "momo/mocks/proxy/worker"
 	hostRepository "momo/mocks/repository/host"
@@ -11,7 +12,7 @@ import (
 
 func registerHostSrv() (*Host, *hostRepository.Host) {
 	hostRepo := hostRepository.New()
-	return New(hostRepo, func(address string, port string) (WorkerProxy, error) {
+	return New(hostRepo, func(address string, port string) (adapter.WorkerProxy, error) {
 		return &workerMock.MockWorkerProxy{}, nil
 	}), hostRepo
 }

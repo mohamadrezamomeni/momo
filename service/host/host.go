@@ -1,17 +1,12 @@
 package host
 
 import (
+	"momo/adapter"
 	hostRepoDto "momo/dto/repository/host_manager"
 	"momo/entity"
 )
 
-type WorkerProxy interface {
-	Close()
-	GetAvailablePorts(uint32, []string) ([]string, error)
-	GetMetric() (uint32, entity.HostStatus, error)
-}
-
-type WorkerFactor func(string, string) (WorkerProxy, error)
+type WorkerFactor func(string, string) (adapter.WorkerProxy, error)
 
 type HostRepo interface {
 	Create(*hostRepoDto.AddHost) (*entity.Host, error)

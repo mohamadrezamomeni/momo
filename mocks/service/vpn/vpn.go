@@ -1,8 +1,7 @@
 package vpn
 
 import (
-	proxyvpn "momo/proxy/vpn"
-
+	"momo/adapter"
 	mockProxyVPN "momo/mocks/proxy/vpn"
 )
 
@@ -12,6 +11,6 @@ func New() *MockVPN {
 	return &MockVPN{}
 }
 
-func (mv *MockVPN) MakeProxy() (proxyvpn.IProxyVPN, error) {
+func (mv *MockVPN) MakeProxy() (adapter.ProxyVPN, error) {
 	return &mockProxyVPN.MockProxy{}, nil
 }
