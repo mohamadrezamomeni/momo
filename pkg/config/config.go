@@ -2,11 +2,13 @@ package config
 
 import (
 	workerServer "github.com/mohamadrezamomeni/momo/delivery/grpc_worker"
+	httpserver "github.com/mohamadrezamomeni/momo/delivery/http_server"
 	"github.com/mohamadrezamomeni/momo/pkg/log"
 	"github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
 
 type Config struct {
+	HTTP           httpserver.HTTPConfig       `koanf:"http"`
 	Log            log.LogConfig               `koanf:"log"`
 	DB             sqllite.DBConfig            `koanf:"db"`
 	Metric         workerServer.MetricConfig   `koanf:"metric"`

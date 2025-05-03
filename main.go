@@ -10,6 +10,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 
 	serviceInitializer "github.com/mohamadrezamomeni/momo/pkg/service"
+
+	httpserver "github.com/mohamadrezamomeni/momo/delivery/http_server"
 )
 
 var configPath = "config.yaml"
@@ -27,4 +29,8 @@ func main() {
 	migration.UP()
 
 	_, _, _, _ = serviceInitializer.GetServices(&cfg.DB)
+
+	server := httpserver.New(&cfg.HTTP)
+
+	server.Serve()
 }
