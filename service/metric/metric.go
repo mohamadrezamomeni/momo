@@ -1,7 +1,7 @@
 package metric
 
 import (
-	metricServer "github.com/mohamadrezamomeni/momo/delivery/worker"
+	metricServer "github.com/mohamadrezamomeni/momo/delivery/grpc_worker"
 	"github.com/mohamadrezamomeni/momo/entity"
 )
 

@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	workerServer "github.com/mohamadrezamomeni/momo/delivery/worker"
+	workerServer "github.com/mohamadrezamomeni/momo/delivery/grpc_worker"
 	"github.com/mohamadrezamomeni/momo/pkg/config"
 	momoLogger "github.com/mohamadrezamomeni/momo/pkg/log"
 	metricService "github.com/mohamadrezamomeni/momo/service/metric"

@@ -1,7 +1,7 @@
 package config
 
 import (
-	workerServer "github.com/mohamadrezamomeni/momo/delivery/worker"
+	workerServer "github.com/mohamadrezamomeni/momo/delivery/grpc_worker"
 	"github.com/mohamadrezamomeni/momo/pkg/log"
 	"github.com/mohamadrezamomeni/momo/repository/sqllite"
 )

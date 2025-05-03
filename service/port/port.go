@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mohamadrezamomeni/momo/delivery/worker"
+	grpcWorker "github.com/mohamadrezamomeni/momo/delivery/grpc_worker"
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
 
@@ -20,7 +20,7 @@ type Port struct {
 	endPort   int
 }
 
-func New(cfg *worker.PortAssignment) *Port {
+func New(cfg *grpcWorker.PortAssignment) *Port {
 	return &Port{
 		startPort: cfg.StartPort,
 		endPort:   cfg.EndPort,
