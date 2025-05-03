@@ -6,6 +6,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (h *Handler) HealthCheck(c echo.Context) error {
+func (h *Handler) healthCheck(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
