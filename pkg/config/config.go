@@ -11,7 +11,7 @@ import (
 
 type Config struct {
 	CryptConfig    encrypt.CryptConfig         `koanf:"encrypt"`
-	AuthConfig     auth.Auth                   `koanf:"auth"`
+	AuthConfig     auth.AuthConfig             `koanf:"auth"`
 	HTTP           httpserver.HTTPConfig       `koanf:"http"`
 	Log            log.LogConfig               `koanf:"log"`
 	DB             sqllite.DBConfig            `koanf:"db"`

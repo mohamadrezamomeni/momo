@@ -9,6 +9,7 @@ import (
 
 type UserRepo interface {
 	FindUserByID(string) (*entity.User, error)
+	FindUserByUsername(string) (*entity.User, error)
 	Create(*userRepoDto.Create) (*entity.User, error)
 }
 
@@ -41,4 +42,8 @@ func (u *User) Create(userDto *userServiceDto.AddUser) (*entity.User, error) {
 
 func (u *User) FindByID(id string) (*entity.User, error) {
 	return u.FindByID(id)
+}
+
+func (u *User) FindByUsername(username string) (*entity.User, error) {
+	return u.FindByUsername(username)
 }

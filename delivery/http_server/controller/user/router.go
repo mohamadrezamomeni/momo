@@ -1,7 +1,10 @@
 package user
 
-import "github.com/labstack/echo/v4"
+import (
+	"github.com/labstack/echo/v4"
+	"github.com/mohamadrezamomeni/momo/delivery/http_server/middleware"
+)
 
 func (h *Handler) SetHandler(v1 *echo.Group) {
-	v1.POST("/users", h.Create)
+	v1.POST("/users", h.Create, middleware.AccessCheck(h.authSvc, true))
 }

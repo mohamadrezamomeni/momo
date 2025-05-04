@@ -10,6 +10,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 
 	serviceInitializer "github.com/mohamadrezamomeni/momo/pkg/service"
+	userValidator "github.com/mohamadrezamomeni/momo/validator/user"
 
 	httpserver "github.com/mohamadrezamomeni/momo/delivery/http_server"
 )
@@ -28,9 +29,9 @@ func main() {
 
 	migration.UP()
 
-	_, _, _, _ = serviceInitializer.GetServices(&cfg)
+	_, _, userSvc, _, authSvc, cryptSvc := serviceInitializer.GetServices(&cfg)
 
-	server := httpserver.New(&cfg.HTTP)
+	server := httpserver.New(&cfg.HTTP, authSvc, userSvc, cryptSvc, userValidator.New())
 
 	server.Serve()
 }
