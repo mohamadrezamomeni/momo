@@ -29,7 +29,7 @@ func (s *Server) Serve() {
 	s.router.Use(middleware.RequestID())
 	s.router.Use(middleware.Recover())
 
-	api := s.router.Group("/api")
+	api := s.router.Group("/api/v1")
 
 	s.metricHandler.SetRouter(api)
 
