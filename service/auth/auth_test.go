@@ -11,7 +11,7 @@ import (
 )
 
 func TestTokenProcessing(t *testing.T) {
-	auth := New(
+	auth1 := New(
 		mockUserService.New(),
 		crypt.New(&crypt.CryptConfig{EncryptKey: "qFQGz0yE0nYBxqi9"}),
 		&AuthConfig{
@@ -25,18 +25,36 @@ func TestTokenProcessing(t *testing.T) {
 		FirstName: utils.RandomString(5),
 		LastName:  utils.RandomString(5),
 	}
-	token, err := auth.createToken(user)
+	token, err := auth1.createToken(user)
 	if err != nil {
 		t.Fatalf("error to create token the error is %v", err)
 	}
-	claim, err := auth.DecodeToken(token)
+	claim, isValid, err := auth1.DecodeToken(token)
 	if err != nil {
 		t.Fatalf("error to decode token the error is %v", err)
+	}
+	if !isValid {
+		t.Fatalf("this token must be valid")
 	}
 	if claim.FirstName != user.FirstName ||
 		claim.UserID != user.ID ||
 		claim.LastName != user.LastName ||
 		user.IsAdmin != claim.IsAdmin {
 		t.Fatalf("the error is %v", err)
+	}
+
+	auth2 := New(
+		mockUserService.New(),
+		crypt.New(&crypt.CryptConfig{EncryptKey: "qFQGz0yE0nYBxqi9"}),
+		&AuthConfig{
+			SecretKey:  "Ve9Bu3A0ZbhunKFn",
+			ExpireTime: 20,
+		},
+	)
+
+	_, isValid, _ = auth2.DecodeToken(token)
+
+	if isValid {
+		t.Errorf("the token must be invalid")
 	}
 }

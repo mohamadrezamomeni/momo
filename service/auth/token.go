@@ -39,31 +39,31 @@ func (a *Auth) createToken(user *entity.User) (string, error) {
 	return token.SignedString([]byte(a.config.SecretKey))
 }
 
-func (a *Auth) DecodeToken(tokenString string) (*Claim, error) {
+func (a *Auth) DecodeToken(tokenString string) (*Claim, bool, error) {
 	scope := "auth.DecodeToken"
 
 	token, err := jwt.ParseWithClaims(tokenString, &EncryptedClaim{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(a.config.SecretKey), nil
 	})
 	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Errorf("error to marshal claim the input is %s", tokenString)
+		return nil, false, momoError.Wrap(err).Scope(scope).Errorf("error to marshal claim the input is %s", tokenString)
 	}
 	encryptedClaim, ok := token.Claims.(*EncryptedClaim)
 
-	if !ok || !token.Valid {
-		return nil, momoError.Scope(scope).Errorf("the token isn't valid the input is %s", tokenString)
+	if !ok {
+		return nil, false, momoError.Scope(scope).Errorf("the token isn't valid the input is %s", tokenString)
 	}
 
 	data, err := a.crypt.Decrypt(encryptedClaim.Data)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	var claim Claim
 	err = json.Unmarshal([]byte(data), &claim)
 	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Errorf("error to unmarshal encrypted claim the input is %s", tokenString)
+		return nil, false, momoError.Wrap(err).Scope(scope).Errorf("error to unmarshal encrypted claim the input is %s", tokenString)
 	}
 
-	return &claim, nil
+	return &claim, token.Valid, nil
 }
