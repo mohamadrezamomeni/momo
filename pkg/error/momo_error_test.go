@@ -33,4 +33,10 @@ func TestWithoutMainError(t *testing.T) {
 	if err.Error() != message {
 		t.Error("error to compare we expected error and the error we were given")
 	}
+
+	err = Wrap(fmt.Errorf("database error")).Scope(scopeTest).Input(struct{ Domain string }{Domain: "google.com"}, "ssss", map[string]string{"name": "mic"}).ErrorWrite()
+	message = `the scope is "test.TestWithoutMainError" and the main error is "database error" also we got ("struct { Domain string }{Domain:"google.com"}", "ssss", "map[name:mic]")`
+	if message != err.Error() {
+		t.Error("the input message isn't generated well")
+	}
 }
