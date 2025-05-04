@@ -28,7 +28,7 @@ func main() {
 
 	migration.UP()
 
-	_, _, _, _ = serviceInitializer.GetServices(&cfg.DB)
+	_, _, _, _ = serviceInitializer.GetServices(&cfg)
 
 	server := httpserver.New(&cfg.HTTP)
 

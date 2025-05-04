@@ -9,6 +9,7 @@ import (
 	userSqlite "github.com/mohamadrezamomeni/momo/repository/sqllite/user"
 	vpnSqlite "github.com/mohamadrezamomeni/momo/repository/sqllite/vpn_manager"
 
+	config "github.com/mohamadrezamomeni/momo/pkg/config"
 	cryptService "github.com/mohamadrezamomeni/momo/service/crypt"
 	hostService "github.com/mohamadrezamomeni/momo/service/host"
 	inboundService "github.com/mohamadrezamomeni/momo/service/inbound"
@@ -16,13 +17,13 @@ import (
 	vpnService "github.com/mohamadrezamomeni/momo/service/vpn_manager"
 )
 
-func GetServices(cfg *sqllite.DBConfig) (
+func GetServices(cfg *config.Config) (
 	*hostService.Host,
 	*vpnService.VPNService,
 	*userService.User,
 	*inboundService.Inbound,
 ) {
-	db := sqllite.New(cfg)
+	db := sqllite.New(&cfg.DB)
 	userRepo := userSqlite.New(db)
 	inboundRepo := inboundSqlite.New(db)
 	hostRepo := hostManagerSqlite.New(db)
@@ -30,7 +31,7 @@ func GetServices(cfg *sqllite.DBConfig) (
 
 	hostSvc := hostService.New(hostRepo, adapter.AdaptedWorkerFactory)
 	vpnSvc := vpnService.New(vpnRepo, adapter.AdaptedVPNProxyFactory)
-	userSvc := userService.New(userRepo, cryptService.New())
+	userSvc := userService.New(userRepo, cryptService.New(&cfg.CryptConfig))
 
 	inbouncSvc := inboundService.New(inboundRepo, vpnSvc, userSvc, hostSvc)
 	return hostSvc, vpnSvc, userSvc, inbouncSvc
