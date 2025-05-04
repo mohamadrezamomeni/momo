@@ -22,8 +22,12 @@ func (a *Auth) createToken(user *entity.User) (string, error) {
 	if err != nil {
 		return "", momoError.Wrap(err).Scope(scope).Errorf("error to marshal claim the input is %+v", *user)
 	}
+	encoded, err := a.crypt.Encrypt(string(jsonData))
+	if err != nil {
+		return "", err
+	}
 	encryptedClaim := EncryptedClaim{
-		Data: string(jsonData),
+		Data: encoded,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(a.config.ExpireTime) * time.Minute)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -49,8 +53,14 @@ func (a *Auth) DecodeToken(tokenString string) (*Claim, error) {
 	if !ok || !token.Valid {
 		return nil, momoError.Scope(scope).Errorf("the token isn't valid the input is %s", tokenString)
 	}
+
+	data, err := a.crypt.Decrypt(encryptedClaim.Data)
+	if err != nil {
+		return nil, err
+	}
+
 	var claim Claim
-	err = json.Unmarshal([]byte(encryptedClaim.Data), &claim)
+	err = json.Unmarshal([]byte(data), &claim)
 	if err != nil {
 		return nil, momoError.Wrap(err).Scope(scope).Errorf("error to unmarshal encrypted claim the input is %s", tokenString)
 	}
