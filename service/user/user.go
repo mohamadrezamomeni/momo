@@ -41,9 +41,9 @@ func (u *User) Create(userDto *userServiceDto.AddUser) (*entity.User, error) {
 }
 
 func (u *User) FindByID(id string) (*entity.User, error) {
-	return u.FindByID(id)
+	return u.userRepo.FindUserByID(id)
 }
 
 func (u *User) FindByUsername(username string) (*entity.User, error) {
-	return u.FindByUsername(username)
+	return u.userRepo.FindUserByUsername(username)
 }

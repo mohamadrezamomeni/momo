@@ -5,6 +5,6 @@ import (
 	"github.com/mohamadrezamomeni/momo/delivery/http_server/middleware"
 )
 
-func (h *Handler) SetHandler(v1 *echo.Group) {
+func (h *Handler) SetRouter(v1 *echo.Group) {
 	v1.POST("/users", h.Create, middleware.AccessCheck(h.authSvc, true))
 }

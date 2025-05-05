@@ -1,6 +1,7 @@
 package auth
 
 import (
+	authServiceDto "github.com/mohamadrezamomeni/momo/dto/service/auth"
 	"github.com/mohamadrezamomeni/momo/entity"
 	"github.com/mohamadrezamomeni/momo/service/crypt"
 )
@@ -22,4 +23,18 @@ func New(userSvc UserService, crypt *crypt.Crypt, config *AuthConfig) *Auth {
 		crypt:   crypt,
 		config:  config,
 	}
+}
+
+func (a *Auth) Login(inpt *authServiceDto.LoginDto) (string, string, error) {
+	user, err := a.userSvc.FindByUsername(inpt.Username)
+	if err != nil {
+		return "", "", err
+	}
+
+	token, err := a.createToken(user)
+	if err != nil {
+		return "", "", err
+	}
+
+	return token, "", nil
 }
