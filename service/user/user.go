@@ -13,6 +13,7 @@ type UserRepo interface {
 	Create(*userRepoDto.Create) (*entity.User, error)
 	Upsert(*userRepoDto.Create) (*entity.User, error)
 	DeleteByUsername(string) error
+	DeletePreviousSuperAdmins() error
 }
 
 type User struct {
@@ -43,6 +44,11 @@ func (u *User) Create(userDto *userServiceDto.AddUser) (*entity.User, error) {
 }
 
 func (u *User) CreateUserAdmin(userDto *userServiceDto.AddUser) (*entity.User, error) {
+	err := u.userRepo.DeletePreviousSuperAdmins()
+	if err != nil {
+		return nil, err
+	}
+
 	passwordHashed, err := u.crypt.Hash(userDto.Password)
 	if err != nil {
 		return nil, err

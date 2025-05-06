@@ -17,7 +17,8 @@ CREATE TABLE `users` (
     `lastName` varchar(32),
     `firstName` varchar(32),
     `password` varchar(64),
-    `is_admin` boolean DEFAULT false
+    `is_admin` boolean DEFAULT false,
+    `is_super_admin` boolean DEFAULT false
 );
 
 -- +migrate Down

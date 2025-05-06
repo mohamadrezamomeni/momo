@@ -85,7 +85,8 @@ func TestFindByID(t *testing.T) {
 	if user.Username != user1.Username ||
 		user.FirstName != user1.FirstName ||
 		user.LastName != user1.LastName ||
-		user.ID != userCreated.ID {
+		user.ID != userCreated.ID ||
+		user.IsSuperAdmin != true {
 		t.Error("something went wrong to compare results")
 		return
 	}
@@ -184,5 +185,21 @@ func TestUpsert(t *testing.T) {
 	_, err = userRepo.Upsert(user1)
 	if err != nil {
 		t.Fatalf("upserting went wrong the error was %v", err)
+	}
+}
+
+func TestDeletePreviousSuperAdmins(t *testing.T) {
+	defer userRepo.DeleteAll()
+	userRepo.Create(user1)
+	userRepo.Create(user2)
+	userRepo.Create(user3)
+
+	err := userRepo.DeletePreviousSuperAdmins()
+	if err != nil {
+		t.Fatalf("something went wrong to delete previousSuperadmins")
+	}
+	superAdmin, _ := userRepo.FindUserByUsername(user1.Username)
+	if superAdmin != nil {
+		t.Fatal("super admine must be deleted")
 	}
 }
