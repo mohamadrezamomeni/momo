@@ -109,7 +109,7 @@ func (u *User) FilterUsers(q *dto.FilterUsers) ([]*entity.User, error) {
 
 	query, err := u.generateFilterUserQuery(q)
 	if err != nil {
-		return []*entity.User{}, err
+		return nil, err
 	}
 
 	rows, err := u.db.Conn().Query(query)
@@ -125,7 +125,7 @@ func (u *User) FilterUsers(q *dto.FilterUsers) ([]*entity.User, error) {
 		if err != nil {
 			return nil, momoError.Wrap(err).Scope(scope).Errorf("error to scan data, the input is %+v", *q)
 		}
-		users = append(users, nil)
+		users = append(users, user)
 	}
 	return users, nil
 }
