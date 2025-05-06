@@ -1,6 +1,7 @@
 package httpserver
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/labstack/echo/v4"
@@ -17,7 +18,7 @@ import (
 )
 
 type Server struct {
-	router        *echo.Echo
+	Router        *echo.Echo
 	config        *HTTPConfig
 	metricHandler *metricHandler.Handler
 	userHandler   *userHandler.Handler
@@ -32,7 +33,7 @@ func New(cfg *HTTPConfig,
 	authValidator *authValidation.Validation,
 ) *Server {
 	return &Server{
-		router:        echo.New(),
+		Router:        echo.New(),
 		config:        cfg,
 		metricHandler: metricHandler.New(),
 		userHandler:   userHandler.New(userSvc, userValidation, authSvc),
@@ -43,17 +44,21 @@ func New(cfg *HTTPConfig,
 func (s *Server) Serve() {
 	scope := "httpserver.serve"
 
-	s.router.Use(middleware.RequestID())
-	s.router.Use(middleware.Recover())
+	s.Router.Use(middleware.RequestID())
+	s.Router.Use(middleware.Recover())
 
-	api := s.router.Group("/api/v1")
+	api := s.Router.Group("/api/v1")
 
 	s.metricHandler.SetRouter(api)
 	s.userHandler.SetRouter(api)
 	s.authHandler.SetRouter(api)
 
 	address := fmt.Sprintf(":%s", s.config.Port)
-	if err := s.router.Start(address); err != nil {
+	if err := s.Router.Start(address); err != nil {
 		momoError.Wrap(err).Scope(scope).Fatal()
 	}
+}
+
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.Router.Shutdown(ctx)
 }

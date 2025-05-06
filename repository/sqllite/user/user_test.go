@@ -141,3 +141,12 @@ func TestFilter(t *testing.T) {
 		t.Errorf("4. something went wrong.")
 	}
 }
+
+func TestDeleteByUsername(t *testing.T) {
+	userRepo.Create(user1)
+
+	err := userRepo.DeleteByUsername(user1.Username)
+	if err != nil {
+		t.Error("the user must be delted")
+	}
+}

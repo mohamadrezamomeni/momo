@@ -9,7 +9,15 @@ import (
 	encrypt "github.com/mohamadrezamomeni/momo/service/crypt"
 )
 
+type Admin struct {
+	Username  string `koanf:"username"`
+	Password  string `koanf:"password"`
+	FirstName string `koanf:"firstname"`
+	LastName  string `koanf:"lastname"`
+}
+
 type Config struct {
+	Admin          Admin                       `koanf:"admin"`
 	CryptConfig    encrypt.CryptConfig         `koanf:"encrypt"`
 	AuthConfig     auth.AuthConfig             `koanf:"auth"`
 	HTTP           httpserver.HTTPConfig       `koanf:"http"`

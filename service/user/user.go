@@ -11,6 +11,7 @@ type UserRepo interface {
 	FindUserByID(string) (*entity.User, error)
 	FindUserByUsername(string) (*entity.User, error)
 	Create(*userRepoDto.Create) (*entity.User, error)
+	DeleteByUsername(string) error
 }
 
 type User struct {
@@ -46,4 +47,8 @@ func (u *User) FindByID(id string) (*entity.User, error) {
 
 func (u *User) FindByUsername(username string) (*entity.User, error) {
 	return u.userRepo.FindUserByUsername(username)
+}
+
+func (u *User) DeleteByUsername(username string) error {
+	return u.userRepo.DeleteByUsername(username)
 }

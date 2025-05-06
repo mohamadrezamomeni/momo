@@ -47,6 +47,25 @@ func (u *User) Delete(id string) error {
 	return nil
 }
 
+func (u *User) DeleteByUsername(username string) error {
+	scope := "userRepository.DeleteByUsername"
+	sql := fmt.Sprintf("DELETE FROM users WHERE username='%s'", username)
+	res, err := u.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d", username)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d", username)
+	}
+
+	if rowsAffected == 0 {
+		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d, no row is affected", username)
+	}
+	return nil
+}
+
 func (u *User) DeleteAll() error {
 	scope := "userRepository.DeleteAll"
 

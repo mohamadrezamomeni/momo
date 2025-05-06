@@ -14,7 +14,7 @@ func (h *Handler) Create(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	err := h.validator.ValidateAddUserRequest(&req)
+	err := h.validator.ValidateAddUserRequest(req)
 	if err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
