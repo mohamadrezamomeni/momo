@@ -79,7 +79,7 @@ func createSuperAdmin(userSvc *userService.User, cfg *config.Admin) {
 		momoError.Wrap(err).Scope(scope).Fatalf("please check admin config")
 	}
 
-	_, err = userSvc.Create(&user.AddUser{
+	_, err = userSvc.CreateUserAdmin(&user.AddUser{
 		IsAdmin:   true,
 		Username:  cfg.Username,
 		Password:  cfg.Password,

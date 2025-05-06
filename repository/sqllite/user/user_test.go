@@ -150,3 +150,39 @@ func TestDeleteByUsername(t *testing.T) {
 		t.Error("the user must be delted")
 	}
 }
+
+func TestUpsert(t *testing.T) {
+	userRepo.Create(user1)
+	defer userRepo.DeleteAll()
+
+	userCopy := user1
+	userCopy.Password = "765432"
+	userCopy.LastName = "jordanhenderson"
+	userCopy.FirstName = "arthor"
+	userCopy.IsAdmin = false
+
+	userCreated, err := userRepo.Upsert(userCopy)
+	if err != nil {
+		t.Fatalf("upserting went wrong the error was %v", err)
+	}
+	if userCreated.LastName != userCopy.LastName ||
+		userCreated.FirstName != userCopy.FirstName ||
+		userCreated.Password != userCopy.Password ||
+		userCreated.IsAdmin != userCopy.IsAdmin {
+		t.Fatal("the data is returned is wrong")
+	}
+
+	userFound, _ := userRepo.FindUserByUsername(user1.Username)
+
+	if userFound.LastName != userCopy.LastName ||
+		userFound.FirstName != userCopy.FirstName ||
+		userFound.Password != userFound.Password ||
+		userFound.IsAdmin != userFound.IsAdmin {
+		t.Fatal("the data is returned is wrong")
+	}
+
+	_, err = userRepo.Upsert(user1)
+	if err != nil {
+		t.Fatalf("upserting went wrong the error was %v", err)
+	}
+}

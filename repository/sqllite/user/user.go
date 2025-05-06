@@ -27,6 +27,27 @@ func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 	return user, nil
 }
 
+func (u *User) Upsert(inpt *dto.Create) (*entity.User, error) {
+	scope := "userRepository.Upsert"
+
+	user := &entity.User{}
+	err := u.db.Conn().QueryRow(`
+	INSERT INTO users (username, lastName, firstName, password, is_admin)
+	VALUES (?, ?, ?, ?, ?)
+	ON CONFLICT(username) DO UPDATE SET
+		password = excluded.password,
+		firstname = excluded.firstname,
+		lastname = excluded.lastname,
+		is_admin = excluded.is_admin
+	RETURNING id, username, lastName, firstName, is_admin, password
+`, inpt.Username, inpt.LastName, inpt.FirstName, inpt.Password, inpt.IsAdmin).Scan(&user.ID, &user.Username, &user.LastName, &user.FirstName, &user.IsAdmin, &user.Password)
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *inpt)
+	}
+
+	return user, nil
+}
+
 func (u *User) Delete(id string) error {
 	scope := "userRepository.Delete"
 

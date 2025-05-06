@@ -11,6 +11,7 @@ type UserRepo interface {
 	FindUserByID(string) (*entity.User, error)
 	FindUserByUsername(string) (*entity.User, error)
 	Create(*userRepoDto.Create) (*entity.User, error)
+	Upsert(*userRepoDto.Create) (*entity.User, error)
 	DeleteByUsername(string) error
 }
 
@@ -33,6 +34,21 @@ func (u *User) Create(userDto *userServiceDto.AddUser) (*entity.User, error) {
 	}
 
 	return u.userRepo.Create(&userRepoDto.Create{
+		IsAdmin:   userDto.IsAdmin,
+		FirstName: userDto.FirstName,
+		LastName:  userDto.LastName,
+		Username:  userDto.Username,
+		Password:  passwordHashed,
+	})
+}
+
+func (u *User) CreateUserAdmin(userDto *userServiceDto.AddUser) (*entity.User, error) {
+	passwordHashed, err := u.crypt.Hash(userDto.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	return u.userRepo.Upsert(&userRepoDto.Create{
 		IsAdmin:   userDto.IsAdmin,
 		FirstName: userDto.FirstName,
 		LastName:  userDto.LastName,
