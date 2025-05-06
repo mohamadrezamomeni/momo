@@ -14,6 +14,7 @@ type UserRepo interface {
 	Upsert(*userRepoDto.Create) (*entity.User, error)
 	DeleteByUsername(string) error
 	DeletePreviousSuperAdmins() error
+	FilterUsers(*userRepoDto.FilterUsers) ([]*entity.User, error)
 }
 
 type User struct {
@@ -73,4 +74,8 @@ func (u *User) FindByUsername(username string) (*entity.User, error) {
 
 func (u *User) DeleteByUsername(username string) error {
 	return u.userRepo.DeleteByUsername(username)
+}
+
+func (u *User) Filter() ([]*entity.User, error) {
+	return u.userRepo.FilterUsers(&userRepoDto.FilterUsers{})
 }

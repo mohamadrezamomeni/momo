@@ -15,6 +15,7 @@ type Handler struct {
 
 type UserService interface {
 	Create(*userServiceDto.AddUser) (*entity.User, error)
+	Filter() ([]*entity.User, error)
 }
 
 func New(userSvc UserService, validator *userValidator.Validator, authSvc *auth.Auth) *Handler {

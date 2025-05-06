@@ -1,7 +1,6 @@
 package crypt
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -37,7 +36,6 @@ func TestEncryptin(t *testing.T) {
 	plainText := "hello this is a test for encrypting data :)"
 
 	encryptedData, err := crypt.Encrypt(plainText)
-	fmt.Println(err)
 	if err != nil || encryptedData == plainText {
 		t.Error("error to encrypt data")
 	}
