@@ -3,6 +3,7 @@ package host
 import (
 	"github.com/mohamadrezamomeni/momo/adapter"
 	hostRepoDto "github.com/mohamadrezamomeni/momo/dto/repository/host_manager"
+	hostServiceDto "github.com/mohamadrezamomeni/momo/dto/service/host"
 	"github.com/mohamadrezamomeni/momo/entity"
 )
 
@@ -38,4 +39,13 @@ func (h *Host) FindRightHosts(status entity.HostStatus) ([]*entity.Host, error) 
 	}
 
 	return hosts, nil
+}
+
+func (h *Host) Create(createHostDto *hostServiceDto.CreateHostDto) (*entity.Host, error) {
+	return h.hostRepo.Create(&hostRepoDto.AddHost{
+		Domain: createHostDto.Domain,
+		Port:   createHostDto.Port,
+		Status: entity.Deactive,
+		Rank:   0,
+	})
 }

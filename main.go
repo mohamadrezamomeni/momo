@@ -15,6 +15,7 @@ import (
 
 	serviceInitializer "github.com/mohamadrezamomeni/momo/pkg/service"
 	authValidator "github.com/mohamadrezamomeni/momo/validator/auth"
+	hostValidator "github.com/mohamadrezamomeni/momo/validator/host"
 	userValidator "github.com/mohamadrezamomeni/momo/validator/user"
 
 	httpserver "github.com/mohamadrezamomeni/momo/delivery/http_server"
@@ -38,10 +39,11 @@ func main() {
 	migration := migrate.New(&cfg.DB)
 
 	migration.UP()
-	_, _, userSvc, _, authSvc, cryptSvc := serviceInitializer.GetServices(&cfg)
+	hostSvc, _, userSvc, _, authSvc, cryptSvc := serviceInitializer.GetServices(&cfg)
+
 	initializer(userSvc, &cfg)
 
-	server := httpserver.New(&cfg.HTTP, authSvc, userSvc, cryptSvc, userValidator.New(), authValidator.New())
+	server := httpserver.New(&cfg.HTTP, authSvc, userSvc, cryptSvc, hostSvc, userValidator.New(), authValidator.New(), hostValidator.New())
 
 	go func() {
 		server.Serve()
