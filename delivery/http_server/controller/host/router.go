@@ -7,4 +7,5 @@ import (
 
 func (h *Handler) SetRouter(v1 *echo.Group) {
 	v1.POST("/hosts", h.CreateHost, middleware.AccessCheck(h.authSvc, true))
+	v1.GET("/hosts", h.FilterHosts, middleware.AccessCheck(h.authSvc, true))
 }

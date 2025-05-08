@@ -15,6 +15,7 @@ type Handler struct {
 
 type HostService interface {
 	Create(*hostServiceDto.CreateHostDto) (*entity.Host, error)
+	Filter(*hostServiceDto.FilterHosts) ([]*entity.Host, error)
 }
 
 func New(hostSvc HostService, authSvc *authService.Auth, hostValidation *hostValidation.Validator) *Handler {

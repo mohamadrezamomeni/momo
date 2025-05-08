@@ -21,7 +21,7 @@ func TestCreateHostValidation(t *testing.T) {
 		Port:   "12345",
 	})
 	if err != nil {
-		t.Fatalf("the problem has occurred")
+		t.Fatalf("the problem has occurred that was %v", err)
 	}
 	err = validator.CreateHostValidation(hostDto.CreateHostDto{
 		Domain: "twitter.com",

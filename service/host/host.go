@@ -41,6 +41,14 @@ func (h *Host) FindRightHosts(status entity.HostStatus) ([]*entity.Host, error) 
 	return hosts, nil
 }
 
+func (h *Host) Filter(filterDto *hostServiceDto.FilterHosts) ([]*entity.Host, error) {
+	return h.hostRepo.Filter(
+		&hostRepoDto.FilterHosts{
+			Statuses: filterDto.Status,
+		},
+	)
+}
+
 func (h *Host) Create(createHostDto *hostServiceDto.CreateHostDto) (*entity.Host, error) {
 	return h.hostRepo.Create(&hostRepoDto.AddHost{
 		Domain: createHostDto.Domain,

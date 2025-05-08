@@ -43,7 +43,16 @@ func main() {
 
 	initializer(userSvc, &cfg)
 
-	server := httpserver.New(&cfg.HTTP, authSvc, userSvc, cryptSvc, hostSvc, userValidator.New(), authValidator.New(), hostValidator.New())
+	server := httpserver.New(
+		&cfg.HTTP,
+		authSvc,
+		userSvc,
+		cryptSvc,
+		hostSvc,
+		userValidator.New(),
+		authValidator.New(),
+		hostValidator.New(),
+	)
 
 	go func() {
 		server.Serve()
