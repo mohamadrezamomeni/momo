@@ -7,4 +7,5 @@ import (
 
 func (h *Handler) SetRouter(v1 *echo.Group) {
 	v1.POST("/vpns", h.CreateVPN, middleware.AccessCheck(h.authSvc, true))
+	v1.GET("/vpns", h.Filter, middleware.AccessCheck(h.authSvc, true))
 }

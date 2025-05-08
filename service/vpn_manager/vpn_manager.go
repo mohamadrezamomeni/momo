@@ -68,6 +68,13 @@ func (v *VPNService) MonitorVPNs() {
 	}
 }
 
+func (v *VPNService) Filter(vpnFilterDto *vpnServiceDto.FilterVPNs) ([]*entity.VPN, error) {
+	return v.vpnRepo.Filter(&vpnManagerRepositoryDto.FilterVPNs{
+		Domain:  vpnFilterDto.Domain,
+		VPNType: vpnFilterDto.VPNType,
+	})
+}
+
 func (v *VPNService) MakeProxy() (adapter.ProxyVPN, error) {
 	vpns, err := v.load()
 	if err != nil {

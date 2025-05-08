@@ -36,3 +36,35 @@ func TestCreateVPN(t *testing.T) {
 		t.Error("we expected we would get err but we got nothing")
 	}
 }
+
+func TestValidateFilter(t *testing.T) {
+	err := validator.ValidateFilterVPNs(vpnControllerDto.FilterVPNs{
+		Domain:  "twitter.com",
+		VPNType: "xray",
+	})
+	if err != nil {
+		t.Errorf("something went wrong that was %v", err)
+	}
+	err = validator.ValidateFilterVPNs(vpnControllerDto.FilterVPNs{
+		VPNType: "xray",
+	})
+	if err != nil {
+		t.Errorf("something went wrong that was %v", err)
+	}
+	err = validator.ValidateFilterVPNs(vpnControllerDto.FilterVPNs{})
+	if err != nil {
+		t.Errorf("something went wrong that was %v", err)
+	}
+	err = validator.ValidateFilterVPNs(vpnControllerDto.FilterVPNs{
+		Domain: "twitter.com",
+	})
+	if err != nil {
+		t.Errorf("something went wrong that was %v", err)
+	}
+	err = validator.ValidateFilterVPNs(vpnControllerDto.FilterVPNs{
+		Domain: "fggggg",
+	})
+	if err == nil {
+		t.Errorf("something went wrong that was %v", err)
+	}
+}
