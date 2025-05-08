@@ -3,14 +3,16 @@ package vpnmanager
 import (
 	"github.com/mohamadrezamomeni/momo/adapter"
 	vpnProxyDto "github.com/mohamadrezamomeni/momo/dto/proxy/vpn"
-	vpnManagerDto "github.com/mohamadrezamomeni/momo/dto/repository/vpn_manager"
+	vpnManagerRepositoryDto "github.com/mohamadrezamomeni/momo/dto/repository/vpn_manager"
+	vpnServiceDto "github.com/mohamadrezamomeni/momo/dto/service/vpn"
 	"github.com/mohamadrezamomeni/momo/entity"
 )
 
 type VPNRepo interface {
-	Filter(*vpnManagerDto.FilterVPNs) ([]*entity.VPN, error)
+	Filter(*vpnManagerRepositoryDto.FilterVPNs) ([]*entity.VPN, error)
 	ActiveVPN(int) error
 	DeactiveVPN(int) error
+	Create(*vpnManagerRepositoryDto.AddVPN) (*entity.VPN, error)
 }
 
 type AdaptedVPNProxy func(adapterConfigs []*adapter.AdapterVPnProxyigFactoryConfig) adapter.ProxyVPN
@@ -25,6 +27,16 @@ func New(repo VPNRepo, adaptedVPNProxy AdaptedVPNProxy) *VPNService {
 		vpnRepo:         repo,
 		adaptedVPNProxy: adaptedVPNProxy,
 	}
+}
+
+func (v *VPNService) Create(createVPNDto *vpnServiceDto.CreateVPN) (*entity.VPN, error) {
+	return v.vpnRepo.Create(&vpnManagerRepositoryDto.AddVPN{
+		ApiPort:   createVPNDto.Port,
+		VPNType:   createVPNDto.VpnType,
+		Domain:    createVPNDto.Domain,
+		IsActive:  false,
+		UserCount: createVPNDto.UserCount,
+	})
 }
 
 func (v *VPNService) MonitorVPNs() {
@@ -76,7 +88,7 @@ func (v *VPNService) MakeProxy() (adapter.ProxyVPN, error) {
 }
 
 func (v *VPNService) load() ([]*entity.VPN, error) {
-	vpns, err := v.vpnRepo.Filter(&vpnManagerDto.FilterVPNs{})
+	vpns, err := v.vpnRepo.Filter(&vpnManagerRepositoryDto.FilterVPNs{})
 	if err != nil {
 		return nil, err
 	}
