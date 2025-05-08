@@ -130,7 +130,6 @@ func (v *VPN) Filter(inpt *vpnManagerDto.FilterVPNs) ([]*entity.VPN, error) {
 
 func (v *VPN) makeSQlFilter(inpt *vpnManagerDto.FilterVPNs) string {
 	sql := "SELECT * FROM vpns"
-
 	val := reflect.ValueOf(*inpt)
 	t := reflect.TypeOf(*inpt)
 	subQueries := make([]string, 0)
@@ -151,5 +150,6 @@ func (v *VPN) makeSQlFilter(inpt *vpnManagerDto.FilterVPNs) string {
 	if len(joinSQL) > 0 {
 		sql += fmt.Sprintf(" WHERE %s", joinSQL)
 	}
+	fmt.Println(sql)
 	return sql
 }
