@@ -2,6 +2,7 @@ package auth
 
 import (
 	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -45,8 +46,10 @@ func (a *Auth) DecodeToken(tokenString string) (*Claim, bool, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &EncryptedClaim{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(a.config.SecretKey), nil
 	})
-	if err != nil {
-		return nil, false, momoError.Wrap(err).Scope(scope).Errorf("error to marshal claim the input is %s", tokenString)
+	if err != nil && errors.Is(err, jwt.ErrTokenExpired) {
+		return nil, false, nil
+	} else if err != nil {
+		return nil, false, momoError.Wrap(err).Scope(scope).Input(tokenString).ErrorWrite()
 	}
 	encryptedClaim, ok := token.Claims.(*EncryptedClaim)
 
