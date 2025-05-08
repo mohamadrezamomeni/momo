@@ -75,8 +75,8 @@ func New(
 	}
 }
 
-func (i *Inbound) Create(inpt *dto.CreateInbound) error {
-	_, err := i.inboundRepo.Create(&inboundRepoDto.CreateInbound{
+func (i *Inbound) Create(inpt *dto.CreateInbound) (*entity.Inbound, error) {
+	inboundCreated, err := i.inboundRepo.Create(&inboundRepoDto.CreateInbound{
 		Tag:      fmt.Sprintf("inbound-%s", uuid.New().String()),
 		Port:     "",
 		Domain:   "",
@@ -88,9 +88,9 @@ func (i *Inbound) Create(inpt *dto.CreateInbound) error {
 		VPNType:  inpt.VPNType,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return inboundCreated, nil
 }
 
 func (i *Inbound) AssignDomainToInbounds() {
