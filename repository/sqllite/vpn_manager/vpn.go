@@ -140,7 +140,7 @@ func (v *VPN) makeSQlFilter(inpt *vpnManagerDto.FilterVPNs) string {
 		if v.Kind() == reflect.Pointer && !v.IsNil() && v.Elem().Kind() == reflect.Bool && field.Name == "IsActive" {
 			subQueries = append(subQueries, fmt.Sprintf("is_active = %v", v.Elem().Bool()))
 		} else if v.Kind() == reflect.String && v.String() != "" && field.Name == "Domain" {
-			subQueries = append(subQueries, fmt.Sprintf("domain = '%s'", v.String()))
+			subQueries = append(subQueries, fmt.Sprintf("domain LIKE  '%%%s%%'", v.String()))
 		} else if field.Name == "VPNType" && v.Int() != 0 {
 			subQueries = append(subQueries, fmt.Sprintf("vpn_type = '%s'", entity.VPNTypeString(int(v.Int()))))
 		}
