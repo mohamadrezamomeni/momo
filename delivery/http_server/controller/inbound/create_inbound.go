@@ -7,6 +7,7 @@ import (
 	inboundControllerDto "github.com/mohamadrezamomeni/momo/dto/controller/inbound"
 	"github.com/mohamadrezamomeni/momo/dto/service/inbound"
 	"github.com/mohamadrezamomeni/momo/entity"
+	inboundSerializer "github.com/mohamadrezamomeni/momo/serializer/inbound"
 	timeTransformer "github.com/mohamadrezamomeni/momo/transformer/time"
 )
 
@@ -28,7 +29,7 @@ func (h *Handler) CreateInbound(c echo.Context) error {
 
 	startTime, _ := timeTransformer.ConvertStrToTime(req.Start)
 	endTime, _ := timeTransformer.ConvertStrToTime(req.End)
-	_, err = h.inboundSvc.Create(&inbound.CreateInbound{
+	inboundCreated, err := h.inboundSvc.Create(&inbound.CreateInbound{
 		UserID:     req.UserID,
 		Start:      startTime,
 		End:        endTime,
@@ -41,5 +42,7 @@ func (h *Handler) CreateInbound(c echo.Context) error {
 		})
 	}
 
-	return c.NoContent(http.StatusNoContent)
+	return c.JSON(http.StatusAccepted, &inboundSerializer.CredateInboundSerializer{
+		ID: inboundCreated.ID,
+	})
 }
