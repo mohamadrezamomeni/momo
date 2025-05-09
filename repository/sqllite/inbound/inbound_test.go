@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	inboundDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
+	"github.com/mohamadrezamomeni/momo/pkg/utils"
 	"github.com/mohamadrezamomeni/momo/repository/migrate"
 	"github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
@@ -257,5 +258,43 @@ func TestUnBlock(t *testing.T) {
 
 	if inboundFound.IsBlock {
 		t.Fatal("inbound that is founded must be blocked")
+	}
+}
+
+func TestUpdate(t *testing.T) {
+	defer inboundRepo.DeleteAll()
+	inboundCreated, _ := inboundRepo.Create(inbound1)
+
+	err := inboundRepo.Update(strconv.Itoa(inboundCreated.ID), &inboundDto.UpdateInboundDto{
+		Start: utils.GetDateTime("2026-04-21 14:30:00"),
+		End:   utils.GetDateTime("2026-04-22 14:30:00"),
+	})
+	if err != nil {
+		t.Fatalf("the error was %v", err)
+	}
+
+	inboundFound, _ := inboundRepo.FindInboundByID(inboundCreated.ID)
+
+	if inboundFound.Start != utils.GetDateTime("2026-04-21 14:30:00") {
+		t.Errorf("we expected start be %s", inboundFound.Start.Format("2006-01-02 15:04:05"))
+	}
+
+	if inboundFound.End != utils.GetDateTime("2026-04-22 14:30:00") {
+		t.Errorf("we expected start be %s", inboundFound.End.Format("2006-01-02 15:04:05"))
+	}
+
+	inboundCreated, _ = inboundRepo.Create(inbound2)
+
+	err = inboundRepo.Update(strconv.Itoa(inboundCreated.ID), &inboundDto.UpdateInboundDto{
+		Start: utils.GetDateTime("2026-04-21 14:30:00"),
+	})
+	if err != nil {
+		t.Fatalf("the error was %v", err)
+	}
+
+	inboundFound, _ = inboundRepo.FindInboundByID(inboundCreated.ID)
+
+	if inboundFound.Start != utils.GetDateTime("2026-04-21 14:30:00") {
+		t.Errorf("we expected start be %s", inboundFound.Start.Format("2006-01-02 15:04:05"))
 	}
 }

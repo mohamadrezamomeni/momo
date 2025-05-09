@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	inboundControllerDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
 	inboundDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
 	"github.com/mohamadrezamomeni/momo/entity"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
@@ -337,6 +338,38 @@ func (i *Inbound) ChangeBlockState(id string, state bool) error {
 		state,
 		id,
 	)
+	result, err := i.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
+	}
+	if rows, err := result.RowsAffected(); err != nil || rows == 0 {
+		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
+	}
+	return nil
+}
+
+func (i *Inbound) Update(id string, inpt *inboundControllerDto.UpdateInboundDto) error {
+	scope := "inboundRepository.Update"
+
+	subUpdates := []string{}
+	if !inpt.Start.IsZero() {
+		subUpdates = append(subUpdates, fmt.Sprintf("start = '%s'", inpt.Start.Format("2006-01-02 15:04:05")))
+	}
+
+	if !inpt.End.IsZero() {
+		subUpdates = append(subUpdates, fmt.Sprintf("end = '%s'", inpt.End.Format("2006-01-02 15:04:05")))
+	}
+
+	if len(subUpdates) == 0 {
+		return momoError.Scope(scope).Input(inpt, id).UnExpected().DebuggingError()
+	}
+
+	sql := fmt.Sprintf(
+		"UPDATE inbounds SET %s WHERE id = %s",
+		strings.Join(subUpdates, ", "),
+		id,
+	)
+
 	result, err := i.db.Conn().Exec(sql)
 	if err != nil {
 		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
