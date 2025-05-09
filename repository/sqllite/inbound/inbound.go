@@ -326,9 +326,12 @@ func (i *Inbound) Block(id string) error {
 		"UPDATE inbounds SET is_block = true WHERE id = %s",
 		id,
 	)
-	_, err := i.db.Conn().Exec(sql)
+	result, err := i.db.Conn().Exec(sql)
 	if err != nil {
 		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
+	}
+	if rows, err := result.RowsAffected(); err != nil || rows == 0 {
+		return momoError.Wrap(err).Scope(scope).Input(id)
 	}
 	return nil
 }
@@ -340,9 +343,12 @@ func (i *Inbound) UnBlock(id string) error {
 		"UPDATE inbounds SET is_block = false WHERE id = %s",
 		id,
 	)
-	_, err := i.db.Conn().Exec(sql)
+	result, err := i.db.Conn().Exec(sql)
 	if err != nil {
 		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
+	}
+	if rows, err := result.RowsAffected(); err != nil || rows == 0 {
+		return momoError.Wrap(err).Scope(scope).Input(id)
 	}
 	return nil
 }
