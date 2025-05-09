@@ -318,3 +318,17 @@ func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
 	inbound.VPNType = entity.ConvertStringVPNTypeToEnum(vpnType)
 	return inbound, nil
 }
+
+func (i *Inbound) Block(id string) error {
+	scope := "inboundRepository.Block"
+
+	sql := fmt.Sprintf(
+		"UPDATE inbounds SET is_block = true WHERE id = %s",
+		id,
+	)
+	_, err := i.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
+	}
+	return nil
+}

@@ -227,3 +227,19 @@ func TestGetListOfPortsByDomain(t *testing.T) {
 		t.Fatalf("output was wrong.")
 	}
 }
+
+func TestBlock(t *testing.T) {
+	inboundCreated, _ := inboundRepo.Create(inbound1)
+	defer inboundRepo.DeleteAll()
+
+	err := inboundRepo.Block(string(inboundCreated.ID))
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	inboundFound, _ := inboundRepo.FindInboundByID(inboundCreated.ID)
+
+	if !inboundFound.IsBlock {
+		t.Fatal("inbound that is founded must be blocked")
+	}
+}
