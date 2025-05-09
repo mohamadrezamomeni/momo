@@ -96,3 +96,29 @@ func TestCreatingInbound(t *testing.T) {
 		t.Errorf("domain could be validated")
 	}
 }
+
+func TestValidateFilteringInbounds(t *testing.T) {
+	err := validator.ValidateFilteringInbounds(inbound.FilterInboundsDto{})
+	if err != nil {
+		t.Errorf("we exptected not errors that  was %v", err)
+	}
+	err = validator.ValidateFilteringInbounds(inbound.FilterInboundsDto{Domain: "tww"})
+	if err == nil {
+		t.Errorf("we exptected errors")
+	}
+
+	err = validator.ValidateFilteringInbounds(inbound.FilterInboundsDto{Port: "21f"})
+	if err == nil {
+		t.Errorf("we exptected errors")
+	}
+
+	err = validator.ValidateFilteringInbounds(inbound.FilterInboundsDto{UserID: "asdfad-234"})
+	if err == nil {
+		t.Errorf("we exptected errors")
+	}
+
+	err = validator.ValidateFilteringInbounds(inbound.FilterInboundsDto{VPNType: "xrayy"})
+	if err == nil {
+		t.Errorf("we exptected errors")
+	}
+}

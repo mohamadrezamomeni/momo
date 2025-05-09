@@ -68,6 +68,7 @@ func TestFilterInbounds(t *testing.T) {
 	inboundRepo.Create(inbound3)
 	inboundRepo.Create(inbound4)
 
+	defer inboundRepo.DeleteAll()
 	inbounds, err := inboundRepo.Filter(&inboundDto.FilterInbound{Port: port2})
 	if err != nil {
 		t.Errorf("1. the problem has occured that is %v", err)
@@ -109,7 +110,10 @@ func TestFilterInbounds(t *testing.T) {
 		t.Errorf("5. the number of items must be %v but got %v items", 1, len(inbounds))
 	}
 
-	inboundRepo.DeleteAll()
+	inbounds, err = inboundRepo.Filter(&inboundDto.FilterInbound{Port: port2})
+	if err != nil {
+		t.Errorf("1. the problem has occured that is %v", err)
+	}
 }
 
 func TestRertriveFaultyInbounds(t *testing.T) {

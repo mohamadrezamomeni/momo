@@ -263,6 +263,11 @@ func (i *Inbound) getInfo(inbound *entity.Inbound) (*vpnProxyDto.Inbound, error)
 	return info, nil
 }
 
-func (i *Inbound) Filter() ([]*entity.Inbound, error) {
-	return i.inboundRepo.Filter(&inboundRepoDto.FilterInbound{})
+func (i *Inbound) Filter(inpt *dto.FilterInbounds) ([]*entity.Inbound, error) {
+	return i.inboundRepo.Filter(&inboundRepoDto.FilterInbound{
+		Domain:  inpt.Domain,
+		Port:    inpt.Port,
+		VPNType: inpt.VPNType,
+		UserID:  inpt.UserID,
+	})
 }

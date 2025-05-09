@@ -150,6 +150,5 @@ func (v *VPN) makeSQlFilter(inpt *vpnManagerDto.FilterVPNs) string {
 	if len(joinSQL) > 0 {
 		sql += fmt.Sprintf(" WHERE %s", joinSQL)
 	}
-	fmt.Println(sql)
 	return sql
 }

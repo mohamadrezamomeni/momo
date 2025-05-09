@@ -180,7 +180,6 @@ func (i *Inbound) Filter(inpt *inboundDto.FilterInbound) ([]*entity.Inbound, err
 	scope := "inboundRepository.Filter"
 
 	query := i.makeQueryFilter(inpt)
-
 	rows, err := i.db.Conn().Query(query)
 	if err != nil {
 		return nil, momoError.Wrap(err).Scope(scope).DebuggingErrorf("the input is %+v", *inpt)
@@ -224,8 +223,10 @@ func (i *Inbound) makeQueryFilter(inpt *inboundDto.FilterInbound) string {
 		}
 
 	}
-	subQuery := strings.Join(subSQLs, " AND ")
-	sql += fmt.Sprintf(" WHERE %s", subQuery)
+	if len(subSQLs) > 0 {
+		subQuery := strings.Join(subSQLs, " AND ")
+		sql += fmt.Sprintf(" WHERE %s", subQuery)
+	}
 	return sql
 }
 
