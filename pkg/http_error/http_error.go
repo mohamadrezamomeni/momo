@@ -51,6 +51,8 @@ func getMessage(err error) string {
 	switch code {
 	case http.StatusBadRequest:
 		return "input is wrong"
+	case http.StatusNotFound:
+		return "no record found"
 	default:
 		return "something went wrong"
 	}
