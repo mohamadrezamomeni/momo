@@ -21,7 +21,7 @@ func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 	RETURNING id, username, lastName, firstName, is_admin, password, is_super_admin
 `, inpt.Username, inpt.LastName, inpt.FirstName, inpt.Password, inpt.IsAdmin, inpt.IsSuperAdmin).Scan(&user.ID, &user.Username, &user.LastName, &user.FirstName, &user.IsAdmin, &user.Password, &user.IsSuperAdmin)
 	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *inpt)
+		return nil, momoError.Wrap(err).Scope(scope).Input(inpt).DebuggingError()
 	}
 
 	return user, nil
@@ -40,9 +40,22 @@ func (u *User) Upsert(inpt *dto.Create) (*entity.User, error) {
 		lastname = excluded.lastname,
 		is_admin = excluded.is_admin
 	RETURNING id, username, lastName, firstName, is_admin, password, is_super_admin
-`, inpt.Username, inpt.LastName, inpt.FirstName, inpt.Password, inpt.IsAdmin, inpt.IsSuperAdmin).Scan(&user.ID, &user.Username, &user.LastName, &user.FirstName, &user.IsAdmin, &user.Password, &user.IsSuperAdmin)
+`, inpt.Username,
+		inpt.LastName,
+		inpt.FirstName,
+		inpt.Password,
+		inpt.IsAdmin,
+		inpt.IsSuperAdmin,
+	).Scan(&user.ID,
+		&user.Username,
+		&user.LastName,
+		&user.FirstName,
+		&user.IsAdmin,
+		&user.Password,
+		&user.IsSuperAdmin,
+	)
 	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *inpt)
+		return nil, momoError.Wrap(err).Scope(scope).Input(inpt).DebuggingError()
 	}
 
 	return user, nil
@@ -54,16 +67,16 @@ func (u *User) Delete(id string) error {
 	sql := fmt.Sprintf("DELETE FROM users WHERE id='%s'", id)
 	res, err := u.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d", id)
+		return momoError.Wrap(err).Scope(scope).Input(id).DebuggingError()
 	}
 
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d", id)
+		return momoError.Wrap(err).Scope(scope).Input(id).DebuggingError()
 	}
 
 	if rowsAffected == 0 {
-		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d, no row is affected", id)
+		return momoError.Wrap(err).Scope(scope).Input(id).DebuggingError()
 	}
 	return nil
 }
@@ -73,16 +86,16 @@ func (u *User) DeleteByUsername(username string) error {
 	sql := fmt.Sprintf("DELETE FROM users WHERE username='%s'", username)
 	res, err := u.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d", username)
+		return momoError.Wrap(err).Scope(scope).Input(username).UnExpected().DebuggingError()
 	}
 
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d", username)
+		return momoError.Wrap(err).Scope(scope).Input(username).UnExpected().DebuggingError()
 	}
 
 	if rowsAffected == 0 {
-		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d, no row is affected", username)
+		return momoError.Wrap(err).Scope(scope).Input(username).UnExpected().DebuggingError()
 	}
 	return nil
 }
@@ -114,7 +127,7 @@ func (u *User) FilterUsers(q *dto.FilterUsers) ([]*entity.User, error) {
 
 	rows, err := u.db.Conn().Query(query)
 	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *q)
+		return nil, momoError.Wrap(err).Scope(scope).Input(q).UnExpected().DebuggingError()
 	}
 	users := []*entity.User{}
 	for rows.Next() {
@@ -123,7 +136,7 @@ func (u *User) FilterUsers(q *dto.FilterUsers) ([]*entity.User, error) {
 		var createdAt interface{}
 		err = rows.Scan(&user.ID, &user.Username, &createdAt, &user.LastName, &user.FirstName, &user.Password, &user.IsAdmin, &user.IsSuperAdmin)
 		if err != nil {
-			return nil, momoError.Wrap(err).Scope(scope).Errorf("error to scan data, the input is %+v", *q)
+			return nil, momoError.Wrap(err).Scope(scope).Input(q).UnExpected().DebuggingError()
 		}
 		users = append(users, user)
 	}
@@ -143,7 +156,7 @@ func (u *User) generateFilterUserQuery(q *dto.FilterUsers) (string, error) {
 		field := t.Field(i)
 		value := v.Field(i)
 		if k := value.Kind(); k != reflect.String {
-			return "", momoError.Scope(scope).Errorf("error to scan data, the input is %+v", *q)
+			return "", momoError.Scope(scope).Input(q).UnExpected().DebuggingError()
 		}
 		v := value.String()
 
@@ -190,9 +203,9 @@ func (u *User) findUser(key string, value string) (*entity.User, error) {
 		return user, nil
 	}
 	if err == sql.ErrNoRows {
-		return nil, momoError.Wrap(err).Scope(scope).Errorf("the key is %s and value is %s", key, value)
+		return nil, momoError.Wrap(err).Scope(scope).Input(key, value).NotFound().DebuggingError()
 	}
-	return nil, momoError.Wrap(err).Scope(scope).Errorf("the key is %s and value is %s", key, value)
+	return nil, momoError.Wrap(err).Scope(scope).Input(key, value).UnExpected().DebuggingError()
 }
 
 func (u *User) DeletePreviousSuperAdmins() error {
@@ -200,12 +213,12 @@ func (u *User) DeletePreviousSuperAdmins() error {
 
 	res, err := u.db.Conn().Exec("DELETE FROM users WHERE is_super_admin=true")
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).ErrorWrite()
+		return momoError.Wrap(err).Scope(scope).UnExpected().DebuggingError()
 	}
 
 	_, err = res.RowsAffected()
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).ErrorWrite()
+		return momoError.Wrap(err).Scope(scope).UnExpected().DebuggingError()
 	}
 
 	return nil

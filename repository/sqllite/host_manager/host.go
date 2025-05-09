@@ -24,7 +24,7 @@ func (h *Host) Create(inpt *hostmanagerDto.AddHost) (*entity.Host, error) {
 	RETURNING id
 `, host.Domain, host.Port, entity.HostStatusString(host.Status), inpt.Rank).Scan(&host.ID)
 	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *inpt)
+		return nil, momoError.Wrap(err).Input(inpt).UnExpected().Scope(scope).DebuggingError()
 	}
 
 	return host, nil
@@ -49,7 +49,7 @@ func (h *Host) FindByID(id int) (*entity.Host, error) {
 		&updatedAt,
 	)
 	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Errorf("the id is %d", id)
+		return nil, momoError.Wrap(err).Input(id).UnExpected().Scope(scope).DebuggingError()
 	}
 	status, er := entity.MapHostStatusToEnum(hostStatusString)
 	if err != nil {
@@ -70,7 +70,7 @@ func (h *Host) Update(id int, inpt *hostmanagerDto.UpdateHost) error {
 	)
 	_, err := h.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d and data is %+v", id, *inpt)
+		return momoError.Wrap(err).Input(inpt, id).Scope(scope).DebuggingError()
 	}
 	return nil
 }
@@ -81,16 +81,16 @@ func (h *Host) Delete(id int) error {
 	sql := fmt.Sprintf("DELETE FROM hosts WHERE id=%v", id)
 	res, err := h.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).DebuggingErrorf("the id is %d", id)
+		return momoError.Wrap(err).Scope(scope).Input(id).UnExpected().DebuggingError()
 	}
 
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d", id)
+		return momoError.Wrap(err).Scope(scope).Input(id).UnExpected().DebuggingError()
 	}
 
 	if rowsAffected == 0 {
-		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d, no row is deleted", id)
+		return momoError.Wrap(err).Scope(scope).Input(id).UnExpected().DebuggingError()
 	}
 	return nil
 }
@@ -106,7 +106,7 @@ func (h *Host) DeleteAll() error {
 
 	_, err = res.RowsAffected()
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).ErrorWrite()
+		return momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
 	}
 
 	return nil
@@ -118,7 +118,7 @@ func (h *Host) Filter(inpt *hostmanagerDto.FilterHosts) ([]*entity.Host, error) 
 	query := h.makeQuery(inpt)
 	rows, err := h.db.Conn().Query(query)
 	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).DebuggingError()
+		return nil, momoError.Wrap(err).Scope(scope).Input(inpt).UnExpected().DebuggingError()
 	}
 
 	hosts := make([]*entity.Host, 0)
@@ -126,7 +126,7 @@ func (h *Host) Filter(inpt *hostmanagerDto.FilterHosts) ([]*entity.Host, error) 
 	for rows.Next() {
 		host, err := h.scan(rows)
 		if err != nil {
-			return nil, momoError.Wrap(err).Scope(scope).DebuggingErrorf("error to get row")
+			return nil, momoError.Wrap(err).Scope(scope).Input(inpt).UnExpected().DebuggingError()
 		}
 		hosts = append(hosts, host)
 	}
@@ -175,7 +175,7 @@ func (i *Host) scan(rows *sql.Rows) (*entity.Host, error) {
 		&updatedAt,
 	)
 	if err != nil {
-		return host, momoError.Wrap(err).Scope(scope).DebuggingErrorf("error to get row")
+		return host, momoError.Wrap(err).Scope(scope).Input(rows).UnExpected().DebuggingError()
 	}
 	status, er := entity.MapHostStatusToEnum(hostStatusString)
 	if err != nil {

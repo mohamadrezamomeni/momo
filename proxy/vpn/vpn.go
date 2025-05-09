@@ -88,7 +88,7 @@ func (p *ProxyVPN) AddInbound(inpt *proxyVpnDto.Inbound) error {
 
 	v := p.retriveVPN(inpt.Address, inpt.VPNType)
 	if v == nil {
-		return momoError.Scope(scope).DebuggingErrorf("the result wasn't found the input is %+v", inpt)
+		return momoError.Scope(scope).Input(inpt).DebuggingError()
 	}
 	return v.Add(inpt)
 }
@@ -98,7 +98,7 @@ func (p *ProxyVPN) DisableInbound(inpt *proxyVpnDto.Inbound) error {
 
 	v := p.retriveVPN(inpt.Address, inpt.VPNType)
 	if v == nil {
-		return momoError.Scope(scope).DebuggingErrorf("the result wasn't found the input is %+v", inpt)
+		return momoError.Scope(scope).Input(inpt).DebuggingError()
 	}
 	return v.Disable(inpt)
 }
@@ -108,7 +108,7 @@ func (p *ProxyVPN) GetTraffic(inpt *proxyVpnDto.Inbound) (*vpnSerializer.Traffic
 
 	v := p.retriveVPN(inpt.Address, inpt.VPNType)
 	if v == nil {
-		return nil, momoError.Scope(scope).DebuggingErrorf("the result wasn't found the input is %+v", inpt)
+		return nil, momoError.Scope(scope).Input(inpt).DebuggingError()
 	}
 	return v.GetTraffic(inpt)
 }
@@ -118,7 +118,7 @@ func (p *ProxyVPN) Test(inpt *proxyVpnDto.Monitor) error {
 
 	v := p.retriveVPN(inpt.Address, inpt.VPNType)
 	if v == nil {
-		return momoError.Scope(scope).DebuggingErrorf("the result wasn't found the input is %+v", inpt)
+		return momoError.Scope(scope).Input(inpt).DebuggingError()
 	}
 	return v.Test()
 }

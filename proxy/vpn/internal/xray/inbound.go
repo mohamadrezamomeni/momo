@@ -27,14 +27,14 @@ func (x *Xray) addInbound(inpt *dto.AddInbound) (*serializer.AddInboundSerialize
 	scope := "xrayProxy.addInbound"
 	port, err := utils.ConvertToUint16(inpt.Port)
 	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).ErrorWrite()
+		return nil, momoError.Wrap(err).Scope(scope).Input(inpt).ErrorWrite()
 	}
 
 	users := make([]*protocol.User, 0)
 	if inpt.User != nil {
 		level, err := utils.ConvertToUint32(inpt.User.Level)
 		if err != nil {
-			return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", inpt)
+			return nil, momoError.Wrap(err).Scope(scope).Input(inpt).ErrorWrite()
 		}
 		user := &protocol.User{
 			Level: level,
@@ -68,7 +68,7 @@ func (x *Xray) addInbound(inpt *dto.AddInbound) (*serializer.AddInboundSerialize
 
 	_, err = x.hsClient.AddInbound(context.Background(), addInboundRequest)
 	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", inpt)
+		return nil, momoError.Wrap(err).Scope(scope).Input(inpt).ErrorWrite()
 	}
 	return &serializer.AddInboundSerializer{}, nil
 }
@@ -87,7 +87,7 @@ func (x *Xray) removeInbound(inpt *dto.RemoveInbound) (*serializer.RemoveInbound
 		Tag: inpt.Tag,
 	})
 	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", inpt)
+		return nil, momoError.Wrap(err).Scope(scope).Input(inpt).ErrorWrite()
 	}
 	return &serializer.RemoveInbound{}, err
 }
@@ -119,15 +119,15 @@ func (x *Xray) receiveInboundTraffic(tag string, reset bool) (*serializer.Receiv
 	})
 	stats := resp.GetStat()
 	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Errorf("the tag is %s and reset is %v", tag, reset)
+		return nil, momoError.Wrap(err).Scope(scope).Input(tag, reset).ErrorWrite()
 	}
 	if len(stats) == 0 {
-		return nil, momoError.Scope(scope).Errorf("the tag is %s and reset is %v", tag, reset)
+		return nil, momoError.Scope(scope).Input(tag, reset).ErrorWrite()
 	}
 
 	data, err := x.convertStatsToMap(stats)
 	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Errorf("the tag is %s and reset is %v", tag, reset)
+		return nil, momoError.Wrap(err).Scope(scope).Input(tag, reset).ErrorWrite()
 	}
 
 	return &serializer.ReceiveInboundTraffic{
@@ -146,7 +146,7 @@ func (x *Xray) convertStatsToMap(stats []*statsService.Stat) (map[string]int64, 
 		} else if strings.Contains(stat.Name, "downlink") {
 			res["downlink"] = x.getValStat(stat)
 		} else {
-			return map[string]int64{}, momoError.Scope(scope).Errorf("the input is %+v", stats)
+			return map[string]int64{}, momoError.Scope(scope).Input(stats).ErrorWrite()
 		}
 	}
 	return res, nil

@@ -18,7 +18,7 @@ func (pw *ProxyWorker) GetAvailablePorts(requestNumberOfPorts uint32, portsUsed 
 		PortsUsed:           portsUsed,
 	})
 	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Errorf(
+		return nil, momoError.Wrap(err).Scope(scope).Input(requestNumberOfPorts, portsUsed).Errorf(
 			"the requiestNumberOfPorts is %d and portsUsed is %+v and address of worker is %s",
 			requestNumberOfPorts,
 			portsUsed,

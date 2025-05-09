@@ -28,7 +28,7 @@ func (v *VPN) Create(inpt *vpnManagerDto.AddVPN) (*entity.VPN, error) {
 		&vpn.ID,
 	)
 	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *inpt)
+		return nil, momoError.Wrap(err).Scope(scope).Input(inpt).DebuggingError()
 	}
 	return vpn, nil
 }
@@ -39,15 +39,15 @@ func (i *VPN) Delete(id int) error {
 	sql := fmt.Sprintf("DELETE FROM vpns WHERE id = %v", id)
 	res, err := i.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d", id)
+		return momoError.Wrap(err).Scope(scope).Input(id).DebuggingError()
 	}
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d", id)
+		return momoError.Wrap(err).Scope(scope).Input(id).DebuggingError()
 	}
 
 	if rowsAffected == 0 {
-		return momoError.Wrap(err).Scope(scope).Errorf("no row is affected", id)
+		return momoError.Wrap(err).Scope(scope).Input(id).DebuggingError()
 	}
 	return nil
 }
@@ -83,7 +83,7 @@ func (v *VPN) updateActivationVPN(id int, status bool) error {
 
 	_, err := v.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Errorf("the id is %d and the status is %v", id, status)
+		return momoError.Wrap(err).Scope(scope).Input(id, status).DebuggingError()
 	}
 	return nil
 }
@@ -94,7 +94,7 @@ func (v *VPN) Filter(inpt *vpnManagerDto.FilterVPNs) ([]*entity.VPN, error) {
 	query := v.makeSQlFilter(inpt)
 	rows, err := v.db.Conn().Query(query)
 	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *inpt)
+		return nil, momoError.Wrap(err).Scope(scope).Input(inpt).DebuggingError()
 	}
 
 	vpns := make([]*entity.VPN, 0)
@@ -114,12 +114,12 @@ func (v *VPN) Filter(inpt *vpnManagerDto.FilterVPNs) ([]*entity.VPN, error) {
 			&updatedAt,
 		)
 		if err != nil {
-			return nil, momoError.Wrap(err).Scope(scope).Errorf("error to scand data, the input is %+v", *inpt)
+			return nil, momoError.Wrap(err).Scope(scope).Input(inpt).DebuggingError()
 		}
 
 		vpnTypeEnum := entity.ConvertStringVPNTypeToEnum(vpnType)
 		if vpnTypeEnum == entity.UknownVPNType {
-			return nil, momoError.Wrap(err).Scope(scope).Errorf("error to convert vpnType, the input is %+v", *inpt)
+			return nil, momoError.Wrap(err).Scope(scope).Input(inpt, vpnType).DebuggingError()
 		}
 		vpn.VPNType = vpnTypeEnum
 		vpns = append(vpns, vpn)

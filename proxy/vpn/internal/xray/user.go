@@ -20,7 +20,7 @@ func (x *Xray) addUser(inpt *dto.AddUser) error {
 
 	level, err := utils.ConvertToUint32(inpt.Level)
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *inpt)
+		return momoError.Wrap(err).Scope(scope).Input(inpt).ErrorWrite()
 	}
 	_, err = x.hsClient.AlterInbound(context.Background(), &command.AlterInboundRequest{
 		Tag: inpt.Tag,
@@ -47,7 +47,7 @@ func (x *Xray) removeUser(inpt *dto.RemoveUser) error {
 		}),
 	})
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Errorf("the input is %+v", *inpt)
+		return momoError.Wrap(err).Scope(scope).Input(inpt).ErrorWrite()
 	}
 	return err
 }
@@ -59,7 +59,7 @@ func (x *Xray) getUsers(tag string) (*serializer.GetUsers, error) {
 		Tag: tag,
 	})
 	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Errorf("the tag is %s", tag)
+		return nil, momoError.Wrap(err).Scope(scope).Input(tag).ErrorWrite()
 	}
 	usernames := make([]string, 0)
 	for _, user := range res.Users {
