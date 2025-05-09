@@ -2,6 +2,7 @@ package inbound
 
 import (
 	"os"
+	"strconv"
 	"testing"
 
 	inboundDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
@@ -232,7 +233,7 @@ func TestBlock(t *testing.T) {
 	inboundCreated, _ := inboundRepo.Create(inbound1)
 	defer inboundRepo.DeleteAll()
 
-	err := inboundRepo.Block(string(inboundCreated.ID))
+	err := inboundRepo.Block(strconv.Itoa(inboundCreated.ID))
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
 	}
@@ -247,8 +248,7 @@ func TestBlock(t *testing.T) {
 func TestUnBlock(t *testing.T) {
 	inboundCreated, _ := inboundRepo.Create(inbound5)
 	defer inboundRepo.DeleteAll()
-
-	err := inboundRepo.UnBlock(string(inboundCreated.ID))
+	err := inboundRepo.UnBlock(strconv.Itoa(inboundCreated.ID))
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
 	}
