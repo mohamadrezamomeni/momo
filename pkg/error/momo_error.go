@@ -17,6 +17,7 @@ const (
 	UnExpected ErrorType = iota + 1
 	Forbidden
 	BadRequest
+	NotFound
 )
 
 type MomoError struct {
@@ -83,6 +84,11 @@ func (m *MomoError) Message() string {
 
 func (m *MomoError) UnExpected() *MomoError {
 	m.errorType = UnExpected
+	return m
+}
+
+func (m *MomoError) NotFound() *MomoError {
+	m.errorType = NotFound
 	return m
 }
 

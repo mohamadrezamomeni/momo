@@ -49,6 +49,12 @@ func TestErrorType(t *testing.T) {
 		t.Error("error type must be forbidden")
 	}
 
+	e = Scope(scope).NotFound()
+
+	if e.GetErrorType() != NotFound {
+		t.Error("error type must be notfound")
+	}
+
 	e = Scope(scope)
 	if e.GetErrorType() != UnExpected {
 		t.Error("error type must be unexpected")
