@@ -7,6 +7,7 @@ import (
 	hostDto "github.com/mohamadrezamomeni/momo/dto/controller/host"
 	"github.com/mohamadrezamomeni/momo/dto/service/host"
 	"github.com/mohamadrezamomeni/momo/entity"
+	momoErrorHttp "github.com/mohamadrezamomeni/momo/pkg/http_error"
 	hostSerializer "github.com/mohamadrezamomeni/momo/serializer/host"
 	hostTransformer "github.com/mohamadrezamomeni/momo/transformer/host"
 )
@@ -14,23 +15,26 @@ import (
 func (h *Handler) FilterHosts(c echo.Context) error {
 	var req hostDto.FilterHostsDto
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "input was wrong",
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
 		})
 	}
 
 	hostStatuses, err := hostTransformer.TransformStringsToHostStatus(req.Statuses)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "input was wrong",
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
 		})
 	}
 	hosts, err := h.hostSvc.Filter(&host.FilterHosts{
 		Status: hostStatuses,
 	})
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"message": "something went wrong, pleas report the problem",
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
 		})
 	}
 	resp := &hostSerializer.FilterHosts{

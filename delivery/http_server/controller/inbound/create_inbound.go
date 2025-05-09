@@ -7,6 +7,7 @@ import (
 	inboundControllerDto "github.com/mohamadrezamomeni/momo/dto/controller/inbound"
 	"github.com/mohamadrezamomeni/momo/dto/service/inbound"
 	"github.com/mohamadrezamomeni/momo/entity"
+	momoErrorHttp "github.com/mohamadrezamomeni/momo/pkg/http_error"
 	inboundSerializer "github.com/mohamadrezamomeni/momo/serializer/inbound"
 	timeTransformer "github.com/mohamadrezamomeni/momo/transformer/time"
 )
@@ -15,15 +16,17 @@ func (h *Handler) CreateInbound(c echo.Context) error {
 	var req inboundControllerDto.CreateInbound
 
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "the input is Wrong",
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
 		})
 	}
 
 	err := h.validation.ValidateCreatingInbound(req)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "the input is Wrong",
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
 		})
 	}
 
@@ -37,8 +40,9 @@ func (h *Handler) CreateInbound(c echo.Context) error {
 		ServerType: entity.High,
 	})
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"message": "someting went wrong",
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
 		})
 	}
 

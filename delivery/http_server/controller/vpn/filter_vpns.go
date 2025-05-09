@@ -7,21 +7,24 @@ import (
 	vpnControllerDto "github.com/mohamadrezamomeni/momo/dto/controller/vpn"
 	vpnServiceDto "github.com/mohamadrezamomeni/momo/dto/service/vpn"
 	"github.com/mohamadrezamomeni/momo/entity"
+	momoErrorHttp "github.com/mohamadrezamomeni/momo/pkg/http_error"
 	vpnSerializer "github.com/mohamadrezamomeni/momo/serializer/vpn"
 )
 
 func (h *Handler) Filter(c echo.Context) error {
 	var req vpnControllerDto.FilterVPNs
 	if err := c.Bind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "the input was wrong",
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
 		})
 	}
 
 	err := h.validation.ValidateFilterVPNs(req)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "the input was wrong",
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
 		})
 	}
 	vpns, err := h.vpnSvc.Filter(&vpnServiceDto.FilterVPNs{
@@ -29,8 +32,9 @@ func (h *Handler) Filter(c echo.Context) error {
 		VPNType: entity.ConvertStringVPNTypeToEnum(req.VPNType),
 	})
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "the input was wrong",
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
 		})
 	}
 	filterVpnsSerializer := &vpnSerializer.FilterVpnsSerializer{

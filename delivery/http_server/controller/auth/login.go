@@ -6,20 +6,23 @@ import (
 	"github.com/labstack/echo/v4"
 	authControllerDto "github.com/mohamadrezamomeni/momo/dto/controller/auth"
 	authServiceDto "github.com/mohamadrezamomeni/momo/dto/service/auth"
+	momoErrorHttp "github.com/mohamadrezamomeni/momo/pkg/http_error"
 	authSerializer "github.com/mohamadrezamomeni/momo/serializer/auth"
 )
 
 func (h *Handler) Login(c echo.Context) error {
 	var req authControllerDto.Login
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "fields that were given was wrong",
+		message, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": message,
 		})
 	}
 	err := h.validation.LoginValidator(req)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "fields that were given was wrong",
+		message, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": message,
 		})
 	}
 	accessToken, _, err := h.authSvc.Login(&authServiceDto.LoginDto{
@@ -27,8 +30,9 @@ func (h *Handler) Login(c echo.Context) error {
 		Password: req.Password,
 	})
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"message": "someting went wrong",
+		message, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": message,
 		})
 	}
 

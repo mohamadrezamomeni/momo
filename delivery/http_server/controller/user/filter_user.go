@@ -4,14 +4,16 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	momoErrorHttp "github.com/mohamadrezamomeni/momo/pkg/http_error"
 	userSerializer "github.com/mohamadrezamomeni/momo/serializer/user"
 )
 
 func (u *Handler) filterUsers(c echo.Context) error {
 	users, err := u.userSvc.Filter()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"message": "internal server error please try another time",
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
 		})
 	}
 	filterSerializer := &userSerializer.Filter{

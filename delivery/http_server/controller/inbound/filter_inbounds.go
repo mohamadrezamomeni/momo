@@ -7,21 +7,24 @@ import (
 	inboundControllerDto "github.com/mohamadrezamomeni/momo/dto/controller/inbound"
 	inboundServiceDto "github.com/mohamadrezamomeni/momo/dto/service/inbound"
 	"github.com/mohamadrezamomeni/momo/entity"
+	momoErrorHttp "github.com/mohamadrezamomeni/momo/pkg/http_error"
 	inboundSerializer "github.com/mohamadrezamomeni/momo/serializer/inbound"
 )
 
 func (h *Handler) Filter(c echo.Context) error {
 	var req inboundControllerDto.FilterInboundsDto
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "the input was wrong",
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
 		})
 	}
 
 	err := h.validation.ValidateFilteringInbounds(req)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "the input was wrong",
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
 		})
 	}
 	inbounds, err := h.inboundSvc.Filter(&inboundServiceDto.FilterInbounds{
@@ -31,8 +34,9 @@ func (h *Handler) Filter(c echo.Context) error {
 		UserID:  req.UserID,
 	})
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"message": "something went wrong",
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
 		})
 	}
 	res := &inboundSerializer.FilterInboundsSerializer{

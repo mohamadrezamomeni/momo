@@ -7,20 +7,23 @@ import (
 	vpnControllerDto "github.com/mohamadrezamomeni/momo/dto/controller/vpn"
 	vpnServiceDto "github.com/mohamadrezamomeni/momo/dto/service/vpn"
 	"github.com/mohamadrezamomeni/momo/entity"
+	momoErrorHttp "github.com/mohamadrezamomeni/momo/pkg/http_error"
 )
 
 func (h *Handler) CreateVPN(c echo.Context) error {
 	var req vpnControllerDto.CreateVPN
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "the input is not valid",
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
 		})
 	}
 
 	err := h.validation.ValidateCreatingVPN(req)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "the input was wrong",
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
 		})
 	}
 
@@ -30,5 +33,11 @@ func (h *Handler) CreateVPN(c echo.Context) error {
 		Domain:    req.Domain,
 		Port:      req.Port,
 	})
+	if err != nil {
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
+		})
+	}
 	return c.NoContent(http.StatusNoContent)
 }
