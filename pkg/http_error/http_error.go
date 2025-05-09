@@ -44,5 +44,12 @@ func getMessage(err error) string {
 	if len(message) > 0 {
 		return message
 	}
-	return "something went wrong"
+
+	code := getStatus(err)
+	switch code {
+	case http.StatusBadRequest:
+		return "input is wrong"
+	default:
+		return "something went wrong"
+	}
 }
