@@ -14,7 +14,7 @@ func (v *Validation) LoginValidator(req authDto.Login) error {
 		validation.Field(&req.Password, validation.Required, validation.Length(1, 0)),
 	)
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Input(req).ErrorWrite()
+		return momoError.Wrap(err).Scope(scope).Input(req).BadRequest().ErrorWrite()
 	}
 	return nil
 }

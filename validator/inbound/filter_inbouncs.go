@@ -35,17 +35,17 @@ func (v *Validator) ValidateFilteringInbounds(req inboundControllerDto.FilterInb
 
 				v, ok := value.(string)
 				if !ok {
-					return momoError.Scope(scope).Input(req).ErrorWrite()
+					return momoError.Scope(scope).BadRequest().Input(req).ErrorWrite()
 				}
 				if entity.UknownVPNType == entity.ConvertStringVPNTypeToEnum(v) {
-					return momoError.Scope(scope).Input(req).ErrorWrite()
+					return momoError.Scope(scope).BadRequest().Input(req).ErrorWrite()
 				}
 				return nil
 			}),
 		),
 	)
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Input(req).ErrorWrite()
+		return momoError.Wrap(err).Scope(scope).BadRequest().Input(req).ErrorWrite()
 	}
 	return nil
 }

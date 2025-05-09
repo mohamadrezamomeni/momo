@@ -25,7 +25,7 @@ func (v *Validator) CreateHostValidation(req hostDto.CreateHostDto) error {
 		),
 	)
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Input(req).ErrorWrite()
+		return momoError.Wrap(err).Scope(scope).BadRequest().Input(req).ErrorWrite()
 	}
 	return nil
 }

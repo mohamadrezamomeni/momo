@@ -42,7 +42,7 @@ func (v *Validator) ValidateCreatingInbound(req inboundControllerDto.CreateInbou
 					return momoError.Scope(scope).Input(req).ErrorWrite()
 				}
 				if entity.UknownVPNType == entity.ConvertStringVPNTypeToEnum(v) {
-					return momoError.Scope(scope).Input(req).ErrorWrite()
+					return momoError.Scope(scope).Input(req).BadRequest().ErrorWrite()
 				}
 				return nil
 			}),
@@ -53,7 +53,7 @@ func (v *Validator) ValidateCreatingInbound(req inboundControllerDto.CreateInbou
 			validation.By(func(value interface{}) error {
 				s, ok := value.(string)
 				if !ok {
-					return momoError.Scope(scope).Input(req).ErrorWrite()
+					return momoError.Scope(scope).Input(req).BadRequest().ErrorWrite()
 				}
 				startTime, err := timetransfer.ConvertStrToTime(s)
 				if err != nil {
@@ -61,7 +61,7 @@ func (v *Validator) ValidateCreatingInbound(req inboundControllerDto.CreateInbou
 				}
 
 				if !ok {
-					return momoError.Scope(scope).Input(req).ErrorWrite()
+					return momoError.Scope(scope).Input(req).BadRequest().ErrorWrite()
 				}
 				endTime, err := timetransfer.ConvertStrToTime(req.End)
 				if err != nil {
@@ -79,11 +79,11 @@ func (v *Validator) ValidateCreatingInbound(req inboundControllerDto.CreateInbou
 		),
 	)
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Input(req).ErrorWrite()
+		return momoError.Wrap(err).Scope(scope).BadRequest().Input(req).ErrorWrite()
 	}
 	user, err := v.userSvc.FindByID(req.UserID)
 	if err != nil || user == nil {
-		return momoError.Wrap(err).Scope(scope).Input(req).Errorf("error to retrive user")
+		return momoError.Wrap(err).Scope(scope).Input(req).BadRequest().Errorf("error to retrive user")
 	}
 	return nil
 }

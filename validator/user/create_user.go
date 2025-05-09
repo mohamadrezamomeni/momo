@@ -38,7 +38,7 @@ func (v *Validator) ValidateAddUserRequest(data userControllerDto.AddUser) error
 		),
 	)
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Input(data).ErrorWrite()
+		return momoError.Wrap(err).Scope(scope).BadRequest().Input(data).ErrorWrite()
 	}
 	return err
 }

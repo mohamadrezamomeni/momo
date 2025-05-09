@@ -39,7 +39,7 @@ func (v *Validator) ValidateCreatingVPN(req vpnControllerDto.CreateVPN) error {
 		),
 	)
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Input(req).ErrorWrite()
+		return momoError.Wrap(err).BadRequest().Scope(scope).Input(req).ErrorWrite()
 	}
 	return nil
 }
