@@ -28,6 +28,8 @@ func mapMomoErrorTypeToHttpStatus(errType momoError.ErrorType) int {
 		return http.StatusForbidden
 	case momoError.UnExpected:
 		return http.StatusInternalServerError
+	case momoError.NotFound:
+		return http.StatusNotFound
 	default:
 		return http.StatusInternalServerError
 	}
