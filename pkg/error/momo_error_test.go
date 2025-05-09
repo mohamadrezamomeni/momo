@@ -40,3 +40,53 @@ func TestWithoutMainError(t *testing.T) {
 		t.Error("the input message isn't generated well")
 	}
 }
+
+func TestErrorType(t *testing.T) {
+	scope := "test.TestErrorType"
+	e := Scope(scope).Forbidden()
+
+	if e.GetErrorType() != Forbidden {
+		t.Error("error type must be forbidden")
+	}
+
+	e = Scope(scope)
+	if e.GetErrorType() != UnExpected {
+		t.Error("error type must be unexpected")
+	}
+
+	e = Scope(scope).BadRequest()
+	e = Scope(scope).UnExpected()
+	if e.GetErrorType() != UnExpected {
+		t.Error("error type must be unexpected")
+	}
+
+	e = Scope(scope).BadRequest()
+	e = Wrap(e)
+	if e.GetErrorType() != BadRequest {
+		t.Error("error type must be BadRequest")
+	}
+}
+
+func TestMessage(t *testing.T) {
+	scope := "test.TestMessage"
+	message := "hello world"
+	e := Scope(scope).Errorf(message)
+
+	v, _ := e.(*MomoError)
+	if v.Message() != message {
+		t.Errorf("message must be %s but we got %s", message, v.Message())
+	}
+	message2 := "hello another world"
+
+	e1 := Wrap(e).Errorf(message2)
+	v, _ = e1.(*MomoError)
+	if v.Message() != message2 {
+		t.Errorf("message must be %s but we got %s", message2, v.Message())
+	}
+
+	e1 = Wrap(e)
+	v, _ = e1.(*MomoError)
+	if v.Message() != message {
+		t.Errorf("message must be %s but we got %s", message, v.Message())
+	}
+}

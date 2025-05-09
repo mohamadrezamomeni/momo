@@ -11,6 +11,14 @@ import (
 
 const empty = "empty"
 
+type ErrorType = int
+
+const (
+	UnExpected ErrorType = iota + 1
+	Forbidden
+	BadRequest
+)
+
 type MomoError struct {
 	args      []any
 	pattern   string
@@ -18,6 +26,7 @@ type MomoError struct {
 	err       error
 	isPrinted bool
 	input     []any
+	errorType ErrorType
 }
 
 func Scope(scope string) *MomoError {
@@ -39,6 +48,52 @@ func Wrap(err error) *MomoError {
 		err:       err,
 		scope:     fmt.Sprintf("\"%s\"", empty),
 	}
+}
+
+func (m *MomoError) GetErrorType() ErrorType {
+	errorType := m.errorType
+
+	if errorType != 0 {
+		return m.errorType
+	}
+
+	m, ok := m.err.(*MomoError)
+
+	if ok {
+		return m.GetErrorType()
+	}
+
+	return UnExpected
+}
+
+func (m *MomoError) Message() string {
+	message := m.matchPatternAndArgs()
+	if len(message) > 0 {
+		return message
+	}
+
+	m, ok := m.err.(*MomoError)
+
+	if ok {
+		return m.Message()
+	}
+
+	return ""
+}
+
+func (m *MomoError) UnExpected() *MomoError {
+	m.errorType = UnExpected
+	return m
+}
+
+func (m *MomoError) BadRequest() *MomoError {
+	m.errorType = BadRequest
+	return m
+}
+
+func (m *MomoError) Forbidden() *MomoError {
+	m.errorType = Forbidden
+	return m
 }
 
 func (m *MomoError) DeactiveWrite() *MomoError {
@@ -65,18 +120,22 @@ func (m *MomoError) Error() string {
 		message += fmt.Sprintf(` also we got ("%s")`, messageInput)
 	}
 
-	additionlMessage := ""
-
-	if len(m.pattern) > 0 && len(m.args) > 0 {
-		additionlMessage = fmt.Sprintf(m.pattern, m.args...)
-	} else if len(m.pattern) > 0 {
-		additionlMessage = m.pattern
-	}
+	additionlMessage := m.matchPatternAndArgs()
 
 	if len(additionlMessage) > 0 {
 		message += " the additional information is " + `"` + additionlMessage + `"`
 	}
 	return message
+}
+
+func (m *MomoError) matchPatternAndArgs() string {
+	additionlMessage := ""
+	if len(m.pattern) > 0 && len(m.args) > 0 {
+		additionlMessage = fmt.Sprintf(m.pattern, m.args...)
+	} else if len(m.pattern) > 0 {
+		additionlMessage = m.pattern
+	}
+	return additionlMessage
 }
 
 func (m *MomoError) Input(data ...any) *MomoError {
