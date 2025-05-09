@@ -243,3 +243,19 @@ func TestBlock(t *testing.T) {
 		t.Fatal("inbound that is founded must be blocked")
 	}
 }
+
+func TestUnBlock(t *testing.T) {
+	inboundCreated, _ := inboundRepo.Create(inbound5)
+	defer inboundRepo.DeleteAll()
+
+	err := inboundRepo.UnBlock(string(inboundCreated.ID))
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	inboundFound, _ := inboundRepo.FindInboundByID(inboundCreated.ID)
+
+	if inboundFound.IsBlock {
+		t.Fatal("inbound that is founded must be blocked")
+	}
+}

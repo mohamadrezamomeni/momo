@@ -332,3 +332,17 @@ func (i *Inbound) Block(id string) error {
 	}
 	return nil
 }
+
+func (i *Inbound) UnBlock(id string) error {
+	scope := "inboundRepository.Block"
+
+	sql := fmt.Sprintf(
+		"UPDATE inbounds SET is_block = false WHERE id = %s",
+		id,
+	)
+	_, err := i.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
+	}
+	return nil
+}
