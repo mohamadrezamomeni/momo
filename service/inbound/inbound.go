@@ -38,6 +38,7 @@ type InboundRepo interface {
 	UpdateDomainPort(int, string, string) error
 	RetriveFaultyInbounds() ([]*entity.Inbound, error)
 	Active(id int) error
+	Filter(*inboundRepoDto.FilterInbound) ([]*entity.Inbound, error)
 	DeActive(id int) error
 	Create(*inboundRepoDto.CreateInbound) (*entity.Inbound, error)
 	FindInboundIsNotAssigned() ([]*entity.Inbound, error)
@@ -260,4 +261,8 @@ func (i *Inbound) getInfo(inbound *entity.Inbound) (*vpnProxyDto.Inbound, error)
 		Tag:     inbound.Tag,
 	}
 	return info, nil
+}
+
+func (i *Inbound) Filter() ([]*entity.Inbound, error) {
+	return i.inboundRepo.Filter(&inboundRepoDto.FilterInbound{})
 }

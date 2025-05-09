@@ -15,6 +15,7 @@ type Handler struct {
 
 type InboundService interface {
 	Create(*inboundServiceDto.CreateInbound) (*entity.Inbound, error)
+	Filter() ([]*entity.Inbound, error)
 }
 
 func New(inboundSvc InboundService, validation *inboundValidation.Validator, authSvc *authSvc.Auth) *Handler {
