@@ -150,10 +150,6 @@ func (i *MockInbound) UpdateDomainPort(id int, domain string, port string) error
 	return nil
 }
 
-func (i *MockInbound) Block(_ string) error {
-	return nil
-}
-
-func (i *MockInbound) UnBlock(_ string) error {
+func (i *MockInbound) ChangeBlockState(_ string, _ bool) error {
 	return nil
 }

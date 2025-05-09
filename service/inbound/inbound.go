@@ -36,8 +36,7 @@ type UserService interface {
 
 type InboundRepo interface {
 	UpdateDomainPort(int, string, string) error
-	Block(string) error
-	UnBlock(string) error
+	ChangeBlockState(string, bool) error
 	RetriveFaultyInbounds() ([]*entity.Inbound, error)
 	Active(id int) error
 	Filter(*inboundRepoDto.FilterInbound) ([]*entity.Inbound, error)
@@ -275,7 +274,7 @@ func (i *Inbound) Filter(inpt *dto.FilterInbounds) ([]*entity.Inbound, error) {
 }
 
 func (i *Inbound) Block(id string) error {
-	err := i.inboundRepo.Block(id)
+	err := i.inboundRepo.ChangeBlockState(id, true)
 	if err != nil {
 		return err
 	}
@@ -283,7 +282,7 @@ func (i *Inbound) Block(id string) error {
 }
 
 func (i *Inbound) UnBlock(id string) error {
-	err := i.inboundRepo.UnBlock(id)
+	err := i.inboundRepo.ChangeBlockState(id, false)
 	if err != nil {
 		return err
 	}

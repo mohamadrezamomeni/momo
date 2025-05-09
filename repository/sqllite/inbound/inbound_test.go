@@ -233,7 +233,7 @@ func TestBlock(t *testing.T) {
 	inboundCreated, _ := inboundRepo.Create(inbound1)
 	defer inboundRepo.DeleteAll()
 
-	err := inboundRepo.Block(strconv.Itoa(inboundCreated.ID))
+	err := inboundRepo.ChangeBlockState(strconv.Itoa(inboundCreated.ID), true)
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
 	}
@@ -248,7 +248,7 @@ func TestBlock(t *testing.T) {
 func TestUnBlock(t *testing.T) {
 	inboundCreated, _ := inboundRepo.Create(inbound5)
 	defer inboundRepo.DeleteAll()
-	err := inboundRepo.UnBlock(strconv.Itoa(inboundCreated.ID))
+	err := inboundRepo.ChangeBlockState(strconv.Itoa(inboundCreated.ID), false)
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
 	}

@@ -329,11 +329,12 @@ func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
 	return inbound, nil
 }
 
-func (i *Inbound) Block(id string) error {
+func (i *Inbound) ChangeBlockState(id string, state bool) error {
 	scope := "inboundRepository.Block"
 
 	sql := fmt.Sprintf(
-		"UPDATE inbounds SET is_block = true WHERE id = %s",
+		"UPDATE inbounds SET is_block = %t WHERE id = %s",
+		state,
 		id,
 	)
 	result, err := i.db.Conn().Exec(sql)
@@ -342,23 +343,6 @@ func (i *Inbound) Block(id string) error {
 	}
 	if rows, err := result.RowsAffected(); err != nil || rows == 0 {
 		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
-	}
-	return nil
-}
-
-func (i *Inbound) UnBlock(id string) error {
-	scope := "inboundRepository.Block"
-
-	sql := fmt.Sprintf(
-		"UPDATE inbounds SET is_block = false WHERE id = %s",
-		id,
-	)
-	result, err := i.db.Conn().Exec(sql)
-	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Input(id).DebuggingError()
-	}
-	if rows, err := result.RowsAffected(); err != nil || rows == 0 {
-		return momoError.Wrap(err).Scope(scope).Input(id).DebuggingError()
 	}
 	return nil
 }
