@@ -1,6 +1,6 @@
 package inbound
 
 type ExtendInboundDto struct {
-	*IdentifyInbounbdDto
+	IdentifyInbounbdDto
 	End string `json:"end_time"`
 }

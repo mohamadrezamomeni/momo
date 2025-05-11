@@ -11,6 +11,12 @@ import (
 
 func (i *Handler) ExtendInbound(c echo.Context) error {
 	var req inboundControllerDto.ExtendInboundDto
+	if err := c.Bind(&req); err != nil {
+		msg, code := httpErr.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
+		})
+	}
 	err := i.validation.ValidateExtendingInbound(req)
 	if err != nil {
 		msg, code := httpErr.Error(err)

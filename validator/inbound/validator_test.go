@@ -147,7 +147,7 @@ func TestValidateExtendingInbound(t *testing.T) {
 	defer inboundSvcMock.DeletedAll()
 
 	err := validator.ValidateExtendingInbound(inbound.ExtendInboundDto{
-		IdentifyInbounbdDto: &inbound.IdentifyInbounbdDto{
+		IdentifyInbounbdDto: inbound.IdentifyInbounbdDto{
 			ID: strconv.Itoa(inboundCreated.ID),
 		},
 		End: now.AddDate(0, 2, 0).Format("2006-01-02 15:04:05"),
@@ -157,7 +157,7 @@ func TestValidateExtendingInbound(t *testing.T) {
 	}
 
 	err = validator.ValidateExtendingInbound(inbound.ExtendInboundDto{
-		IdentifyInbounbdDto: &inbound.IdentifyInbounbdDto{
+		IdentifyInbounbdDto: inbound.IdentifyInbounbdDto{
 			ID: strconv.Itoa(inboundCreated.ID),
 		},
 		End: now.AddDate(0, 1, 0).Format("2006-01-02 15:04:05"),
@@ -167,7 +167,7 @@ func TestValidateExtendingInbound(t *testing.T) {
 	}
 
 	err = validator.ValidateExtendingInbound(inbound.ExtendInboundDto{
-		IdentifyInbounbdDto: &inbound.IdentifyInbounbdDto{
+		IdentifyInbounbdDto: inbound.IdentifyInbounbdDto{
 			ID: strconv.Itoa(inboundCreated.ID),
 		},
 		End: now.AddDate(0, 0, 2).Format("2006-01-02 15:04:05"),
@@ -184,7 +184,7 @@ func TestValidateExtendingInbound(t *testing.T) {
 	})
 
 	err = validator.ValidateExtendingInbound(inbound.ExtendInboundDto{
-		IdentifyInbounbdDto: &inbound.IdentifyInbounbdDto{
+		IdentifyInbounbdDto: inbound.IdentifyInbounbdDto{
 			ID: strconv.Itoa(inboundCreated.ID),
 		},
 		End: now.AddDate(1, 0, 2).Format("2006-01-02 15:04:05"),
