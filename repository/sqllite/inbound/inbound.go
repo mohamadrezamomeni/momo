@@ -53,13 +53,13 @@ func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error
 	return inbound, nil
 }
 
-func (i *Inbound) FindInboundByID(id int) (*entity.Inbound, error) {
+func (i *Inbound) FindInboundByID(id string) (*entity.Inbound, error) {
 	scope := "inboundRepository.FindInboundByID"
 
 	var createdAt, updatedAt interface{}
 	var inbound *entity.Inbound = &entity.Inbound{}
 	var vpnType string
-	s := fmt.Sprintf("SELECT * FROM inbounds WHERE id=%v LIMIT 1", id)
+	s := fmt.Sprintf("SELECT * FROM inbounds WHERE id=%s LIMIT 1", id)
 	err := i.db.Conn().QueryRow(s).Scan(
 		&inbound.ID,
 		&inbound.Protocol,
@@ -89,7 +89,7 @@ func (i *Inbound) FindInboundByID(id int) (*entity.Inbound, error) {
 }
 
 func (i *Inbound) Delete(id int) error {
-	scope := "inboundRepository.FindInboundByID"
+	scope := "inboundRepository.Delete"
 
 	sql := fmt.Sprintf("DELETE FROM inbounds WHERE id=%v", id)
 	res, err := i.db.Conn().Exec(sql)
