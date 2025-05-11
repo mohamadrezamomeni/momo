@@ -25,7 +25,7 @@ func GenerateRandomInRange(min, max int) int {
 }
 
 func GetDateTime(s string) time.Time {
-	layout := "2006-01-02 15:04:05"
+	layout := time.DateTime
 	t, _ := time.Parse(layout, s)
 	return t
 }

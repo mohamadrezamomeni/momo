@@ -8,7 +8,7 @@ import (
 
 func ConvertStrToTime(timeStr string) (time.Time, error) {
 	scope := "validation.ConvertStrToTime"
-	t, err := time.Parse(time.RFC3339, timeStr)
+	t, err := time.Parse(time.DateTime, timeStr)
 	if err != nil {
 		return time.Time{}, momoError.Wrap(err).Scope(scope).Input(timeStr).ErrorWrite()
 	}

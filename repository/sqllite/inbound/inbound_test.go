@@ -4,6 +4,7 @@ import (
 	"os"
 	"strconv"
 	"testing"
+	"time"
 
 	inboundDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
@@ -276,11 +277,11 @@ func TestUpdate(t *testing.T) {
 	inboundFound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
 
 	if inboundFound.Start != utils.GetDateTime("2026-04-21 14:30:00") {
-		t.Errorf("we expected start be %s", inboundFound.Start.Format("2006-01-02 15:04:05"))
+		t.Errorf("we expected start be %s", inboundFound.Start.Format(time.DateTime))
 	}
 
 	if inboundFound.End != utils.GetDateTime("2026-04-22 14:30:00") {
-		t.Errorf("we expected start be %s", inboundFound.End.Format("2006-01-02 15:04:05"))
+		t.Errorf("we expected start be %s", inboundFound.End.Format(time.DateTime))
 	}
 
 	inboundCreated, _ = inboundRepo.Create(inbound2)
@@ -295,6 +296,6 @@ func TestUpdate(t *testing.T) {
 	inboundFound, _ = inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
 
 	if inboundFound.Start != utils.GetDateTime("2026-04-21 14:30:00") {
-		t.Errorf("we expected start be %s", inboundFound.Start.Format("2006-01-02 15:04:05"))
+		t.Errorf("we expected start be %s", inboundFound.Start.Format(time.DateTime))
 	}
 }

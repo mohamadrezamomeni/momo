@@ -37,8 +37,8 @@ func TestCreatingInbound(t *testing.T) {
 		Domain:   "twitter.com",
 		Port:     "234",
 		UserID:   uuid.New().String(),
-		Start:    "2025-11-01T15:00:00Z",
-		End:      "2025-11-01T16:00:00Z",
+		Start:    "2025-11-01 15:00:00",
+		End:      "2025-11-01 16:00:00",
 	})
 	if err != nil {
 		t.Errorf("someting went wrong err was %v", err)
@@ -50,8 +50,8 @@ func TestCreatingInbound(t *testing.T) {
 		Domain:   "twitter.com",
 		Port:     "234",
 		UserID:   uuid.New().String(),
-		Start:    "2025-11-01T15:00:00Z",
-		End:      "2025-11-01T14:00:00Z",
+		Start:    "2025-11-01 15:00:00",
+		End:      "2025-11-01 14:00:00",
 	})
 	if err == nil {
 		t.Errorf("this validation must validate start be before end")
@@ -62,8 +62,8 @@ func TestCreatingInbound(t *testing.T) {
 		Domain:   "twitter.com",
 		Port:     "234",
 		UserID:   uuid.New().String(),
-		Start:    "2025-11-01T15:00:00Z",
-		End:      "2025-11-01T16:00:00Z",
+		Start:    "2025-11-01 15:00:00",
+		End:      "2025-11-01 16:00:00",
 	})
 	if err == nil {
 		t.Errorf("vpnType could be validated")
@@ -75,8 +75,8 @@ func TestCreatingInbound(t *testing.T) {
 		Domain:   "twitter.com",
 		Port:     "2343s",
 		UserID:   uuid.New().String(),
-		Start:    "2025-11-01T15:00:00Z",
-		End:      "2025-11-01T16:00:00Z",
+		Start:    "2025-11-01 15:00:00",
+		End:      "2025-11-01 16:00:00",
 	})
 	if err == nil {
 		t.Errorf("port could be validated")
@@ -88,8 +88,8 @@ func TestCreatingInbound(t *testing.T) {
 		Domain:   "twitte",
 		Port:     "2343",
 		UserID:   uuid.New().String(),
-		Start:    "2025-11-01T15:00:00Z",
-		End:      "2025-11-01T16:00:00Z",
+		Start:    "2025-11-01 15:00:00",
+		End:      "2025-11-01 16:00:00",
 	})
 	if err == nil {
 		t.Errorf("domain could be validated")
@@ -101,8 +101,8 @@ func TestCreatingInbound(t *testing.T) {
 		Domain:   "twitter.com",
 		Port:     "2343",
 		UserID:   uuid.New().String() + "3",
-		Start:    "2025-11-01T15:00:00Z",
-		End:      "2025-11-01T16:00:00Z",
+		Start:    "2025-11-01 15:00:00",
+		End:      "2025-11-01 16:00:00",
 	})
 	if err == nil {
 		t.Errorf("domain could be validated")
@@ -150,7 +150,7 @@ func TestValidateExtendingInbound(t *testing.T) {
 		IdentifyInbounbdDto: inbound.IdentifyInbounbdDto{
 			ID: strconv.Itoa(inboundCreated.ID),
 		},
-		End: now.AddDate(0, 2, 0).Format("2006-01-02 15:04:05"),
+		End: now.AddDate(0, 2, 0).Format(time.DateTime),
 	})
 	if err != nil {
 		t.Errorf("something went wrong the problem was %v", err)
@@ -160,7 +160,7 @@ func TestValidateExtendingInbound(t *testing.T) {
 		IdentifyInbounbdDto: inbound.IdentifyInbounbdDto{
 			ID: strconv.Itoa(inboundCreated.ID),
 		},
-		End: now.AddDate(0, 1, 0).Format("2006-01-02 15:04:05"),
+		End: now.AddDate(0, 1, 0).Format(time.DateTime),
 	})
 	if err != nil {
 		t.Error("we expected input end will be greater than current end")
@@ -170,7 +170,7 @@ func TestValidateExtendingInbound(t *testing.T) {
 		IdentifyInbounbdDto: inbound.IdentifyInbounbdDto{
 			ID: strconv.Itoa(inboundCreated.ID),
 		},
-		End: now.AddDate(0, 0, 2).Format("2006-01-02 15:04:05"),
+		End: now.AddDate(0, 0, 2).Format(time.DateTime),
 	})
 
 	if err == nil {
@@ -187,10 +187,55 @@ func TestValidateExtendingInbound(t *testing.T) {
 		IdentifyInbounbdDto: inbound.IdentifyInbounbdDto{
 			ID: strconv.Itoa(inboundCreated.ID),
 		},
-		End: now.AddDate(1, 0, 2).Format("2006-01-02 15:04:05"),
+		End: now.AddDate(1, 0, 2).Format(time.DateTime),
 	})
 
 	if err == nil {
 		t.Error("current time must be lower than current end time")
+	}
+}
+
+func TestValidateSettingPeriodTime(t *testing.T) {
+	now := time.Now()
+	now = now.Truncate(time.Second)
+
+	inboundCreated, _ := inboundSvcMock.Create(&inboundServiceDto.CreateInbound{
+		ServerType: entity.High,
+		Start:      now.AddDate(0, -2, 0),
+		End:        now.AddDate(0, -1, 0),
+	})
+	defer inboundSvcMock.DeletedAll()
+
+	err := validator.ValidateSettingPeriodTime(inboundControllerDto.SetPeriodDto{
+		IdentifyInbounbdDto: inboundControllerDto.IdentifyInbounbdDto{
+			ID: strconv.Itoa(inboundCreated.ID),
+		},
+		Start: now.AddDate(0, 1, 1).Format(time.DateTime),
+		End:   now.AddDate(0, 1, 2).Format(time.DateTime),
+	})
+	if err != nil {
+		t.Errorf("something went wrong the problem was %v", err)
+	}
+
+	err = validator.ValidateSettingPeriodTime(inboundControllerDto.SetPeriodDto{
+		IdentifyInbounbdDto: inboundControllerDto.IdentifyInbounbdDto{
+			ID: strconv.Itoa(inboundCreated.ID),
+		},
+		Start: now.AddDate(0, 1, 1).Format(time.DateTime),
+		End:   now.Format(time.DateTime),
+	})
+	if err == nil {
+		t.Errorf("we expected an error")
+	}
+
+	err = validator.ValidateSettingPeriodTime(inboundControllerDto.SetPeriodDto{
+		IdentifyInbounbdDto: inboundControllerDto.IdentifyInbounbdDto{
+			ID: strconv.Itoa(inboundCreated.ID),
+		},
+		Start: now.AddDate(0, -1, -1).Format(time.DateTime),
+		End:   now.AddDate(0, 1, 2).Format(time.DateTime),
+	})
+	if err == nil {
+		t.Errorf("something went wrong the problem was %v", err)
 	}
 }

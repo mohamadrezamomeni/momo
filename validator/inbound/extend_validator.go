@@ -1,7 +1,6 @@
 package inbound
 
 import (
-	"fmt"
 	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -36,7 +35,6 @@ func (v *Validator) ValidateExtendingInbound(req inboundControllerDto.ExtendInbo
 
 	endTime := utils.GetDateTime(req.End)
 	now := time.Now()
-	fmt.Println(inbound.End, endTime, inbound.End.After(endTime))
 	if inbound.End.After(endTime) || now.After(inbound.End) {
 		return momoError.Scope(scope).BadRequest().ErrorWrite()
 	}

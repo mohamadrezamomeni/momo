@@ -352,11 +352,11 @@ func (i *Inbound) Update(id string, inpt *inboundDto.UpdateInboundDto) error {
 
 	subUpdates := []string{}
 	if !inpt.Start.IsZero() {
-		subUpdates = append(subUpdates, fmt.Sprintf("start = '%s'", inpt.Start.Format("2006-01-02 15:04:05")))
+		subUpdates = append(subUpdates, fmt.Sprintf("start = '%s'", inpt.Start.Format(time.DateTime)))
 	}
 
 	if !inpt.End.IsZero() {
-		subUpdates = append(subUpdates, fmt.Sprintf("end = '%s'", inpt.End.Format("2006-01-02 15:04:05")))
+		subUpdates = append(subUpdates, fmt.Sprintf("end = '%s'", inpt.End.Format(time.DateTime)))
 	}
 
 	if len(subUpdates) == 0 {

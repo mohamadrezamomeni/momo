@@ -12,7 +12,7 @@ import (
 
 	vpnProxyDto "github.com/mohamadrezamomeni/momo/dto/proxy/vpn"
 	inboundRepoDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
-	dto "github.com/mohamadrezamomeni/momo/dto/service/inbound"
+	inboundServiceDto "github.com/mohamadrezamomeni/momo/dto/service/inbound"
 
 	"github.com/google/uuid"
 	vpnProxy "github.com/mohamadrezamomeni/momo/proxy/vpn"
@@ -78,7 +78,7 @@ func New(
 	}
 }
 
-func (i *Inbound) Create(inpt *dto.CreateInbound) (*entity.Inbound, error) {
+func (i *Inbound) Create(inpt *inboundServiceDto.CreateInbound) (*entity.Inbound, error) {
 	inboundCreated, err := i.inboundRepo.Create(&inboundRepoDto.CreateInbound{
 		Tag:      fmt.Sprintf("inbound-%s", uuid.New().String()),
 		Port:     "",
@@ -265,7 +265,7 @@ func (i *Inbound) getInfo(inbound *entity.Inbound) (*vpnProxyDto.Inbound, error)
 	return info, nil
 }
 
-func (i *Inbound) Filter(inpt *dto.FilterInbounds) ([]*entity.Inbound, error) {
+func (i *Inbound) Filter(inpt *inboundServiceDto.FilterInbounds) ([]*entity.Inbound, error) {
 	return i.inboundRepo.Filter(&inboundRepoDto.FilterInbound{
 		Domain:  inpt.Domain,
 		Port:    inpt.Port,
@@ -302,4 +302,15 @@ func (i *Inbound) ExtendInbound(id string, end time.Time) error {
 
 func (i *Inbound) FindInboundByID(id string) (*entity.Inbound, error) {
 	return i.inboundRepo.FindInboundByID(id)
+}
+
+func (i *Inbound) SetPeriodTime(id string, period *inboundServiceDto.SetPeriodDto) error {
+	err := i.inboundRepo.Update(id, &inboundRepoDto.UpdateInboundDto{
+		Start: period.Start,
+		End:   period.End,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }
