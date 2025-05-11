@@ -2,6 +2,7 @@ package inbound
 
 import (
 	"reflect"
+	"strconv"
 	"testing"
 	"unsafe"
 
@@ -31,9 +32,9 @@ func TestApplyDomainAndPortToInbounds(t *testing.T) {
 
 	inboundSvc.AssignDomainToInbounds()
 
-	ret1, _ := inboundRepo.FindInboundByID(inboundCreated1.ID)
-	ret2, _ := inboundRepo.FindInboundByID(inboundCreated2.ID)
-	ret3, _ := inboundRepo.FindInboundByID(inboundCreated3.ID)
+	ret1, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated1.ID))
+	ret2, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated2.ID))
+	ret3, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated3.ID))
 
 	if ret1.IsAssigned != true || ret2.IsAssigned != true {
 		t.Fatal("inbounds aren't updated currectly")

@@ -14,9 +14,8 @@ import (
 	inboundRepoDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
 	dto "github.com/mohamadrezamomeni/momo/dto/service/inbound"
 
-	vpnProxy "github.com/mohamadrezamomeni/momo/proxy/vpn"
-
 	"github.com/google/uuid"
+	vpnProxy "github.com/mohamadrezamomeni/momo/proxy/vpn"
 )
 
 type Inbound struct {
@@ -35,6 +34,8 @@ type UserService interface {
 }
 
 type InboundRepo interface {
+	Update(string, *inboundRepoDto.UpdateInboundDto) error
+	FindInboundByID(id string) (*entity.Inbound, error)
 	UpdateDomainPort(int, string, string) error
 	ChangeBlockState(string, bool) error
 	RetriveFaultyInbounds() ([]*entity.Inbound, error)
@@ -287,4 +288,18 @@ func (i *Inbound) UnBlock(id string) error {
 		return err
 	}
 	return nil
+}
+
+func (i *Inbound) ExtendInbound(id string, end time.Time) error {
+	err := i.inboundRepo.Update(id, &inboundRepoDto.UpdateInboundDto{
+		End: end,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (i *Inbound) FindInboundByID(id string) (*entity.Inbound, error) {
+	return i.inboundRepo.FindInboundByID(id)
 }
