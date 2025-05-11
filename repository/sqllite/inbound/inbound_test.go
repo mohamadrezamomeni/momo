@@ -175,7 +175,7 @@ func TestInboundsIsNotAssigned(t *testing.T) {
 func TestFindInboundByUserID(t *testing.T) {
 	inboundCreated, _ := inboundRepo.Create(inbound10)
 	defer inboundRepo.DeleteAll()
-	inbound, err := inboundRepo.FindInboundByID(inboundCreated.ID)
+	inbound, err := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
 	if err != nil {
 		t.Fatalf("the query was field the problem was %v", err)
 	}
@@ -194,7 +194,7 @@ func TestUpdateInbound(t *testing.T) {
 		t.Fatalf("update has field the problem was %v", err)
 	}
 
-	inbound, _ := inboundRepo.FindInboundByID(inboundCreated.ID)
+	inbound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
 
 	if inbound.Domain != newDomain || inbound.Port != newPort {
 		t.Fatalf("update hasn't worked carefuly")
@@ -239,7 +239,7 @@ func TestBlock(t *testing.T) {
 		t.Fatalf("something went wrong that was %v", err)
 	}
 
-	inboundFound, _ := inboundRepo.FindInboundByID(inboundCreated.ID)
+	inboundFound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
 
 	if !inboundFound.IsBlock {
 		t.Fatal("inbound that is founded must be blocked")
@@ -254,7 +254,7 @@ func TestUnBlock(t *testing.T) {
 		t.Fatalf("something went wrong that was %v", err)
 	}
 
-	inboundFound, _ := inboundRepo.FindInboundByID(inboundCreated.ID)
+	inboundFound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
 
 	if inboundFound.IsBlock {
 		t.Fatal("inbound that is founded must be blocked")
@@ -273,7 +273,7 @@ func TestUpdate(t *testing.T) {
 		t.Fatalf("the error was %v", err)
 	}
 
-	inboundFound, _ := inboundRepo.FindInboundByID(inboundCreated.ID)
+	inboundFound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
 
 	if inboundFound.Start != utils.GetDateTime("2026-04-21 14:30:00") {
 		t.Errorf("we expected start be %s", inboundFound.Start.Format("2006-01-02 15:04:05"))
@@ -292,7 +292,7 @@ func TestUpdate(t *testing.T) {
 		t.Fatalf("the error was %v", err)
 	}
 
-	inboundFound, _ = inboundRepo.FindInboundByID(inboundCreated.ID)
+	inboundFound, _ = inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
 
 	if inboundFound.Start != utils.GetDateTime("2026-04-21 14:30:00") {
 		t.Errorf("we expected start be %s", inboundFound.Start.Format("2006-01-02 15:04:05"))
