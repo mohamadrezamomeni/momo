@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	inboundControllerDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
 	inboundDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
 	"github.com/mohamadrezamomeni/momo/entity"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
@@ -348,7 +347,7 @@ func (i *Inbound) ChangeBlockState(id string, state bool) error {
 	return nil
 }
 
-func (i *Inbound) Update(id string, inpt *inboundControllerDto.UpdateInboundDto) error {
+func (i *Inbound) Update(id string, inpt *inboundDto.UpdateInboundDto) error {
 	scope := "inboundRepository.Update"
 
 	subUpdates := []string{}

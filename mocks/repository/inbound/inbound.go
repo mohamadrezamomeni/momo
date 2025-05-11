@@ -2,6 +2,7 @@ package inbound
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	inboundDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
@@ -41,9 +42,9 @@ func (i *MockInbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, e
 	return inbound, nil
 }
 
-func (i *MockInbound) FindInboundByID(id int) (*entity.Inbound, error) {
+func (i *MockInbound) FindInboundByID(id string) (*entity.Inbound, error) {
 	for _, inbound := range i.inbounds {
-		if inbound.ID == id {
+		if strconv.Itoa(inbound.ID) == id {
 			return inbound, nil
 		}
 	}
@@ -151,5 +152,9 @@ func (i *MockInbound) UpdateDomainPort(id int, domain string, port string) error
 }
 
 func (i *MockInbound) ChangeBlockState(_ string, _ bool) error {
+	return nil
+}
+
+func (i *MockInbound) Update(_ string, _ *inboundDto.UpdateInboundDto) error {
 	return nil
 }
