@@ -32,77 +32,83 @@ func TestMain(m *testing.M) {
 
 func TestCreatingInbound(t *testing.T) {
 	err := validator.ValidateCreatingInbound(inboundControllerDto.CreateInbound{
-		Protocol: "vmess",
-		VPNType:  "xray",
-		Domain:   "twitter.com",
-		Port:     "234",
-		UserID:   uuid.New().String(),
-		Start:    "2025-11-01 15:00:00",
-		End:      "2025-11-01 16:00:00",
+		Protocol:     "vmess",
+		VPNType:      "xray",
+		Domain:       "twitter.com",
+		Port:         "234",
+		UserID:       uuid.New().String(),
+		TrafficLimit: 500000,
+		Start:        "2025-11-01 15:00:00",
+		End:          "2025-11-01 16:00:00",
 	})
 	if err != nil {
 		t.Errorf("someting went wrong err was %v", err)
 	}
 
 	err = validator.ValidateCreatingInbound(inboundControllerDto.CreateInbound{
-		Protocol: "vmess",
-		VPNType:  "xray",
-		Domain:   "twitter.com",
-		Port:     "234",
-		UserID:   uuid.New().String(),
-		Start:    "2025-11-01 15:00:00",
-		End:      "2025-11-01 14:00:00",
+		Protocol:     "vmess",
+		VPNType:      "xray",
+		Domain:       "twitter.com",
+		Port:         "234",
+		TrafficLimit: 500000,
+		UserID:       uuid.New().String(),
+		Start:        "2025-11-01 15:00:00",
+		End:          "2025-11-01 14:00:00",
 	})
 	if err == nil {
 		t.Errorf("this validation must validate start be before end")
 	}
 	err = validator.ValidateCreatingInbound(inboundControllerDto.CreateInbound{
-		Protocol: "vmess",
-		VPNType:  "xrayy",
-		Domain:   "twitter.com",
-		Port:     "234",
-		UserID:   uuid.New().String(),
-		Start:    "2025-11-01 15:00:00",
-		End:      "2025-11-01 16:00:00",
+		Protocol:     "vmess",
+		VPNType:      "xrayy",
+		Domain:       "twitter.com",
+		TrafficLimit: 500000,
+		Port:         "234",
+		UserID:       uuid.New().String(),
+		Start:        "2025-11-01 15:00:00",
+		End:          "2025-11-01 16:00:00",
 	})
 	if err == nil {
 		t.Errorf("vpnType could be validated")
 	}
 
 	err = validator.ValidateCreatingInbound(inboundControllerDto.CreateInbound{
-		Protocol: "vmess",
-		VPNType:  "xrayy",
-		Domain:   "twitter.com",
-		Port:     "2343s",
-		UserID:   uuid.New().String(),
-		Start:    "2025-11-01 15:00:00",
-		End:      "2025-11-01 16:00:00",
+		Protocol:     "vmess",
+		VPNType:      "xrayy",
+		Domain:       "twitter.com",
+		Port:         "2343s",
+		UserID:       uuid.New().String(),
+		Start:        "2025-11-01 15:00:00",
+		TrafficLimit: 500000,
+		End:          "2025-11-01 16:00:00",
 	})
 	if err == nil {
 		t.Errorf("port could be validated")
 	}
 
 	err = validator.ValidateCreatingInbound(inboundControllerDto.CreateInbound{
-		Protocol: "vmess",
-		VPNType:  "xray",
-		Domain:   "twitte",
-		Port:     "2343",
-		UserID:   uuid.New().String(),
-		Start:    "2025-11-01 15:00:00",
-		End:      "2025-11-01 16:00:00",
+		Protocol:     "vmess",
+		VPNType:      "xray",
+		Domain:       "twitte",
+		Port:         "2343",
+		UserID:       uuid.New().String(),
+		TrafficLimit: 500000,
+		Start:        "2025-11-01 15:00:00",
+		End:          "2025-11-01 16:00:00",
 	})
 	if err == nil {
 		t.Errorf("domain could be validated")
 	}
 
 	err = validator.ValidateCreatingInbound(inboundControllerDto.CreateInbound{
-		Protocol: "vmess",
-		VPNType:  "xrayy",
-		Domain:   "twitter.com",
-		Port:     "2343",
-		UserID:   uuid.New().String() + "3",
-		Start:    "2025-11-01 15:00:00",
-		End:      "2025-11-01 16:00:00",
+		Protocol:     "vmess",
+		VPNType:      "xrayy",
+		Domain:       "twitter.com",
+		Port:         "2343",
+		TrafficLimit: 500000,
+		UserID:       uuid.New().String() + "3",
+		Start:        "2025-11-01 15:00:00",
+		End:          "2025-11-01 16:00:00",
 	})
 	if err == nil {
 		t.Errorf("domain could be validated")

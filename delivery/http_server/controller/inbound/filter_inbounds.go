@@ -45,16 +45,19 @@ func (h *Handler) Filter(c echo.Context) error {
 
 	for _, inbound := range inbounds {
 		res.Inbounds = append(res.Inbounds, &inboundSerializer.InboundSerializer{
-			Protocol:   inbound.Protocol,
-			Domain:     inbound.Domain,
-			Port:       inbound.Port,
-			UserID:     inbound.UserID,
-			IsNotified: inbound.IsNotified,
-			IsBlock:    inbound.IsBlock,
-			IsAssigned: inbound.IsAssigned,
-			Start:      inbound.Start,
-			End:        inbound.End,
-			Tag:        inbound.Tag,
+			Protocol:     inbound.Protocol,
+			Domain:       inbound.Domain,
+			Port:         inbound.Port,
+			UserID:       inbound.UserID,
+			IsNotified:   inbound.IsNotified,
+			IsBlock:      inbound.IsBlock,
+			IsAssigned:   inbound.IsAssigned,
+			Start:        inbound.Start,
+			End:          inbound.End,
+			Tag:          inbound.Tag,
+			TrafficUsage: inbound.TrafficUsage,
+			TrafficLimit: inbound.TrafficLimit,
+			ChargeCount:  inbound.ChargeCount,
 		})
 	}
 	return c.JSON(http.StatusOK, res)

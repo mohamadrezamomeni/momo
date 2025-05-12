@@ -7,16 +7,17 @@ import (
 )
 
 type CreateInbound struct {
-	Protocol   string
-	Tag        string
-	Port       string
-	UserID     string
-	Domain     string
-	VPNType    entity.VPNType
-	IsAssigned bool
-	IsNotified bool
-	IsActive   bool
-	Start      time.Time
-	End        time.Time
-	IsBlock    bool
+	TrafficLimit uint32
+	Protocol     string
+	Tag          string
+	Port         string
+	UserID       string
+	Domain       string
+	VPNType      entity.VPNType
+	IsAssigned   bool
+	IsNotified   bool
+	IsActive     bool
+	Start        time.Time
+	End          time.Time
+	IsBlock      bool
 }

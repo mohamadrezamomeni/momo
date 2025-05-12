@@ -21,6 +21,10 @@ func (v *Validator) ValidateCreatingInbound(req inboundControllerDto.CreateInbou
 			is.URL,
 		),
 		validation.Field(
+			&req.TrafficLimit,
+			validation.Required,
+		),
+		validation.Field(
 			&req.Port,
 			validation.Required,
 			validation.Match(regexp.MustCompile(`^\d+$`)).Error("must be a numeric string"),
