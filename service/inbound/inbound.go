@@ -81,15 +81,16 @@ func New(
 
 func (i *Inbound) Create(inpt *inboundServiceDto.CreateInbound) (*entity.Inbound, error) {
 	inboundCreated, err := i.inboundRepo.Create(&inboundRepoDto.CreateInbound{
-		Tag:      fmt.Sprintf("inbound-%s", uuid.New().String()),
-		Port:     "",
-		Domain:   "",
-		IsActive: false,
-		IsBlock:  false,
-		UserID:   inpt.UserID,
-		Start:    inpt.Start,
-		End:      inpt.End,
-		VPNType:  inpt.VPNType,
+		Tag:          fmt.Sprintf("inbound-%s", uuid.New().String()),
+		Port:         "",
+		Domain:       "",
+		IsActive:     false,
+		IsBlock:      false,
+		UserID:       inpt.UserID,
+		Start:        inpt.Start,
+		End:          inpt.End,
+		VPNType:      inpt.VPNType,
+		TrafficLimit: inpt.TrafficLimit,
 	})
 	if err != nil {
 		return nil, err
@@ -306,10 +307,11 @@ func (i *Inbound) FindInboundByID(id string) (*entity.Inbound, error) {
 	return i.inboundRepo.FindInboundByID(id)
 }
 
-func (i *Inbound) SetPeriodTime(id string, period *inboundServiceDto.SetPeriodDto) error {
+func (i *Inbound) UpdateInbound(id string, inpt *inboundServiceDto.UpdateDto) error {
 	err := i.inboundRepo.Update(id, &inboundRepoDto.UpdateInboundDto{
-		Start: period.Start,
-		End:   period.End,
+		Start:        inpt.Start,
+		End:          inpt.End,
+		TrafficLimit: inpt.TrafficLimit,
 	})
 	if err != nil {
 		return err

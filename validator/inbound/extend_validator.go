@@ -6,7 +6,7 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	inboundControllerDto "github.com/mohamadrezamomeni/momo/dto/controller/inbound"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
-	"github.com/mohamadrezamomeni/momo/pkg/utils"
+	timeTransofrmer "github.com/mohamadrezamomeni/momo/transformer/time"
 )
 
 func (v *Validator) ValidateExtendingInbound(req inboundControllerDto.ExtendInboundDto) error {
@@ -38,10 +38,14 @@ func (v *Validator) ValidateExtendingInbound(req inboundControllerDto.ExtendInbo
 		return err
 	}
 
-	endTime := utils.GetDateTime(req.End)
+	endTime, err := timeTransofrmer.ConvertStrToTime(req.End)
+	if err != nil {
+		return err
+	}
+
 	now := time.Now()
 	if inbound.End.After(endTime) || now.After(inbound.End) {
-		return momoError.Scope(scope).BadRequest().ErrorWrite()
+		return momoError.Scope(scope).Input(req).BadRequest().ErrorWrite()
 	}
 	return nil
 }

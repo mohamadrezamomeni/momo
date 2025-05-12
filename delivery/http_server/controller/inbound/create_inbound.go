@@ -33,11 +33,12 @@ func (h *Handler) CreateInbound(c echo.Context) error {
 	startTime, _ := timeTransformer.ConvertStrToTime(req.Start)
 	endTime, _ := timeTransformer.ConvertStrToTime(req.End)
 	inboundCreated, err := h.inboundSvc.Create(&inbound.CreateInbound{
-		UserID:     req.UserID,
-		Start:      startTime,
-		End:        endTime,
-		VPNType:    entity.ConvertStringVPNTypeToEnum(req.VPNType),
-		ServerType: entity.High,
+		UserID:       req.UserID,
+		Start:        startTime,
+		TrafficLimit: req.TrafficLimit,
+		End:          endTime,
+		VPNType:      entity.ConvertStringVPNTypeToEnum(req.VPNType),
+		ServerType:   entity.High,
 	})
 	if err != nil {
 		msg, code := momoErrorHttp.Error(err)

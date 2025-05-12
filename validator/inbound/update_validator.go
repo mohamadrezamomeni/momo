@@ -15,6 +15,10 @@ func (v *Validator) ValidateSettingPeriodTime(req inboundControllerDto.SetPeriod
 	err := validation.ValidateStruct(
 		&req,
 		validation.Field(
+			&req.TrafficLimit,
+			validation.Required,
+		),
+		validation.Field(
 			&req.Start,
 			validation.Required,
 			validation.By(func(value interface{}) error {

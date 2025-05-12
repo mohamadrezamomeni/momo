@@ -19,7 +19,7 @@ type InboundService interface {
 	Block(string) error
 	UnBlock(string) error
 	ExtendInbound(string, *inboundServiceDto.ExtendInboundDto) error
-	SetPeriodTime(string, *inboundServiceDto.SetPeriodDto) error
+	UpdateInbound(string, *inboundServiceDto.UpdateDto) error
 }
 
 func New(inboundSvc InboundService, validation *inboundValidation.Validator, authSvc *authSvc.Auth) *Handler {

@@ -10,7 +10,7 @@ import (
 	transformer "github.com/mohamadrezamomeni/momo/transformer/time"
 )
 
-func (h *Handler) SetPeriodInbound(c echo.Context) error {
+func (h *Handler) UpdateInbound(c echo.Context) error {
 	var req inboundControllerDto.SetPeriodDto
 	if err := c.Bind(&req); err != nil {
 		msg, code := momoErrorHttp.Error(err)
@@ -28,9 +28,10 @@ func (h *Handler) SetPeriodInbound(c echo.Context) error {
 	}
 	startTime, _ := transformer.ConvertStrToTime(req.Start)
 	endTime, _ := transformer.ConvertStrToTime(req.End)
-	err = h.inboundSvc.SetPeriodTime(req.ID, &inboundServiceDto.SetPeriodDto{
-		Start: startTime,
-		End:   endTime,
+	err = h.inboundSvc.UpdateInbound(req.ID, &inboundServiceDto.UpdateDto{
+		Start:        startTime,
+		End:          endTime,
+		TrafficLimit: req.TrafficLimit,
 	})
 	if err != nil {
 		msg, code := momoErrorHttp.Error(err)
