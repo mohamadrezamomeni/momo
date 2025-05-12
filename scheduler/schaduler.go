@@ -17,6 +17,7 @@ type Scheduler struct {
 type InboundService interface {
 	HealingUpInbounds()
 	AssignDomainToInbounds()
+	UpdateTraffics()
 }
 
 type VPNService interface {
@@ -41,6 +42,7 @@ func (s *Scheduler) Start(done <-chan struct{}, wg *sync.WaitGroup) {
 
 	s.sch.Cron("*/10 * * * *").Do(s.inboundSvc.HealingUpInbounds)
 	s.sch.Cron("*/5 * * * *").Do(s.inboundSvc.AssignDomainToInbounds)
+	s.sch.Cron("*/1 * * * *").Do(s.inboundSvc.UpdateTraffics)
 	s.sch.Cron("*/2 * * * *").Do(s.vpnSvc.MonitorVPNs)
 	s.sch.Cron("*/2 * * * *").Do(s.hostSvc.MonitorHosts)
 	s.sch.StartAsync()

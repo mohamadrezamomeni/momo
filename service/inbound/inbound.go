@@ -3,6 +3,7 @@ package inbound
 import (
 	"fmt"
 	"math/rand"
+	"strconv"
 	"sync"
 	"time"
 
@@ -317,4 +318,37 @@ func (i *Inbound) UpdateInbound(id string, inpt *inboundServiceDto.UpdateDto) er
 		return err
 	}
 	return nil
+}
+
+func (i *Inbound) UpdateTraffics() {
+	active := true
+	inbounds, err := i.inboundRepo.Filter(&inboundRepoDto.FilterInbound{IsActive: &active})
+	if err != nil {
+		return
+	}
+
+	proxy, err := i.vpnService.MakeProxy()
+	if err != nil {
+		return
+	}
+
+	for _, inbound := range inbounds {
+		i.updateTraffic(inbound, proxy)
+	}
+}
+
+func (i *Inbound) updateTraffic(inbound *entity.Inbound, proxy adapter.ProxyVPN) {
+	info, err := i.getInfo(inbound)
+	if err != nil {
+		return
+	}
+
+	traffic, err := proxy.GetTraffic(info)
+	if err != nil {
+		return
+	}
+
+	i.inboundRepo.Update(strconv.Itoa(inbound.ID), &inboundRepoDto.UpdateInboundDto{
+		TrafficUsage: uint32(traffic.Download) + uint32(traffic.Upload),
+	})
 }
