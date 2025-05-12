@@ -48,6 +48,7 @@ type InboundRepo interface {
 		Domain string
 		Ports  []string
 	}, error)
+	ExtendInbound(string, *inboundRepoDto.ExtendInboundDto) error
 }
 
 type HostService interface {
@@ -290,9 +291,10 @@ func (i *Inbound) UnBlock(id string) error {
 	return nil
 }
 
-func (i *Inbound) ExtendInbound(id string, end time.Time) error {
-	err := i.inboundRepo.Update(id, &inboundRepoDto.UpdateInboundDto{
-		End: end,
+func (i *Inbound) ExtendInbound(id string, inpt *inboundServiceDto.ExtendInboundDto) error {
+	err := i.inboundRepo.ExtendInbound(id, &inboundRepoDto.ExtendInboundDto{
+		End:             inpt.End,
+		TrafficExtended: inpt.ExtendedTrafficLimit,
 	})
 	if err != nil {
 		return err

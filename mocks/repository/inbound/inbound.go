@@ -158,3 +158,7 @@ func (i *MockInbound) ChangeBlockState(_ string, _ bool) error {
 func (i *MockInbound) Update(_ string, _ *inboundDto.UpdateInboundDto) error {
 	return nil
 }
+
+func (i *MockInbound) ExtendInbound(_ string, _ *inboundDto.ExtendInboundDto) error {
+	return nil
+}

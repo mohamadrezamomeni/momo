@@ -390,3 +390,23 @@ func (i *Inbound) Update(id string, inpt *inboundDto.UpdateInboundDto) error {
 	}
 	return nil
 }
+
+func (i *Inbound) ExtendInbound(id string, inpt *inboundDto.ExtendInboundDto) error {
+	scope := "inboundRepository.extendinbound"
+
+	sql := fmt.Sprintf(
+		"UPDATE inbounds SET end = '%s', traffic_limit = traffic_limit + %d WHERE id = %s",
+		inpt.End.Format(time.DateTime),
+		inpt.TrafficExtended,
+		id,
+	)
+
+	result, err := i.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
+	}
+	if rows, err := result.RowsAffected(); err != nil || rows == 0 {
+		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
+	}
+	return nil
+}

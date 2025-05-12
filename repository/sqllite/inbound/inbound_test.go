@@ -10,6 +10,7 @@ import (
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
 	"github.com/mohamadrezamomeni/momo/repository/migrate"
 	"github.com/mohamadrezamomeni/momo/repository/sqllite"
+	timeTransformer "github.com/mohamadrezamomeni/momo/transformer/time"
 )
 
 var inboundRepo *Inbound
@@ -297,5 +298,37 @@ func TestUpdate(t *testing.T) {
 
 	if inboundFound.Start != utils.GetDateTime("2026-04-21 14:30:00") {
 		t.Errorf("we expected start be %s", inboundFound.Start.Format(time.DateTime))
+	}
+}
+
+func TestExtendInbound(t *testing.T) {
+	defer inboundRepo.DeleteAll()
+
+	inboundCreated, _ := inboundRepo.Create(inbound1)
+	endTime, _ := timeTransformer.ConvertStrToTime("2026-04-21 14:30:00")
+	endTime.Truncate(time.Second)
+	err := inboundRepo.ExtendInbound(strconv.Itoa(inboundCreated.ID), &inboundDto.ExtendInboundDto{
+		TrafficExtended: 200,
+		End:             endTime,
+	})
+	if err != nil {
+		t.Fatalf("something went wrong the problem was %v", err)
+	}
+
+	err = inboundRepo.ExtendInbound(strconv.Itoa(inboundCreated.ID), &inboundDto.ExtendInboundDto{
+		TrafficExtended: 400,
+		End:             endTime,
+	})
+	if err != nil {
+		t.Fatalf("something went wrong the problem was %v", err)
+	}
+
+	inboundFound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
+	if inboundFound.TrafficLimit != 600 {
+		t.Fatalf("the field of trafficlimit must be 600 but we got %d", inboundFound.TrafficLimit)
+	}
+
+	if !inboundFound.End.Equal(endTime) {
+		t.Fatalf("the end field must be %s but we got %s", inboundFound.End.Format(time.DateTime), endTime.Format(time.DateTime))
 	}
 }

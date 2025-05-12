@@ -12,6 +12,11 @@ import (
 func (v *Validator) ValidateExtendingInbound(req inboundControllerDto.ExtendInboundDto) error {
 	scope := "validator.ValidateExtendingInbound"
 	err := validation.ValidateStruct(
+		&req,
+		validation.Field(
+			&req.ExtendedTrafficLimit,
+			validation.Required,
+		),
 		validation.Field(
 			&req.End,
 			validation.Required,
