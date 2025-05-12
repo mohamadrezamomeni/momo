@@ -268,8 +268,9 @@ func TestUpdate(t *testing.T) {
 	inboundCreated, _ := inboundRepo.Create(inbound1)
 
 	err := inboundRepo.Update(strconv.Itoa(inboundCreated.ID), &inboundDto.UpdateInboundDto{
-		Start: utils.GetDateTime("2026-04-21 14:30:00"),
-		End:   utils.GetDateTime("2026-04-22 14:30:00"),
+		Start:        utils.GetDateTime("2026-04-21 14:30:00"),
+		End:          utils.GetDateTime("2026-04-22 14:30:00"),
+		TrafficLimit: 200,
 	})
 	if err != nil {
 		t.Fatalf("the error was %v", err)
@@ -279,6 +280,10 @@ func TestUpdate(t *testing.T) {
 
 	if inboundFound.Start != utils.GetDateTime("2026-04-21 14:30:00") {
 		t.Errorf("we expected start be %s", inboundFound.Start.Format(time.DateTime))
+	}
+
+	if inboundFound.TrafficLimit != 200 {
+		t.Errorf("we expected traffic limit was 200 but we got %d", inboundFound.TrafficLimit)
 	}
 
 	if inboundFound.End != utils.GetDateTime("2026-04-22 14:30:00") {

@@ -375,6 +375,10 @@ func (i *Inbound) Update(id string, inpt *inboundDto.UpdateInboundDto) error {
 		return momoError.Scope(scope).Input(inpt, id).UnExpected().DebuggingError()
 	}
 
+	if inpt.TrafficLimit != 0 {
+		subUpdates = append(subUpdates, fmt.Sprintf("traffic_limit = %d", inpt.TrafficLimit))
+	}
+
 	sql := fmt.Sprintf(
 		"UPDATE inbounds SET %s WHERE id = %s",
 		strings.Join(subUpdates, ", "),
