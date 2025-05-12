@@ -8,6 +8,7 @@ import (
 
 type CreateInbound struct {
 	TrafficLimit uint32
+	TrafficUsage uint32
 	Protocol     string
 	Tag          string
 	Port         string

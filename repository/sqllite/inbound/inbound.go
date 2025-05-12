@@ -32,7 +32,7 @@ func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error
 		inpt.IsAssigned,
 		inpt.IsNotified,
 		1,
-		0,
+		inpt.TrafficUsage,
 		inpt.TrafficLimit,
 	).Scan(
 		&inbound.ID,
@@ -252,7 +252,7 @@ func (i *Inbound) makeQueryFilter(inpt *inboundDto.FilterInbound) string {
 func (i *Inbound) RetriveFaultyInbounds() ([]*entity.Inbound, error) {
 	scope := "inboundRepository.RetriveFaultyInbounds"
 
-	query := "SELECT * FROM inbounds WHERE (is_active = true AND end < ?) OR (is_block = true AND is_active = true) OR (is_block = false AND start >= ? AND ? <= end AND is_active = false)"
+	query := "SELECT * FROM inbounds WHERE (is_active = true AND end < ?) OR (is_block = true AND is_active = true) OR (is_block = false AND start <= ? AND ? <= end AND is_active = false) OR (is_active = true AND traffic_limit <= traffic_usage)"
 	now := time.Now()
 	rows, err := i.db.Conn().Query(query, now, now, now)
 

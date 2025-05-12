@@ -126,13 +126,16 @@ func TestRertriveFaultyInbounds(t *testing.T) {
 	inboundRepo.Create(inbound6)
 	inboundRepo.Create(inbound7)
 	inboundRepo.Create(inbound15)
+	inboundRepo.Create(inbound16)
+
+	defer inboundRepo.DeleteAll()
 
 	inbounds, err := inboundRepo.RetriveFaultyInbounds()
 	if err != nil {
 		t.Errorf("the problem has happend that was %v", err)
 	}
-	if len(inbounds) != 2 {
-		t.Errorf("the number of inbouns could be 2 but system got %v", len(inbounds))
+	if len(inbounds) != 3 {
+		t.Errorf("the number of inbouns could be 3 but system got %v", len(inbounds))
 	}
 	userID4Status := false
 	userID6Status := false
@@ -152,8 +155,6 @@ func TestRertriveFaultyInbounds(t *testing.T) {
 	if !userID6Status {
 		t.Error("we didn't get the userID6")
 	}
-
-	inboundRepo.DeleteAll()
 }
 
 func TestInboundsIsNotAssigned(t *testing.T) {

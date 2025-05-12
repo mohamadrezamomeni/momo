@@ -214,9 +214,9 @@ func (i *Inbound) HealingUpInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IP
 
 func (i *Inbound) mustItBeActive(inbound *entity.Inbound) bool {
 	if now := time.Now(); inbound.IsBlock == false &&
-		((now.Before(inbound.End) || now.Equal(inbound.End)) &&
-			(now.After(inbound.Start) || now.Equal(inbound.Start))) &&
-		!inbound.IsActive {
+		!now.After(inbound.End) &&
+		!now.Before(inbound.Start) &&
+		inbound.TrafficLimit > inbound.TrafficUsage {
 		return true
 	}
 	return false
