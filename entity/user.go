@@ -8,4 +8,5 @@ type User struct {
 	IsAdmin      bool
 	Password     string
 	IsSuperAdmin bool
+	TelegramID   string
 }

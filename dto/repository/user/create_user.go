@@ -7,4 +7,5 @@ type Create struct {
 	IsAdmin      bool
 	Password     string
 	IsSuperAdmin bool
+	TelegramID   string
 }

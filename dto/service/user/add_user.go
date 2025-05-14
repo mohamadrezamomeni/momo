@@ -1,9 +1,10 @@
 package user
 
 type AddUser struct {
-	IsAdmin   bool
-	Password  string
-	LastName  string
-	FirstName string
-	Username  string
+	IsAdmin    bool
+	Password   string
+	LastName   string
+	FirstName  string
+	Username   string
+	TelegramID string
 }

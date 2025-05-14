@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/google/uuid"
+	userServiceDto "github.com/mohamadrezamomeni/momo/dto/service/user"
 	"github.com/mohamadrezamomeni/momo/entity"
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
@@ -25,6 +26,15 @@ func (u *MockUser) FindByUsername(username string) (*entity.User, error) {
 	return &entity.User{
 		ID:        uuid.New().String(),
 		Username:  username,
+		FirstName: utils.RandomString(5),
+		LastName:  utils.RandomString(5),
+	}, nil
+}
+
+func (u *MockUser) Create(_ *userServiceDto.AddUser) (*entity.User, error) {
+	return &entity.User{
+		ID:        uuid.New().String(),
+		Username:  "",
 		FirstName: utils.RandomString(5),
 		LastName:  utils.RandomString(5),
 	}, nil

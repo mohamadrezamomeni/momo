@@ -2,6 +2,7 @@ package auth
 
 import (
 	authServiceDto "github.com/mohamadrezamomeni/momo/dto/service/auth"
+	userServiceDto "github.com/mohamadrezamomeni/momo/dto/service/user"
 	"github.com/mohamadrezamomeni/momo/entity"
 	"github.com/mohamadrezamomeni/momo/service/crypt"
 )
@@ -15,6 +16,7 @@ type Auth struct {
 type UserService interface {
 	FindByID(string) (*entity.User, error)
 	FindByUsername(string) (*entity.User, error)
+	Create(*userServiceDto.AddUser) (*entity.User, error)
 }
 
 func New(userSvc UserService, crypt *crypt.Crypt, config *AuthConfig) *Auth {
@@ -37,4 +39,19 @@ func (a *Auth) Login(inpt *authServiceDto.LoginDto) (string, string, error) {
 	}
 
 	return token, "", nil
+}
+
+func (a *Auth) Register(registerDto *authServiceDto.RegisterDto) (string, error) {
+	user, err := a.userSvc.Create(&userServiceDto.AddUser{
+		IsAdmin:    false,
+		LastName:   registerDto.Lastname,
+		FirstName:  registerDto.Firstname,
+		Username:   registerDto.Username,
+		TelegramID: registerDto.TelegramID,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return user.ID, nil
 }

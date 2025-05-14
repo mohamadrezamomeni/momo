@@ -18,7 +18,8 @@ CREATE TABLE `users` (
     `firstName` varchar(32),
     `password` varchar(64),
     `is_admin` boolean DEFAULT false,
-    `is_super_admin` boolean DEFAULT false
+    `is_super_admin` boolean DEFAULT false,
+    `telegram_id` varchar(32)
 );
 
 -- +migrate Down

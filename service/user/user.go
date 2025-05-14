@@ -36,11 +36,12 @@ func (u *User) Create(userDto *userServiceDto.AddUser) (*entity.User, error) {
 	}
 
 	return u.userRepo.Create(&userRepoDto.Create{
-		IsAdmin:   userDto.IsAdmin,
-		FirstName: userDto.FirstName,
-		LastName:  userDto.LastName,
-		Username:  userDto.Username,
-		Password:  passwordHashed,
+		IsAdmin:    userDto.IsAdmin,
+		TelegramID: userDto.TelegramID,
+		FirstName:  userDto.FirstName,
+		LastName:   userDto.LastName,
+		Username:   userDto.Username,
+		Password:   passwordHashed,
 	})
 }
 
