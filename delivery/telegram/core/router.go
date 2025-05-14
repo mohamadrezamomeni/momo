@@ -28,12 +28,11 @@ func (r *Router) Register(path string, h HandlerFunc, ms ...Middleware) {
 	r.routing[path] = finalHandler
 }
 
-func (r *Router) getHandler(p string) HandlerFunc {
-	for path, handler := range r.routing {
-		if path == p {
-			return handler
-		}
+func (r *Router) getHandler(path string) HandlerFunc {
+	if handler, isExist := r.routing[path]; isExist {
+		return handler
 	}
+
 	return r.rootHandler
 }
 
