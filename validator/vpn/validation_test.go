@@ -65,6 +65,6 @@ func TestValidateFilter(t *testing.T) {
 		Domain: "fggggg",
 	})
 	if err == nil {
-		t.Errorf("something went wrong that was %v", err)
+		t.Errorf("we expected an error")
 	}
 }
