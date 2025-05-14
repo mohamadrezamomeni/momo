@@ -9,6 +9,7 @@ import (
 	"github.com/mohamadrezamomeni/momo/repository/migrate"
 
 	serviceInitializer "github.com/mohamadrezamomeni/momo/pkg/service"
+	telegramMessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
 )
 
 var configPath = "config.yaml"
@@ -20,6 +21,8 @@ func main() {
 	}
 
 	momoLog.Init(cfg.Log)
+
+	telegramMessages.Load()
 
 	migration := migrate.New(&cfg.DB)
 
