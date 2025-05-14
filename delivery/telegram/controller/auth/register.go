@@ -8,6 +8,7 @@ import (
 	"github.com/mohamadrezamomeni/momo/delivery/telegram/core"
 	authServiceDto "github.com/mohamadrezamomeni/momo/dto/service/auth"
 	"github.com/mohamadrezamomeni/momo/pkg/cache"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 )
 
 type UserRegisteration struct {
@@ -19,6 +20,32 @@ type UserRegisteration struct {
 
 func generateRegistrationKey(id string) string {
 	return id + "-registeration"
+}
+
+func (h *Handler) CheckDuplicateRegistration(next core.HandlerFunc) core.HandlerFunc {
+	scope := "telegram.controller.CheckDuplicateRegistration"
+	return func(update *tgbotapi.Update) (*core.ResponseHandlerFunc, error) {
+		id, err := core.GetID(update)
+		if err != nil {
+			return nil, err
+		}
+
+		user, err := h.userSvc.FindByTelegramID(id)
+
+		if user != nil {
+			return nil, momoError.Scope(scope).Input(update).Errorf("you were registered before")
+		}
+
+		momoErr, ok := err.(*momoError.MomoError)
+		if !ok {
+			return nil, err
+		}
+
+		if momoErr.GetErrorType() != momoError.NotFound {
+			return nil, err
+		}
+		return next(update)
+	}
 }
 
 func (h *Handler) SetUserRegisteration(next core.HandlerFunc) core.HandlerFunc {

@@ -15,6 +15,7 @@ type UserRepo interface {
 	DeleteByUsername(string) error
 	DeletePreviousSuperAdmins() error
 	FilterUsers(*userRepoDto.FilterUsers) ([]*entity.User, error)
+	FindByTelegramID(string) (*entity.User, error)
 }
 
 type User struct {
@@ -79,4 +80,8 @@ func (u *User) DeleteByUsername(username string) error {
 
 func (u *User) Filter() ([]*entity.User, error) {
 	return u.userRepo.FilterUsers(&userRepoDto.FilterUsers{})
+}
+
+func (u *User) FindByTelegramID(tid string) (*entity.User, error) {
+	return u.userRepo.FindByTelegramID(tid)
 }

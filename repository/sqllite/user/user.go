@@ -206,6 +206,10 @@ func (u *User) FindUserByUsername(username string) (*entity.User, error) {
 	return u.findUser("username", username)
 }
 
+func (u *User) FindByTelegramID(tid string) (*entity.User, error) {
+	return u.findUser("telegram_id", tid)
+}
+
 func (u *User) FindUserByID(ID string) (*entity.User, error) {
 	return u.findUser("id", ID)
 }
