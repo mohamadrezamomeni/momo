@@ -44,14 +44,21 @@ func (t *Telegram) Serve() {
 	updates := t.bot.GetUpdatesChan(u)
 
 	t.authHandler.SetRouter(t.core)
+	t.rootHandler.SetRouter(t.core)
 
 	for update := range updates {
 		res := t.core.Route(&update)
-		t.bot.Send(res.Result)
-
-		if res.RedirectRoot {
-			r, _ := t.rootHandler.Root(&update)
-			t.bot.Send(r.Result)
+		if res != nil {
+			t.send(res, &update)
 		}
+	}
+}
+
+func (t *Telegram) send(res *core.ResponseHandlerFunc, update *tgbotapi.Update) {
+	t.bot.Send(res.Result)
+
+	if res.RedirectRoot {
+		r, _ := t.rootHandler.Root(update)
+		t.bot.Send(r.Result)
 	}
 }

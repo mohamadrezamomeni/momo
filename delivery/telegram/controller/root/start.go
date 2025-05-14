@@ -7,8 +7,8 @@ import (
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
 
-func (h *Handler) Root(update *tgbotapi.Update) (*core.ResponseHandlerFunc, error) {
-	scope := "telegram.controller.root"
+func (h *Handler) Start(update *tgbotapi.Update) (*core.ResponseHandlerFunc, error) {
+	scope := "telegram.controller.start"
 
 	idStr, _ := core.GetID(update)
 	id, err := utils.ConvertToInt64(idStr)
@@ -16,17 +16,11 @@ func (h *Handler) Root(update *tgbotapi.Update) (*core.ResponseHandlerFunc, erro
 		return nil, momoError.Wrap(err).Scope(scope).Input(update).ErrorWrite()
 	}
 
-	msg := tgbotapi.NewMessage(int64(id), "Please press the button:")
-
-	button := tgbotapi.NewInlineKeyboardButtonData("register", "register")
-	markup := tgbotapi.NewInlineKeyboardMarkup(
-		tgbotapi.NewInlineKeyboardRow(button),
-	)
-
-	msg.ReplyMarkup = markup
+	msg := tgbotapi.NewMessage(int64(id), "hello welcome to our home")
 
 	return &core.ResponseHandlerFunc{
 		Result:       msg,
 		ReleaseState: true,
+		RedirectRoot: true,
 	}, nil
 }

@@ -1,10 +1,9 @@
 package core
 
 import (
-	"strconv"
-
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/mohamadrezamomeni/momo/pkg/cache"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 )
 
 type Router struct {
@@ -36,7 +35,6 @@ func (r *Router) getHandler(p string) HandlerFunc {
 func (r *Router) Route(update *tgbotapi.Update) *ResponseHandlerFunc {
 	var res *ResponseHandlerFunc
 	var path string
-	key := r.getKey(update.FromChat().ID)
 
 	if update.CallbackQuery != nil {
 		res, path = r.callbackQuery(update)
@@ -45,7 +43,11 @@ func (r *Router) Route(update *tgbotapi.Update) *ResponseHandlerFunc {
 	if update.Message != nil {
 		res, path = r.message(update)
 	}
+	if update.MyChatMember != nil {
+		return nil
+	}
 
+	key := r.getKey(update)
 	if res != nil && !res.ReleaseState && len(path) > 0 {
 		cache.Set(key, path)
 	} else if res != nil && (res.ReleaseState || len(path) == 0) {
@@ -55,7 +57,6 @@ func (r *Router) Route(update *tgbotapi.Update) *ResponseHandlerFunc {
 	if res == nil {
 		res, _ = r.rootHandler(update)
 	}
-
 	return res
 }
 
@@ -73,7 +74,7 @@ func (r *Router) callbackQuery(update *tgbotapi.Update) (*ResponseHandlerFunc, s
 
 func (r *Router) message(update *tgbotapi.Update) (*ResponseHandlerFunc, string) {
 	text := update.Message.Text
-	key := r.getKey(update.FromChat().ID)
+	key := r.getKey(update)
 
 	if r.isPath(text) {
 		path := r.getPathFromText(text)
@@ -128,7 +129,10 @@ func (r *Router) routeFromText(path string, update *tgbotapi.Update) *ResponseHa
 	return res
 }
 
-func (r *Router) getKey(id int64) string {
-	idStr := strconv.Itoa(int(id))
-	return idStr
+func (r *Router) getKey(update *tgbotapi.Update) string {
+	id, err := GetID(update)
+	if err != nil {
+		momoError.Wrap(err).Input(update).Fatal()
+	}
+	return id
 }
