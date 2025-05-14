@@ -18,7 +18,7 @@ func (h *Handler) Root(update *tgbotapi.Update) (*core.ResponseHandlerFunc, erro
 
 	msg := tgbotapi.NewMessage(int64(id), "Please press the button:")
 
-	button := tgbotapi.NewInlineKeyboardButtonData("register", "register")
+	button := tgbotapi.NewInlineKeyboardButtonData("register", "/register")
 	markup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(button),
 	)

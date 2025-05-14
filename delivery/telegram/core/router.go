@@ -61,19 +61,16 @@ func (r *Router) Route(update *tgbotapi.Update) *ResponseHandlerFunc {
 }
 
 func (r *Router) callbackQuery(update *tgbotapi.Update) (*ResponseHandlerFunc, string) {
-	path := update.CallbackQuery.Data
-	handler := r.getHandler(path)
-
-	res, err := handler(update)
-	if err != nil {
-		res, _ := r.rootHandler(update)
-		return res, ""
-	}
-	return res, path
+	text := update.CallbackQuery.Data
+	return r.getResponse(text, update)
 }
 
 func (r *Router) message(update *tgbotapi.Update) (*ResponseHandlerFunc, string) {
 	text := update.Message.Text
+	return r.getResponse(text, update)
+}
+
+func (r *Router) getResponse(text string, update *tgbotapi.Update) (*ResponseHandlerFunc, string) {
 	key := r.getKey(update)
 
 	if r.isPath(text) {
