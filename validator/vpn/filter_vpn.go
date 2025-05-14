@@ -2,6 +2,7 @@ package vpn
 
 import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 	vpnControllerDto "github.com/mohamadrezamomeni/momo/dto/controller/vpn"
 	"github.com/mohamadrezamomeni/momo/entity"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
@@ -13,7 +14,7 @@ func (v *Validator) ValidateFilterVPNs(req vpnControllerDto.FilterVPNs) error {
 		&req,
 		validation.Field(
 			&req.Domain,
-			validation.Length(3, 0),
+			is.URL,
 		),
 		validation.Field(
 			&req.VPNType,
