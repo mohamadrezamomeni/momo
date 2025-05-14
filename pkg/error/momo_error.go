@@ -18,6 +18,7 @@ const (
 	Forbidden
 	BadRequest
 	NotFound
+	Duplicate
 )
 
 type MomoError struct {
@@ -98,6 +99,11 @@ func (m *MomoError) BadRequest() *MomoError {
 }
 
 func (m *MomoError) Forbidden() *MomoError {
+	m.errorType = Forbidden
+	return m
+}
+
+func (m *MomoError) Duplicate() *MomoError {
 	m.errorType = Forbidden
 	return m
 }

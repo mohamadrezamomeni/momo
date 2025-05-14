@@ -8,6 +8,7 @@ import (
 	vpnManagerDto "github.com/mohamadrezamomeni/momo/dto/repository/vpn_manager"
 	"github.com/mohamadrezamomeni/momo/entity"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
+	errorRepository "github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
 
 func (v *VPN) Create(inpt *vpnManagerDto.AddVPN) (*entity.VPN, error) {
@@ -27,10 +28,14 @@ func (v *VPN) Create(inpt *vpnManagerDto.AddVPN) (*entity.VPN, error) {
 	`, inpt.Domain, inpt.IsActive, inpt.ApiPort, entity.VPNTypeString(vpn.VPNType), inpt.UserCount).Scan(
 		&vpn.ID,
 	)
-	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Input(inpt).DebuggingError()
+	if err == nil {
+		return vpn, nil
 	}
-	return vpn, nil
+
+	if errorRepository.IsDuplicateError(err) {
+		return nil, momoError.Wrap(err).Input(inpt).Duplicate().Scope(scope).DebuggingError()
+	}
+	return nil, momoError.Wrap(err).Input(inpt).UnExpected().Scope(scope).DebuggingError()
 }
 
 func (i *VPN) Delete(id int) error {

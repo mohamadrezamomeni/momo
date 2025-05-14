@@ -30,6 +30,8 @@ func mapMomoErrorTypeToHttpStatus(errType momoError.ErrorType) int {
 		return http.StatusInternalServerError
 	case momoError.NotFound:
 		return http.StatusNotFound
+	case momoError.Duplicate:
+		return http.StatusConflict
 	default:
 		return http.StatusInternalServerError
 	}
@@ -53,6 +55,8 @@ func getMessage(err error) string {
 		return "input is wrong"
 	case http.StatusNotFound:
 		return "no record found"
+	case http.StatusConflict:
+		return "this record exist"
 	default:
 		return "something went wrong"
 	}

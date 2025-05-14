@@ -8,6 +8,7 @@ import (
 	hostmanagerDto "github.com/mohamadrezamomeni/momo/dto/repository/host_manager"
 	"github.com/mohamadrezamomeni/momo/entity"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
+	errorRepository "github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
 
 func (h *Host) Create(inpt *hostmanagerDto.AddHost) (*entity.Host, error) {
@@ -23,11 +24,13 @@ func (h *Host) Create(inpt *hostmanagerDto.AddHost) (*entity.Host, error) {
 	VALUES (?, ?, ?, ?)
 	RETURNING id
 `, host.Domain, host.Port, entity.HostStatusString(host.Status), inpt.Rank).Scan(&host.ID)
-	if err != nil {
-		return nil, momoError.Wrap(err).Input(inpt).UnExpected().Scope(scope).DebuggingError()
+	if err == nil {
+		return host, nil
 	}
-
-	return host, nil
+	if errorRepository.IsDuplicateError(err) {
+		return nil, momoError.Wrap(err).Input(inpt).Duplicate().Scope(scope).DebuggingError()
+	}
+	return nil, momoError.Wrap(err).Input(inpt).UnExpected().Scope(scope).DebuggingError()
 }
 
 func (h *Host) FindByID(id int) (*entity.Host, error) {

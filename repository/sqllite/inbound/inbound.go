@@ -10,6 +10,7 @@ import (
 	inboundDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
 	"github.com/mohamadrezamomeni/momo/entity"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
+	errorRepository "github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
 
 func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error) {
@@ -51,11 +52,16 @@ func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error
 		&inbound.TrafficUsage,
 		&inbound.TrafficLimit,
 	)
-	if err != nil {
-		return nil, momoError.Wrap(err).UnExpected().Input(inpt).Scope(scope).DebuggingError()
+
+	if err == nil {
+		inbound.VPNType = inpt.VPNType
+		return inbound, nil
 	}
-	inbound.VPNType = inpt.VPNType
-	return inbound, nil
+
+	if errorRepository.IsDuplicateError(err) {
+		return nil, momoError.Wrap(err).Input(inpt).Duplicate().Scope(scope).DebuggingError()
+	}
+	return nil, momoError.Wrap(err).Input(inpt).UnExpected().Scope(scope).DebuggingError()
 }
 
 func (i *Inbound) FindInboundByID(id string) (*entity.Inbound, error) {

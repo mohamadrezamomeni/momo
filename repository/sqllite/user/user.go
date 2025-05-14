@@ -9,6 +9,7 @@ import (
 	dto "github.com/mohamadrezamomeni/momo/dto/repository/user"
 	"github.com/mohamadrezamomeni/momo/entity"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
+	errorRepository "github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
 
 func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
@@ -41,7 +42,10 @@ func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 		return nil, momoError.Wrap(err).Scope(scope).Input(inpt).DebuggingError()
 	}
 
-	return user, nil
+	if errorRepository.IsDuplicateError(err) {
+		return nil, momoError.Wrap(err).Input(inpt).Duplicate().Scope(scope).DebuggingError()
+	}
+	return nil, momoError.Wrap(err).Input(inpt).UnExpected().Scope(scope).DebuggingError()
 }
 
 func (u *User) Upsert(inpt *dto.Create) (*entity.User, error) {
@@ -74,11 +78,15 @@ func (u *User) Upsert(inpt *dto.Create) (*entity.User, error) {
 		&user.IsSuperAdmin,
 		&user.TelegramID,
 	)
-	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Input(inpt).DebuggingError()
+
+	if err == nil {
+		return user, nil
 	}
 
-	return user, nil
+	if errorRepository.IsDuplicateError(err) {
+		return nil, momoError.Wrap(err).Input(inpt).Duplicate().Scope(scope).DebuggingError()
+	}
+	return nil, momoError.Wrap(err).Input(inpt).UnExpected().Scope(scope).DebuggingError()
 }
 
 func (u *User) Delete(id string) error {
