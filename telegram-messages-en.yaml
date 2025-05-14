@@ -1,0 +1,12 @@
+testing:
+  registeration_testing: "hello :username:"
+error:
+  internal_error: 😕 Oops! Something went wrong. Let the admin know so we can fix it.
+auth:
+  registeration:
+    duplicate_register: 🎉 You're already registered! No need to do it again.
+    username_existence: ❌ The username you chose has already been taken. Please try a different one.
+    successfully_registeration: "😊 You're welcome! Here is your information:\n  username: :username:\n  firstname: :firstname:\n lastname: :lastname:"
+    input_username: 📝 Please enter your username. This username may be used on the platform in the future.
+    input_firstname: 📝 Please enter your name.
+    input_lastname: 📝 Please enter your lastname.
