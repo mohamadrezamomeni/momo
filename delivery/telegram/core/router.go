@@ -7,14 +7,14 @@ import (
 )
 
 type Router struct {
-	routing     map[string]HandlerFunc
-	rootHandler HandlerFunc
+	routing      map[string]HandlerFunc
+	defaultRoute string
 }
 
-func New(rootHandler HandlerFunc) *Router {
+func New(defaultRoute string) *Router {
 	return &Router{
-		routing:     make(map[string]HandlerFunc),
-		rootHandler: rootHandler,
+		routing:      make(map[string]HandlerFunc),
+		defaultRoute: defaultRoute,
 	}
 }
 
@@ -132,4 +132,10 @@ func (r *Router) getKey(update *tgbotapi.Update) string {
 		momoError.Wrap(err).Input(update).Fatal()
 	}
 	return id
+}
+
+func (r *Router) rootHandler(update *tgbotapi.Update) (*ResponseHandlerFunc, error) {
+	handler := r.getHandler(r.defaultRoute)
+	res, err := handler(update)
+	return res, err
 }

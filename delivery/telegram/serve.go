@@ -31,7 +31,7 @@ func New(cfg *TelegramConfig, userSvc *userService.User, authSvc *authService.Au
 	return &Telegram{
 		rootHandler: rootHandler,
 		bot:         bot,
-		core:        core.New(rootHandler.Root),
+		core:        core.New("menu"),
 		config:      cfg,
 		userSvc:     userSvc,
 		authHandler: authHandler.New(authSvc),
