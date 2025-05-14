@@ -156,7 +156,8 @@ func TestValidateExtendingInbound(t *testing.T) {
 		IdentifyInbounbdDto: inbound.IdentifyInbounbdDto{
 			ID: strconv.Itoa(inboundCreated.ID),
 		},
-		End: now.AddDate(0, 2, 0).Format(time.DateTime),
+		End:                  now.AddDate(0, 2, 0).Format(time.DateTime),
+		ExtendedTrafficLimit: 20,
 	})
 	if err != nil {
 		t.Errorf("something went wrong the problem was %v", err)
@@ -166,7 +167,8 @@ func TestValidateExtendingInbound(t *testing.T) {
 		IdentifyInbounbdDto: inbound.IdentifyInbounbdDto{
 			ID: strconv.Itoa(inboundCreated.ID),
 		},
-		End: now.AddDate(0, 1, 0).Format(time.DateTime),
+		End:                  now.AddDate(0, 1, 0).Format(time.DateTime),
+		ExtendedTrafficLimit: 20,
 	})
 	if err != nil {
 		t.Error("we expected input end will be greater than current end")
@@ -176,7 +178,8 @@ func TestValidateExtendingInbound(t *testing.T) {
 		IdentifyInbounbdDto: inbound.IdentifyInbounbdDto{
 			ID: strconv.Itoa(inboundCreated.ID),
 		},
-		End: now.AddDate(0, 0, 2).Format(time.DateTime),
+		End:                  now.AddDate(0, 0, 2).Format(time.DateTime),
+		ExtendedTrafficLimit: 20,
 	})
 
 	if err == nil {
@@ -193,7 +196,8 @@ func TestValidateExtendingInbound(t *testing.T) {
 		IdentifyInbounbdDto: inbound.IdentifyInbounbdDto{
 			ID: strconv.Itoa(inboundCreated.ID),
 		},
-		End: now.AddDate(1, 0, 2).Format(time.DateTime),
+		End:                  now.AddDate(1, 0, 2).Format(time.DateTime),
+		ExtendedTrafficLimit: 20,
 	})
 
 	if err == nil {
@@ -206,9 +210,10 @@ func TestValidateSettingPeriodTime(t *testing.T) {
 	now = now.Truncate(time.Second)
 
 	inboundCreated, _ := inboundSvcMock.Create(&inboundServiceDto.CreateInbound{
-		ServerType: entity.High,
-		Start:      now.AddDate(0, -2, 0),
-		End:        now.AddDate(0, -1, 0),
+		ServerType:   entity.High,
+		Start:        now.AddDate(0, -2, 0),
+		End:          now.AddDate(0, -1, 0),
+		TrafficLimit: 20,
 	})
 	defer inboundSvcMock.DeletedAll()
 
@@ -216,8 +221,9 @@ func TestValidateSettingPeriodTime(t *testing.T) {
 		IdentifyInbounbdDto: inboundControllerDto.IdentifyInbounbdDto{
 			ID: strconv.Itoa(inboundCreated.ID),
 		},
-		Start: now.AddDate(0, 1, 1).Format(time.DateTime),
-		End:   now.AddDate(0, 1, 2).Format(time.DateTime),
+		Start:        now.AddDate(0, 1, 1).Format(time.DateTime),
+		End:          now.AddDate(0, 1, 2).Format(time.DateTime),
+		TrafficLimit: 20,
 	})
 	if err != nil {
 		t.Errorf("something went wrong the problem was %v", err)
@@ -227,8 +233,9 @@ func TestValidateSettingPeriodTime(t *testing.T) {
 		IdentifyInbounbdDto: inboundControllerDto.IdentifyInbounbdDto{
 			ID: strconv.Itoa(inboundCreated.ID),
 		},
-		Start: now.AddDate(0, 1, 1).Format(time.DateTime),
-		End:   now.Format(time.DateTime),
+		Start:        now.AddDate(0, 1, 1).Format(time.DateTime),
+		End:          now.Format(time.DateTime),
+		TrafficLimit: 20,
 	})
 	if err == nil {
 		t.Errorf("we expected an error")
@@ -238,8 +245,9 @@ func TestValidateSettingPeriodTime(t *testing.T) {
 		IdentifyInbounbdDto: inboundControllerDto.IdentifyInbounbdDto{
 			ID: strconv.Itoa(inboundCreated.ID),
 		},
-		Start: now.AddDate(0, -1, -1).Format(time.DateTime),
-		End:   now.AddDate(0, 1, 2).Format(time.DateTime),
+		Start:        now.AddDate(0, -1, -1).Format(time.DateTime),
+		End:          now.AddDate(0, 1, 2).Format(time.DateTime),
+		TrafficLimit: 20,
 	})
 	if err == nil {
 		t.Errorf("something went wrong the problem was %v", err)
