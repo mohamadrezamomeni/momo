@@ -38,8 +38,8 @@ func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 		&user.IsSuperAdmin,
 		&user.TelegramID,
 	)
-	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Input(inpt).DebuggingError()
+	if err == nil {
+		return user, nil
 	}
 
 	if errorRepository.IsDuplicateError(err) {
