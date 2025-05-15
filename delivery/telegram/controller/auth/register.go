@@ -175,6 +175,12 @@ func (h *Handler) SetLastname(next core.HandlerFunc) core.HandlerFunc {
 func (h *Handler) Register(update *tgbotapi.Update) (*core.ResponseHandlerFunc, error) {
 	idStr := strconv.Itoa(int(update.FromChat().ID))
 	key := generateRegistrationKey(idStr)
+	stateKey := generateStateKey(idStr)
+
+	defer func() {
+		cache.Delete(key)
+		cache.Delete(stateKey)
+	}()
 
 	value, _ := cache.Get(key)
 	userRegistertion, _ := value.(*UserRegisteration)
@@ -185,7 +191,6 @@ func (h *Handler) Register(update *tgbotapi.Update) (*core.ResponseHandlerFunc, 
 		TelegramID: idStr,
 	})
 	if err != nil {
-		cache.Delete(key)
 		return nil, err
 	}
 
