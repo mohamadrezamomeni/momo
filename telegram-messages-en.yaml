@@ -26,6 +26,7 @@ inbound:
     block: "⛔ Blocked"
     active: "🟢 Active"
     deactive: "🔴 Inactive"
+    not_found: 🌐 You haven’t created a VPN yet — it would be our honor if you set one up!
   create:
     successfully_creation: 🎉 Your VPN has been set up
     select_traffic_limit: 📝 select your desire trafficlimit

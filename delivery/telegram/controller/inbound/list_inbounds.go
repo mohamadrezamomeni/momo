@@ -35,6 +35,15 @@ func (h *Handler) ListInbounds(update *core.Update) (*core.ResponseHandlerFunc, 
 		return nil, err
 	}
 
+	if len(inbounds) == 0 {
+		notFoundTitle, _ := telegrammessages.GetMessage("inbound.list.not_found", map[string]string{})
+		return &core.ResponseHandlerFunc{
+			Result:       tgbotapi.NewMessage(id, notFoundTitle),
+			ReleaseState: true,
+			RedirectRoot: true,
+		}, nil
+	}
+
 	var sb strings.Builder
 
 	title, err := telegrammessages.GetMessage("inbound.list.inbounds_title", map[string]string{})
