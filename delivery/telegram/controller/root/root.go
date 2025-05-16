@@ -4,10 +4,11 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/mohamadrezamomeni/momo/delivery/telegram/core"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
+	telegrammessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
 
-func (h *Handler) Root(update *tgbotapi.Update) (*core.ResponseHandlerFunc, error) {
+func (h *Handler) Root(update *core.Update) (*core.ResponseHandlerFunc, error) {
 	scope := "telegram.controller.root"
 
 	idStr, _ := core.GetID(update)
@@ -16,12 +17,36 @@ func (h *Handler) Root(update *tgbotapi.Update) (*core.ResponseHandlerFunc, erro
 		return nil, momoError.Wrap(err).Scope(scope).Input(update).ErrorWrite()
 	}
 
-	msg := tgbotapi.NewMessage(int64(id), "Please press the button:")
+	titleMenu, err := telegrammessages.GetMessage("root.menu", map[string]string{})
+	if err != nil {
+		return nil, err
+	}
 
-	button := tgbotapi.NewInlineKeyboardButtonData("register", "/register")
-	markup := tgbotapi.NewInlineKeyboardMarkup(
-		tgbotapi.NewInlineKeyboardRow(button),
-	)
+	titleListVPNs, err := telegrammessages.GetMessage("inbound.list_buttom", map[string]string{})
+	if err != nil {
+		return nil, err
+	}
+
+	titleCreateVPNs, err := telegrammessages.GetMessage("inbound.create_buttom", map[string]string{})
+	if err != nil {
+		return nil, err
+	}
+
+	msg := tgbotapi.NewMessage(int64(id), titleMenu)
+
+	inlineKeyboard := [][]tgbotapi.InlineKeyboardButton{}
+
+	if update.UserSystem != nil {
+		button := tgbotapi.NewInlineKeyboardButtonData("register", "/register")
+
+		inlineKeyboard = append(inlineKeyboard, tgbotapi.NewInlineKeyboardRow(button))
+	} else {
+		listInboundsButtom := tgbotapi.NewInlineKeyboardButtonData(titleListVPNs, "/list_inbound")
+		createInboundsButtom := tgbotapi.NewInlineKeyboardButtonData(titleCreateVPNs, "/create_inbound")
+		inlineKeyboard = append(inlineKeyboard, tgbotapi.NewInlineKeyboardRow(listInboundsButtom, createInboundsButtom))
+	}
+
+	markup := tgbotapi.NewInlineKeyboardMarkup(inlineKeyboard...)
 
 	msg.ReplyMarkup = markup
 

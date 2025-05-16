@@ -49,18 +49,22 @@ func (t *Telegram) Serve() {
 	t.rootHandler.SetRouter(t.core)
 
 	for update := range updates {
-		res, err := t.core.Route(&update)
+		customUpdate := &core.Update{
+			Update: &update,
+		}
+
+		res, err := t.core.Route(customUpdate)
 		if err != nil {
-			t.sendError(&update)
+			t.sendError(customUpdate)
 		}
 
 		if res != nil {
-			t.send(res, &update)
+			t.send(res, customUpdate)
 		}
 	}
 }
 
-func (t *Telegram) send(res *core.ResponseHandlerFunc, update *tgbotapi.Update) {
+func (t *Telegram) send(res *core.ResponseHandlerFunc, update *core.Update) {
 	t.bot.Send(res.Result)
 
 	if res.RedirectRoot {
@@ -69,7 +73,7 @@ func (t *Telegram) send(res *core.ResponseHandlerFunc, update *tgbotapi.Update) 
 	}
 }
 
-func (t *Telegram) sendError(update *tgbotapi.Update) {
+func (t *Telegram) sendError(update *core.Update) {
 	errMessage, _ := telegrammessages.GetMessage("error.internal_error", map[string]string{})
 	idStr, _ := core.GetID(update)
 	id, _ := utils.ConvertToInt64(idStr)

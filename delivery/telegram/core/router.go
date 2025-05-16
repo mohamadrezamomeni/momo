@@ -1,7 +1,6 @@
 package core
 
 import (
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/mohamadrezamomeni/momo/pkg/cache"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 )
@@ -36,7 +35,7 @@ func (r *Router) getHandler(path string) HandlerFunc {
 	return r.rootHandler
 }
 
-func (r *Router) Route(update *tgbotapi.Update) (*ResponseHandlerFunc, error) {
+func (r *Router) Route(update *Update) (*ResponseHandlerFunc, error) {
 	var res *ResponseHandlerFunc
 	var path string
 	var err error
@@ -66,17 +65,17 @@ func (r *Router) Route(update *tgbotapi.Update) (*ResponseHandlerFunc, error) {
 	return res, err
 }
 
-func (r *Router) callbackQuery(update *tgbotapi.Update) (*ResponseHandlerFunc, string, error) {
+func (r *Router) callbackQuery(update *Update) (*ResponseHandlerFunc, string, error) {
 	text := update.CallbackQuery.Data
 	return r.getResponse(text, update)
 }
 
-func (r *Router) message(update *tgbotapi.Update) (*ResponseHandlerFunc, string, error) {
+func (r *Router) message(update *Update) (*ResponseHandlerFunc, string, error) {
 	text := update.Message.Text
 	return r.getResponse(text, update)
 }
 
-func (r *Router) getResponse(text string, update *tgbotapi.Update) (*ResponseHandlerFunc, string, error) {
+func (r *Router) getResponse(text string, update *Update) (*ResponseHandlerFunc, string, error) {
 	key := r.getKey(update)
 
 	if r.isPath(text) {
@@ -123,7 +122,7 @@ func (r *Router) getPathFromText(path string) string {
 	return path[1:]
 }
 
-func (r *Router) routeFromText(path string, update *tgbotapi.Update) (*ResponseHandlerFunc, error) {
+func (r *Router) routeFromText(path string, update *Update) (*ResponseHandlerFunc, error) {
 	handler := r.getHandler(path)
 	res, err := handler(update)
 	if err != nil {
@@ -133,7 +132,7 @@ func (r *Router) routeFromText(path string, update *tgbotapi.Update) (*ResponseH
 	return res, nil
 }
 
-func (r *Router) getKey(update *tgbotapi.Update) string {
+func (r *Router) getKey(update *Update) string {
 	id, err := GetID(update)
 	if err != nil {
 		momoError.Wrap(err).Input(update).Fatal()
@@ -141,7 +140,7 @@ func (r *Router) getKey(update *tgbotapi.Update) string {
 	return id
 }
 
-func (r *Router) rootHandler(update *tgbotapi.Update) (*ResponseHandlerFunc, error) {
+func (r *Router) rootHandler(update *Update) (*ResponseHandlerFunc, error) {
 	handler := r.getHandler(r.defaultRoute)
 	res, err := handler(update)
 	return res, err

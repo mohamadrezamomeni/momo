@@ -10,3 +10,9 @@ auth:
     input_username: 📝 Please enter your username. This username may be used on the platform in the future.
     input_firstname: 📝 Please enter your name.
     input_lastname: 📝 Please enter your lastname.
+root:
+  menu: 😊 Where would you like to go next?
+
+inbound:
+  list_buttom: 👀 See My VPNs
+  create_buttom: 🚀 Create Your VPN

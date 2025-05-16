@@ -28,7 +28,7 @@ func generateStateKey(id string) string {
 
 func (h *Handler) CheckDuplicateRegistration(next core.HandlerFunc) core.HandlerFunc {
 	scope := "telegram.controller.CheckDuplicateRegistration"
-	return func(update *tgbotapi.Update) (*core.ResponseHandlerFunc, error) {
+	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		id, err := core.GetID(update)
 		if err != nil {
 			return nil, err
@@ -58,7 +58,7 @@ func (h *Handler) CheckDuplicateRegistration(next core.HandlerFunc) core.Handler
 }
 
 func (h *Handler) SetUserRegisteration(next core.HandlerFunc) core.HandlerFunc {
-	return func(update *tgbotapi.Update) (*core.ResponseHandlerFunc, error) {
+	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		idStr := strconv.Itoa(int(update.FromChat().ID))
 		key := generateRegistrationKey(idStr)
 		stateKey := generateStateKey(idStr)
@@ -86,7 +86,7 @@ func (h *Handler) SetUserRegisteration(next core.HandlerFunc) core.HandlerFunc {
 }
 
 func (h *Handler) SetUsername(next core.HandlerFunc) core.HandlerFunc {
-	return func(update *tgbotapi.Update) (*core.ResponseHandlerFunc, error) {
+	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		idStr := strconv.Itoa(int(update.FromChat().ID))
 		key := generateRegistrationKey(idStr)
 		stateKey := generateStateKey(idStr)
@@ -117,7 +117,7 @@ func (h *Handler) SetUsername(next core.HandlerFunc) core.HandlerFunc {
 }
 
 func (h *Handler) SetFirstname(next core.HandlerFunc) core.HandlerFunc {
-	return func(update *tgbotapi.Update) (*core.ResponseHandlerFunc, error) {
+	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		idStr := strconv.Itoa(int(update.FromChat().ID))
 		key := generateRegistrationKey(idStr)
 		stateKey := generateStateKey(idStr)
@@ -149,7 +149,7 @@ func (h *Handler) SetFirstname(next core.HandlerFunc) core.HandlerFunc {
 }
 
 func (h *Handler) SetLastname(next core.HandlerFunc) core.HandlerFunc {
-	return func(update *tgbotapi.Update) (*core.ResponseHandlerFunc, error) {
+	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		idStr := strconv.Itoa(int(update.FromChat().ID))
 		key := generateRegistrationKey(idStr)
 		stateKey := generateStateKey(idStr)
@@ -172,7 +172,7 @@ func (h *Handler) SetLastname(next core.HandlerFunc) core.HandlerFunc {
 	}
 }
 
-func (h *Handler) Register(update *tgbotapi.Update) (*core.ResponseHandlerFunc, error) {
+func (h *Handler) Register(update *core.Update) (*core.ResponseHandlerFunc, error) {
 	idStr := strconv.Itoa(int(update.FromChat().ID))
 	key := generateRegistrationKey(idStr)
 	stateKey := generateStateKey(idStr)

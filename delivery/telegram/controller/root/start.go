@@ -7,7 +7,7 @@ import (
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
 
-func (h *Handler) Start(update *tgbotapi.Update) (*core.ResponseHandlerFunc, error) {
+func (h *Handler) Start(update *core.Update) (*core.ResponseHandlerFunc, error) {
 	scope := "telegram.controller.start"
 
 	idStr, _ := core.GetID(update)

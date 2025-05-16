@@ -3,11 +3,10 @@ package core
 import (
 	"strconv"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 )
 
-func GetID(update *tgbotapi.Update) (string, error) {
+func GetID(update *Update) (string, error) {
 	scope := "telegram.core.GetID"
 	var id int64
 

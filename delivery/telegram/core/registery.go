@@ -8,7 +8,7 @@ type ResponseHandlerFunc struct {
 	RedirectRoot bool
 }
 
-type HandlerFunc = func(*tgbotapi.Update) (*ResponseHandlerFunc, error)
+type HandlerFunc = func(*Update) (*ResponseHandlerFunc, error)
 
 type Middleware = func(HandlerFunc) HandlerFunc
 
