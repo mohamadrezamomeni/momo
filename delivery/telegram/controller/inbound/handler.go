@@ -12,6 +12,7 @@ type Handler struct {
 
 type InboundService interface {
 	Filter(inpt *inboundServiceDto.FilterInbounds) ([]*entity.Inbound, error)
+	Create(inpt *inboundServiceDto.CreateInbound) (*entity.Inbound, error)
 }
 
 type UserService interface {

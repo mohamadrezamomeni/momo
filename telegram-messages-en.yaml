@@ -21,7 +21,11 @@ inbound:
     inbounds_title: "<b>📊 VPN Report:</b>\n\n"
     inbound_traffic_used: "   🔄 Used: :traffic_used:MB / :traffic_limit:MB\n"
     id_report: ":counter:. 🆔 :id:\n"
-    block: "✅ Not Blocked"
-    unblock: "⛔ Blocked"
+    unblock: "✅ Not Blocked"
+    block: "⛔ Blocked"
     active: "🟢 Active"
     deactive: "🔴 Inactive"
+  create:
+    successfully_creation: 🎉 Your VPN has been set up
+    select_traffic_limit: 📝 select your desire trafficlimit
+    select_vpn: 📝 select your desire vpn
