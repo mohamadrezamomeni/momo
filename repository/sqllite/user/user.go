@@ -17,9 +17,9 @@ func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 
 	user := &entity.User{}
 	err := u.db.Conn().QueryRow(`
-	INSERT INTO users (username, lastName, firstName, password, is_admin, is_super_admin, telegram_id)
-	VALUES (?, ?, ?, ?, ?, ?, ?)
-	RETURNING id, username, lastName, firstName, is_admin, password, is_super_admin, telegram_id
+	INSERT INTO users (username, lastName, firstName, password, is_admin, is_super_admin, telegram_id, is_approved)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+	RETURNING id, username, lastName, firstName, is_admin, password, is_super_admin, telegram_id, is_approved
 `,
 		inpt.Username,
 		inpt.LastName,
@@ -28,6 +28,7 @@ func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 		inpt.IsAdmin,
 		inpt.IsSuperAdmin,
 		inpt.TelegramID,
+		inpt.IsApproved,
 	).Scan(
 		&user.ID,
 		&user.Username,
@@ -37,6 +38,7 @@ func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 		&user.Password,
 		&user.IsSuperAdmin,
 		&user.TelegramID,
+		&user.IsApproved,
 	)
 	if err == nil {
 		return user, nil
@@ -53,14 +55,14 @@ func (u *User) Upsert(inpt *dto.Create) (*entity.User, error) {
 
 	user := &entity.User{}
 	err := u.db.Conn().QueryRow(`
-	INSERT INTO users (username, lastName, firstName, password, is_admin, is_super_admin, telegram_id)
-	VALUES (?, ?, ?, ?, ?, ?, ?)
+	INSERT INTO users (username, lastName, firstName, password, is_admin, is_super_admin, telegram_id, is_approved)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 	ON CONFLICT(username) DO UPDATE SET
 		password = excluded.password,
 		firstname = excluded.firstname,
 		lastname = excluded.lastname,
 		is_admin = excluded.is_admin
-	RETURNING id, username, lastName, firstName, is_admin, password, is_super_admin, telegram_id
+	RETURNING id, username, lastName, firstName, is_admin, password, is_super_admin, telegram_id, is_approved
 `, inpt.Username,
 		inpt.LastName,
 		inpt.FirstName,
@@ -68,6 +70,7 @@ func (u *User) Upsert(inpt *dto.Create) (*entity.User, error) {
 		inpt.IsAdmin,
 		inpt.IsSuperAdmin,
 		inpt.TelegramID,
+		inpt.IsApproved,
 	).Scan(
 		&user.ID,
 		&user.Username,
@@ -77,6 +80,7 @@ func (u *User) Upsert(inpt *dto.Create) (*entity.User, error) {
 		&user.Password,
 		&user.IsSuperAdmin,
 		&user.TelegramID,
+		&user.IsApproved,
 	)
 
 	if err == nil {
@@ -162,7 +166,7 @@ func (u *User) FilterUsers(q *dto.FilterUsers) ([]*entity.User, error) {
 		user := &entity.User{}
 
 		var createdAt interface{}
-		err = rows.Scan(&user.ID, &user.Username, &createdAt, &user.LastName, &user.FirstName, &user.Password, &user.IsAdmin, &user.IsSuperAdmin, &user.TelegramID)
+		err = rows.Scan(&user.ID, &user.Username, &createdAt, &user.LastName, &user.FirstName, &user.Password, &user.IsAdmin, &user.IsSuperAdmin, &user.IsApproved, &user.TelegramID)
 		if err != nil {
 			return nil, momoError.Wrap(err).Scope(scope).Input(q).UnExpected().DebuggingError()
 		}
@@ -230,6 +234,7 @@ func (u *User) findUser(key string, value string) (*entity.User, error) {
 		&user.Password,
 		&user.IsAdmin,
 		&user.IsSuperAdmin,
+		&user.IsApproved,
 		&user.TelegramID,
 	)
 	if err == nil {

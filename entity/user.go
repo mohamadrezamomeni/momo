@@ -9,4 +9,5 @@ type User struct {
 	Password     string
 	IsSuperAdmin bool
 	TelegramID   string
+	IsApproved   bool
 }

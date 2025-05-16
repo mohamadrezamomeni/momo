@@ -46,6 +46,7 @@ func TestCreate(t *testing.T) {
 		userCreated.FirstName != user1.FirstName ||
 		userCreated.Password != user1.Password ||
 		userCreated.IsAdmin != user1.IsAdmin ||
+		userCreated.IsApproved != user1.IsApproved ||
 		userCreated.LastName != user1.LastName {
 		t.Error("user creation requires some troubleshooting")
 		return
@@ -64,6 +65,7 @@ func TestFindByUsername(t *testing.T) {
 	}
 	if user.Username != user1.Username ||
 		user.FirstName != user1.FirstName ||
+		userCreated.IsApproved != user1.IsApproved ||
 		user.LastName != user1.LastName ||
 		user.ID != userCreated.ID {
 		t.Error("something went wrong to compare results")
@@ -85,6 +87,7 @@ func TestFindByID(t *testing.T) {
 	if user.Username != user1.Username ||
 		user.FirstName != user1.FirstName ||
 		user.LastName != user1.LastName ||
+		userCreated.IsApproved != user1.IsApproved ||
 		user.ID != userCreated.ID ||
 		user.IsSuperAdmin != true {
 		t.Error("something went wrong to compare results")
@@ -140,6 +143,24 @@ func TestFilter(t *testing.T) {
 
 	if len(users) != 1 {
 		t.Errorf("4. something went wrong.")
+	}
+
+	users, err = userRepo.FilterUsers(&userDto.FilterUsers{})
+	if err != nil {
+		t.Errorf("5. something went wrong. please follow problem the error was %v", err)
+	}
+
+	if len(users) != 3 {
+		t.Errorf("6. something went wrong.")
+	}
+	userApprovedCount := 0
+	for _, user := range users {
+		if user.IsApproved {
+			userApprovedCount += 1
+		}
+	}
+	if userApprovedCount != 1 {
+		t.Errorf("we expected we have one active user but we got %d", userApprovedCount)
 	}
 }
 

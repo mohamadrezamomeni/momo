@@ -8,6 +8,7 @@ var (
 		FirstName:    "andy",
 		LastName:     "arodoa",
 		IsAdmin:      true,
+		IsApproved:   true,
 		Password:     "12342",
 		IsSuperAdmin: true,
 	}

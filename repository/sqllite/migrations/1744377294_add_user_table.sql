@@ -19,6 +19,7 @@ CREATE TABLE `users` (
     `password` varchar(64),
     `is_admin` boolean DEFAULT false,
     `is_super_admin` boolean DEFAULT false,
+    `is_approved` boolean DEFAULT false,
     `telegram_id` varchar(32)
 );
 
