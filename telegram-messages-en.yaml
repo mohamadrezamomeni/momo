@@ -2,6 +2,7 @@ testing:
   registeration_testing: "hello :username:"
 error:
   internal_error: 😕 Oops! Something went wrong. Let the admin know so we can fix it.
+  forbidden_access: 🙏 Sorry, access is pending admin approval. Please be patient!
 auth:
   registeration:
     duplicate_register: 🎉 You're already registered! No need to do it again.
