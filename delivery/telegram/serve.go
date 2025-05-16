@@ -4,6 +4,8 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/mohamadrezamomeni/momo/delivery/telegram/core"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
+	telegrammessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
+	"github.com/mohamadrezamomeni/momo/pkg/utils"
 	authService "github.com/mohamadrezamomeni/momo/service/auth"
 	userService "github.com/mohamadrezamomeni/momo/service/user"
 
@@ -47,7 +49,11 @@ func (t *Telegram) Serve() {
 	t.rootHandler.SetRouter(t.core)
 
 	for update := range updates {
-		res := t.core.Route(&update)
+		res, err := t.core.Route(&update)
+		if err != nil {
+			t.sendError(&update)
+		}
+
 		if res != nil {
 			t.send(res, &update)
 		}
@@ -61,4 +67,12 @@ func (t *Telegram) send(res *core.ResponseHandlerFunc, update *tgbotapi.Update) 
 		r, _ := t.rootHandler.Root(update)
 		t.bot.Send(r.Result)
 	}
+}
+
+func (t *Telegram) sendError(update *tgbotapi.Update) {
+	errMessage, _ := telegrammessages.GetMessage("error.internal_error", map[string]string{})
+	idStr, _ := core.GetID(update)
+	id, _ := utils.ConvertToInt64(idStr)
+	msg := tgbotapi.NewMessage(id, errMessage)
+	t.bot.Send(msg)
 }

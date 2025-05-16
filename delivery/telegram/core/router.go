@@ -36,19 +36,21 @@ func (r *Router) getHandler(path string) HandlerFunc {
 	return r.rootHandler
 }
 
-func (r *Router) Route(update *tgbotapi.Update) *ResponseHandlerFunc {
+func (r *Router) Route(update *tgbotapi.Update) (*ResponseHandlerFunc, error) {
 	var res *ResponseHandlerFunc
 	var path string
+	var err error
 
 	if update.CallbackQuery != nil {
-		res, path = r.callbackQuery(update)
+		res, path, err = r.callbackQuery(update)
 	}
 
 	if update.Message != nil {
-		res, path = r.message(update)
+		res, path, err = r.message(update)
 	}
+
 	if update.MyChatMember != nil {
-		return nil
+		return nil, nil
 	}
 
 	key := r.getKey(update)
@@ -61,38 +63,39 @@ func (r *Router) Route(update *tgbotapi.Update) *ResponseHandlerFunc {
 	if res == nil {
 		res, _ = r.rootHandler(update)
 	}
-	return res
+	return res, err
 }
 
-func (r *Router) callbackQuery(update *tgbotapi.Update) (*ResponseHandlerFunc, string) {
+func (r *Router) callbackQuery(update *tgbotapi.Update) (*ResponseHandlerFunc, string, error) {
 	text := update.CallbackQuery.Data
 	return r.getResponse(text, update)
 }
 
-func (r *Router) message(update *tgbotapi.Update) (*ResponseHandlerFunc, string) {
+func (r *Router) message(update *tgbotapi.Update) (*ResponseHandlerFunc, string, error) {
 	text := update.Message.Text
 	return r.getResponse(text, update)
 }
 
-func (r *Router) getResponse(text string, update *tgbotapi.Update) (*ResponseHandlerFunc, string) {
+func (r *Router) getResponse(text string, update *tgbotapi.Update) (*ResponseHandlerFunc, string, error) {
 	key := r.getKey(update)
 
 	if r.isPath(text) {
 		path := r.getPathFromText(text)
-		return r.routeFromText(path, update), path
+		res, err := r.routeFromText(path, update)
+		return res, path, err
 	}
 
 	value, isExist := cache.Get(key)
 	if !isExist {
 		res, _ := r.rootHandler(update)
-		return res, ""
+		return res, "", nil
 	}
 
 	path, ok := value.(string)
 
 	if !ok {
 		res, _ := r.rootHandler(update)
-		return res, ""
+		return res, "", nil
 	}
 
 	handler := r.getHandler(path)
@@ -100,10 +103,10 @@ func (r *Router) getResponse(text string, update *tgbotapi.Update) (*ResponseHan
 	res, err := handler(update)
 	if err != nil {
 		res, _ := r.rootHandler(update)
-		return res, ""
+		return res, "", err
 	}
 
-	return res, path
+	return res, path, nil
 }
 
 func (r *Router) isPath(text string) bool {
@@ -120,14 +123,14 @@ func (r *Router) getPathFromText(path string) string {
 	return path[1:]
 }
 
-func (r *Router) routeFromText(path string, update *tgbotapi.Update) *ResponseHandlerFunc {
+func (r *Router) routeFromText(path string, update *tgbotapi.Update) (*ResponseHandlerFunc, error) {
 	handler := r.getHandler(path)
 	res, err := handler(update)
 	if err != nil {
 		res, _ = r.rootHandler(update)
-		return res
+		return res, err
 	}
-	return res
+	return res, nil
 }
 
 func (r *Router) getKey(update *tgbotapi.Update) string {
