@@ -16,3 +16,12 @@ root:
 inbound:
   list_buttom: 👀 See My VPNs
   create_buttom: 🚀 Create Your VPN
+
+  list:
+    inbounds_title: "<b>📊 VPN Report:</b>\n\n"
+    inbound_traffic_used: "   🔄 Used: :traffic_used:MB / :traffic_limit:MB\n"
+    id_report: ":counter:. 🆔 :id:\n"
+    block: "✅ Not Blocked"
+    unblock: "⛔ Blocked"
+    active: "🟢 Active"
+    deactive: "🔴 Inactive"

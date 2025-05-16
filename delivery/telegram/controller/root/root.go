@@ -37,7 +37,7 @@ func (h *Handler) Root(update *core.Update) (*core.ResponseHandlerFunc, error) {
 	inlineKeyboard := [][]tgbotapi.InlineKeyboardButton{}
 
 	if update.UserSystem != nil {
-		listInboundsButtom := tgbotapi.NewInlineKeyboardButtonData(titleListVPNs, "/list_inbound")
+		listInboundsButtom := tgbotapi.NewInlineKeyboardButtonData(titleListVPNs, "/list_inbounds")
 		createInboundsButtom := tgbotapi.NewInlineKeyboardButtonData(titleCreateVPNs, "/create_inbound")
 		inlineKeyboard = append(inlineKeyboard, tgbotapi.NewInlineKeyboardRow(listInboundsButtom, createInboundsButtom))
 	} else {

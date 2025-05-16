@@ -28,8 +28,8 @@ func main() {
 
 	migration.UP()
 
-	_, _, userSvc, _, authSvc, _ := serviceInitializer.GetServices(&cfg)
+	_, _, userSvc, inboundSvc, authSvc, _ := serviceInitializer.GetServices(&cfg)
 
-	t := telegram.New(&cfg.TelegramConfig, userSvc, authSvc)
+	t := telegram.New(&cfg.TelegramConfig, userSvc, authSvc, inboundSvc)
 	t.Serve()
 }

@@ -7,22 +7,25 @@ import (
 	telegrammessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
 	authService "github.com/mohamadrezamomeni/momo/service/auth"
+	inboundService "github.com/mohamadrezamomeni/momo/service/inbound"
 	userService "github.com/mohamadrezamomeni/momo/service/user"
 
 	authHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/auth"
+	inboundHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/inbound"
 	rootHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/root"
 )
 
 type Telegram struct {
-	config      *TelegramConfig
-	userSvc     *userService.User
-	bot         *tgbotapi.BotAPI
-	core        *core.Router
-	authHandler *authHandler.Handler
-	rootHandler *rootHandler.Handler
+	config         *TelegramConfig
+	userSvc        *userService.User
+	bot            *tgbotapi.BotAPI
+	core           *core.Router
+	authHandler    *authHandler.Handler
+	rootHandler    *rootHandler.Handler
+	inboundHandler *inboundHandler.Handler
 }
 
-func New(cfg *TelegramConfig, userSvc *userService.User, authSvc *authService.Auth) *Telegram {
+func New(cfg *TelegramConfig, userSvc *userService.User, authSvc *authService.Auth, inboundSvc *inboundService.Inbound) *Telegram {
 	scope := "telegram.New"
 	bot, err := tgbotapi.NewBotAPI(cfg.Token)
 	if err != nil {
@@ -30,12 +33,13 @@ func New(cfg *TelegramConfig, userSvc *userService.User, authSvc *authService.Au
 	}
 
 	return &Telegram{
-		bot:         bot,
-		core:        core.New("menu"),
-		config:      cfg,
-		userSvc:     userSvc,
-		rootHandler: rootHandler.New(userSvc),
-		authHandler: authHandler.New(authSvc, userSvc),
+		bot:            bot,
+		core:           core.New("menu"),
+		config:         cfg,
+		userSvc:        userSvc,
+		rootHandler:    rootHandler.New(userSvc),
+		authHandler:    authHandler.New(authSvc, userSvc),
+		inboundHandler: inboundHandler.New(userSvc, inboundSvc),
 	}
 }
 
@@ -46,6 +50,7 @@ func (t *Telegram) Serve() {
 
 	t.authHandler.SetRouter(t.core)
 	t.rootHandler.SetRouter(t.core)
+	t.inboundHandler.SetRouter(t.core)
 
 	for update := range updates {
 		customUpdate := &core.Update{

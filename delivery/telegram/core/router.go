@@ -77,7 +77,6 @@ func (r *Router) message(update *Update) (*ResponseHandlerFunc, string, error) {
 
 func (r *Router) getResponse(text string, update *Update) (*ResponseHandlerFunc, string, error) {
 	key := r.getKey(update)
-
 	if r.isPath(text) {
 		path := r.getPathFromText(text)
 		res, err := r.routeFromText(path, update)
