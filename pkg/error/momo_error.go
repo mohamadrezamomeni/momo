@@ -246,3 +246,8 @@ func (m *MomoError) ErrorWrite() error {
 	}
 	return m
 }
+
+func IsMomoError(err error) bool {
+	_, ok := err.(*MomoError)
+	return ok
+}
