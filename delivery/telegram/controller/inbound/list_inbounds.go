@@ -11,12 +11,6 @@ import (
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
 
-type TrafficItem struct {
-	ID           string
-	TrafficUsage int
-	TrafficLimit int
-}
-
 func (h *Handler) ListInbounds(update *core.Update) (*core.ResponseHandlerFunc, error) {
 	idStr, err := core.GetID(update)
 	if err != nil {
