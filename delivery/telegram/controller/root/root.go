@@ -37,13 +37,13 @@ func (h *Handler) Root(update *core.Update) (*core.ResponseHandlerFunc, error) {
 	inlineKeyboard := [][]tgbotapi.InlineKeyboardButton{}
 
 	if update.UserSystem != nil {
-		button := tgbotapi.NewInlineKeyboardButtonData("register", "/register")
-
-		inlineKeyboard = append(inlineKeyboard, tgbotapi.NewInlineKeyboardRow(button))
-	} else {
 		listInboundsButtom := tgbotapi.NewInlineKeyboardButtonData(titleListVPNs, "/list_inbound")
 		createInboundsButtom := tgbotapi.NewInlineKeyboardButtonData(titleCreateVPNs, "/create_inbound")
 		inlineKeyboard = append(inlineKeyboard, tgbotapi.NewInlineKeyboardRow(listInboundsButtom, createInboundsButtom))
+	} else {
+		button := tgbotapi.NewInlineKeyboardButtonData("register", "/register")
+
+		inlineKeyboard = append(inlineKeyboard, tgbotapi.NewInlineKeyboardRow(button))
 	}
 
 	markup := tgbotapi.NewInlineKeyboardMarkup(inlineKeyboard...)

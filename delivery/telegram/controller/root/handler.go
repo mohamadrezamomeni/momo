@@ -7,7 +7,7 @@ type Handler struct {
 }
 
 type UserService interface {
-	FindByID(string) (*entity.User, error)
+	FindByTelegramID(string) (*entity.User, error)
 }
 
 func New(userSvc UserService) *Handler {

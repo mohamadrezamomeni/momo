@@ -42,6 +42,7 @@ func (h *Handler) CheckDuplicateRegistration(next core.HandlerFunc) core.Handler
 			return &core.ResponseHandlerFunc{
 				Result:       tgbotapi.NewMessage(update.FromChat().ID, msg),
 				ReleaseState: false,
+				RedirectRoot: true,
 			}, err
 		}
 
