@@ -29,13 +29,12 @@ func New(cfg *TelegramConfig, userSvc *userService.User, authSvc *authService.Au
 		momoError.Wrap(err).Scope(scope).BadRequest().Fatalf("error to initialize bot")
 	}
 
-	rootHandler := rootHandler.New(userSvc)
 	return &Telegram{
-		rootHandler: rootHandler,
 		bot:         bot,
 		core:        core.New("menu"),
 		config:      cfg,
 		userSvc:     userSvc,
+		rootHandler: rootHandler.New(userSvc),
 		authHandler: authHandler.New(authSvc, userSvc),
 	}
 }
@@ -68,7 +67,7 @@ func (t *Telegram) send(res *core.ResponseHandlerFunc, update *core.Update) {
 	t.bot.Send(res.Result)
 
 	if res.RedirectRoot {
-		r, _ := t.rootHandler.Root(update)
+		r, _ := t.core.RootHandler(update)
 		t.bot.Send(r.Result)
 	}
 }

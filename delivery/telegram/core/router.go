@@ -32,7 +32,7 @@ func (r *Router) getHandler(path string) HandlerFunc {
 		return handler
 	}
 
-	return r.rootHandler
+	return r.RootHandler
 }
 
 func (r *Router) Route(update *Update) (*ResponseHandlerFunc, error) {
@@ -60,7 +60,7 @@ func (r *Router) Route(update *Update) (*ResponseHandlerFunc, error) {
 	}
 
 	if res == nil {
-		res, _ = r.rootHandler(update)
+		res, _ = r.RootHandler(update)
 	}
 	return res, err
 }
@@ -86,14 +86,14 @@ func (r *Router) getResponse(text string, update *Update) (*ResponseHandlerFunc,
 
 	value, isExist := cache.Get(key)
 	if !isExist {
-		res, _ := r.rootHandler(update)
+		res, _ := r.RootHandler(update)
 		return res, "", nil
 	}
 
 	path, ok := value.(string)
 
 	if !ok {
-		res, _ := r.rootHandler(update)
+		res, _ := r.RootHandler(update)
 		return res, "", nil
 	}
 
@@ -101,7 +101,7 @@ func (r *Router) getResponse(text string, update *Update) (*ResponseHandlerFunc,
 
 	res, err := handler(update)
 	if err != nil {
-		res, _ := r.rootHandler(update)
+		res, _ := r.RootHandler(update)
 		return res, "", err
 	}
 
@@ -126,7 +126,7 @@ func (r *Router) routeFromText(path string, update *Update) (*ResponseHandlerFun
 	handler := r.getHandler(path)
 	res, err := handler(update)
 	if err != nil {
-		res, _ = r.rootHandler(update)
+		res, _ = r.RootHandler(update)
 		return res, err
 	}
 	return res, nil
@@ -140,7 +140,7 @@ func (r *Router) getKey(update *Update) string {
 	return id
 }
 
-func (r *Router) rootHandler(update *Update) (*ResponseHandlerFunc, error) {
+func (r *Router) RootHandler(update *Update) (*ResponseHandlerFunc, error) {
 	handler := r.getHandler(r.defaultRoute)
 	res, err := handler(update)
 	return res, err
