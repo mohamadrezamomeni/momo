@@ -247,7 +247,13 @@ func (m *MomoError) ErrorWrite() error {
 	return m
 }
 
-func IsMomoError(err error) bool {
-	_, ok := err.(*MomoError)
-	return ok
+func GetMomoError(err error) (*MomoError, bool) {
+	if err == nil {
+		return nil, false
+	}
+	m, ok := err.(*MomoError)
+	if ok {
+		return m, true
+	}
+	return nil, false
 }
