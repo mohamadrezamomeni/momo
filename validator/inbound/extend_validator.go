@@ -47,5 +47,9 @@ func (v *Validator) ValidateExtendingInbound(req inboundControllerDto.ExtendInbo
 	if inbound.End.After(endTime) || now.After(inbound.End) {
 		return momoError.Scope(scope).Input(req).BadRequest().ErrorWrite()
 	}
+
+	if inbound.TrafficLimit > inbound.TrafficUsage {
+		return momoError.Scope(scope).Input(req).BadRequest().ErrorWrite()
+	}
 	return nil
 }

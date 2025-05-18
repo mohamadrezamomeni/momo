@@ -405,8 +405,9 @@ func (i *Inbound) ExtendInbound(id string, inpt *inboundDto.ExtendInboundDto) er
 	scope := "inboundRepository.extendinbound"
 
 	sql := fmt.Sprintf(
-		"UPDATE inbounds SET end = '%s', traffic_limit = traffic_limit + %d WHERE id = %s",
+		"UPDATE inbounds SET end = '%s', start = '%s', traffic_limit = traffic_limit + %d WHERE id = %s",
 		inpt.End.Format(time.DateTime),
+		inpt.Start.Format(time.DateTime),
 		inpt.TrafficExtended,
 		id,
 	)

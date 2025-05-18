@@ -296,6 +296,7 @@ func (i *Inbound) UnBlock(id string) error {
 func (i *Inbound) ExtendInbound(id string, inpt *inboundServiceDto.ExtendInboundDto) error {
 	err := i.inboundRepo.ExtendInbound(id, &inboundRepoDto.ExtendInboundDto{
 		End:             inpt.End,
+		Start:           inpt.Start,
 		TrafficExtended: inpt.ExtendedTrafficLimit,
 	})
 	if err != nil {
