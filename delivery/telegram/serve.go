@@ -9,6 +9,7 @@ import (
 	authService "github.com/mohamadrezamomeni/momo/service/auth"
 	inboundService "github.com/mohamadrezamomeni/momo/service/inbound"
 	userService "github.com/mohamadrezamomeni/momo/service/user"
+	vpnPackageService "github.com/mohamadrezamomeni/momo/service/vpn_package"
 
 	authHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/auth"
 	inboundHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/inbound"
@@ -26,7 +27,13 @@ type Telegram struct {
 	inboundHandler *inboundHandler.Handler
 }
 
-func New(cfg *TelegramConfig, userSvc *userService.User, authSvc *authService.Auth, inboundSvc *inboundService.Inbound) *Telegram {
+func New(
+	cfg *TelegramConfig,
+	userSvc *userService.User,
+	authSvc *authService.Auth,
+	inboundSvc *inboundService.Inbound,
+	vpnPackageSvc *vpnPackageService.VPNPackage,
+) *Telegram {
 	scope := "telegram.New"
 	bot, err := tgbotapi.NewBotAPI(cfg.Token)
 	if err != nil {
@@ -34,13 +41,18 @@ func New(cfg *TelegramConfig, userSvc *userService.User, authSvc *authService.Au
 	}
 
 	return &Telegram{
-		bot:            bot,
-		core:           core.New("menu"),
-		config:         cfg,
-		userSvc:        userSvc,
-		rootHandler:    rootHandler.New(userSvc),
-		authHandler:    authHandler.New(authSvc, userSvc),
-		inboundHandler: inboundHandler.New(userSvc, inboundSvc, inboundValidator.New(userSvc, inboundSvc)),
+		bot:         bot,
+		core:        core.New("menu"),
+		config:      cfg,
+		userSvc:     userSvc,
+		rootHandler: rootHandler.New(userSvc),
+		authHandler: authHandler.New(authSvc, userSvc),
+		inboundHandler: inboundHandler.New(
+			userSvc,
+			inboundSvc,
+			vpnPackageSvc,
+			inboundValidator.New(userSvc, inboundSvc),
+		),
 	}
 }
 

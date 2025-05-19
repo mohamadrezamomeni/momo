@@ -5,8 +5,8 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/mohamadrezamomeni/momo/delivery/telegram/core"
+	vpnPackageServiceDto "github.com/mohamadrezamomeni/momo/dto/service/vpn_package"
 	"github.com/mohamadrezamomeni/momo/entity"
-	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 	telegrammessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
@@ -30,8 +30,8 @@ var packages []*entity.VPNPackage = []*entity.VPNPackage{
 
 func (h *Handler) getResponseAskPackage(user *entity.User) (*core.ResponseHandlerFunc, error) {
 	var rows [][]tgbotapi.InlineKeyboardButton
-
-	for _, pkg := range packages {
+	vpnPackages, err := h.vpnPackageSvc.Filter(&vpnPackageServiceDto.FilterVPNPackage{})
+	for _, pkg := range vpnPackages {
 		button, err := h.getPackageButton(pkg)
 		if err != nil {
 			return nil, err
@@ -82,7 +82,7 @@ func (h *Handler) getPackageButton(pkg *entity.VPNPackage) (*tgbotapi.InlineKeyb
 
 	titlePkg, err := telegrammessages.GetMessage("inbound.extend.package_buttom", map[string]string{
 		"timeDuration": titleDuration,
-		"price":        strconv.Itoa(int(pkg.Price)),
+		"price":        pkg.PriceTitle,
 	})
 	if err != nil {
 		return nil, err
@@ -92,19 +92,10 @@ func (h *Handler) getPackageButton(pkg *entity.VPNPackage) (*tgbotapi.InlineKeyb
 }
 
 func (h *Handler) answerPackage(packageID string) (*entity.VPNPackage, error) {
-	scope := "telegram.controller.answerPackage"
-	var pkgSelected *entity.VPNPackage
-
-	for _, pkg := range packages {
-		if pkg.ID == packageID {
-			pkgSelected = pkg
-			break
-		}
+	vpnPackage, err := h.vpnPackageSvc.FindVPNPackageByID(packageID)
+	if err != nil {
+		return nil, err
 	}
 
-	if pkgSelected == nil {
-		return nil, momoError.Scope(scope).NotFound().ErrorWrite()
-	}
-
-	return pkgSelected, nil
+	return vpnPackage, nil
 }

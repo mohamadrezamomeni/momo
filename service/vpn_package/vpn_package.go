@@ -13,6 +13,7 @@ type VPNPackageRepository interface {
 	Update(string, *vpnPackageRepositoryDto.UpdateVPNPackage) error
 	Create(*vpnPackageRepositoryDto.CreateVPNPackage) (*entity.VPNPackage, error)
 	Filter(*vpnPackageRepositoryDto.FilterVPNPackage) ([]*entity.VPNPackage, error)
+	FindVPNPackageByID(string) (*entity.VPNPackage, error)
 }
 
 func New(vpnPackageRepo VPNPackageRepository) *VPNPackage {
@@ -55,4 +56,8 @@ func (vp *VPNPackage) Filter(inpt *vpnPackageServiceDto.FilterVPNPackage) ([]*en
 	return vp.vpnPackageRepo.Filter(&vpnPackageRepositoryDto.FilterVPNPackage{
 		IsActive: inpt.IsActive,
 	})
+}
+
+func (vp *VPNPackage) FindVPNPackageByID(id string) (*entity.VPNPackage, error) {
+	return vp.vpnPackageRepo.FindVPNPackageByID(id)
 }
