@@ -8,5 +8,5 @@ type CreateInbound struct {
 	UserID       string `json:"user_id"`
 	Start        string `json:"start_time"`
 	End          string `json:"end_time"`
-	TrafficLimit uint32 `json:"traffic_limit"`
+	TrafficLimit uint64 `json:"traffic_limit"`
 }

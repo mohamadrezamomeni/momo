@@ -4,6 +4,6 @@ import "time"
 
 type ExtendInboundDto struct {
 	End             time.Time
-	TrafficExtended uint32
 	Start           time.Time
+	TrafficExtended uint64
 }
