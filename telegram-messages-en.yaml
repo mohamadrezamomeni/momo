@@ -15,9 +15,10 @@ root:
   menu: 😊 Where would you like to go next?
 
 inbound:
+  not_found_package: unforunetly admin haven't introduced any packages please wait admin will do that
   list_buttom: 👀 See My VPNs
   create_buttom: 🚀 Create Your VPN
-
+  not_found: 🌐 You haven’t created a VPN yet — it would be our honor if you set one up!
   list:
     inbounds_title: "<b>📊 VPN Report:</b>\n\n"
     inbound_traffic_used: "   🔄 Used: :traffic_used:MB / :traffic_limit:MB\n"
@@ -26,8 +27,17 @@ inbound:
     block: "⛔ Blocked"
     active: "🟢 Active"
     deactive: "🔴 Inactive"
-    not_found: 🌐 You haven’t created a VPN yet — it would be our honor if you set one up!
   create:
     successfully_creation: 🎉 Your VPN has been set up
     select_traffic_limit: 📝 select your desire trafficlimit
     select_vpn: 📝 select your desire vpn
+  extend:
+    ask_id: "<b>📝 select one of your VPNs:</b>\n\n"
+    item: "ID:  :ID: - :VPNType:"
+    package_buttom: "📶 10GB ⏳ :timeDuration: 💵 %s"
+    ask_package: "📶 10GB ⏳ :timeDuration:"
+    one_month: "1 month"
+    many_months: ":count: months"
+    one_day: "1 day"
+    many_days: ":count: days"
+    successfully_extending: 🎉 Your VPN has been extended
