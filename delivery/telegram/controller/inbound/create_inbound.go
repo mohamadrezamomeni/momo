@@ -186,7 +186,7 @@ func (h *Handler) AnswerPackageCreatingInbound(next core.HandlerFunc) core.Handl
 	}
 }
 
-func (h *Handler) CreateVPN(update *core.Update) (*core.ResponseHandlerFunc, error) {
+func (h *Handler) CreateInbound(update *core.Update) (*core.ResponseHandlerFunc, error) {
 	scope := "telegram.controller.CreateVPN"
 
 	key := generateCreatingState(update.UserSystem.ID)
