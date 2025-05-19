@@ -34,7 +34,7 @@ inbound:
   extend:
     ask_id: "<b>📝 select one of your VPNs:</b>\n\n"
     item: "ID:  :ID: - :VPNType:"
-    package_buttom: "📶 10GB ⏳ :timeDuration: 💵 %s"
+    package_buttom: "📶 10GB ⏳ :timeDuration: 💵 :price:"
     ask_package: "📶 10GB ⏳ :timeDuration:"
     one_month: "1 month"
     many_months: ":count: months"

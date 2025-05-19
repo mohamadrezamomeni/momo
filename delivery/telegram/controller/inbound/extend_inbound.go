@@ -17,15 +17,14 @@ import (
 type ExtendingInboundStatus = int
 
 const (
-	AskID ExtendingInboundStatus = iota
-	AnswerID
-	AskPackage
-	AnswerPackage
+	askID ExtendingInboundStatus = iota
+	answerID
+	extendingInboundDone
 )
 
 type ExtendingInboundState struct {
-	Inbound *entity.Inbound
-	Package *entity.Package
+	inbound *entity.Inbound
+	pkg     *entity.Package
 	state   ExtendingInboundStatus
 }
 
@@ -49,16 +48,6 @@ func getExtendingInboundState(id string) (*ExtendingInboundState, bool, error) {
 	return state, true, nil
 }
 
-var packages []*entity.Package = []*entity.Package{
-	{
-		ID:           "1",
-		TrafficLimit: 50000,
-		Months:       1,
-		Days:         0,
-		Price:        20000,
-	},
-}
-
 func (h *Handler) SetExtendingInboundState(next core.HandlerFunc) core.HandlerFunc {
 	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		user := update.UserSystem
@@ -72,7 +61,7 @@ func (h *Handler) SetExtendingInboundState(next core.HandlerFunc) core.HandlerFu
 
 		if !isExist {
 			extendingInboundState := &ExtendingInboundState{
-				state: AskID,
+				state: askID,
 			}
 			cache.Set(key, extendingInboundState)
 		}
@@ -92,7 +81,7 @@ func (h *Handler) SelectInboundIDInExtendingInbound(next core.HandlerFunc) core.
 			return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
 		}
 
-		if state.state != AskID {
+		if state.state != askID {
 			return next(update)
 		}
 
@@ -104,7 +93,7 @@ func (h *Handler) SelectInboundIDInExtendingInbound(next core.HandlerFunc) core.
 			return h.sendNotFoundInbounds(user)
 		}
 
-		state.state = AnswerID
+		state.state = answerID
 		defer cache.Set(key, state)
 
 		id, err := utils.ConvertToInt64(user.TelegramID)
@@ -167,7 +156,7 @@ func (h *Handler) ChooseInbound(next core.HandlerFunc) core.HandlerFunc {
 			return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
 		}
 
-		if state.state != AnswerID {
+		if state.state != answerID {
 			return next(update)
 		}
 
@@ -178,15 +167,15 @@ func (h *Handler) ChooseInbound(next core.HandlerFunc) core.HandlerFunc {
 			return nil, err
 		}
 
-		state.state = AskPackage
-		state.Inbound = inbound
+		state.state = askPackage
+		state.inbound = inbound
 		cache.Set(key, state)
 
 		return next(update)
 	}
 }
 
-func (h *Handler) AskPackages(next core.HandlerFunc) core.HandlerFunc {
+func (h *Handler) AskPackagesExtending(next core.HandlerFunc) core.HandlerFunc {
 	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		scope := "telegram.AskServices"
 		user := update.UserSystem
@@ -198,76 +187,22 @@ func (h *Handler) AskPackages(next core.HandlerFunc) core.HandlerFunc {
 			return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
 		}
 
-		if state.state != AskPackage {
+		if state.state != askPackage {
 			return next(update)
 		}
 
-		var rows [][]tgbotapi.InlineKeyboardButton
-
-		for _, pkg := range packages {
-			button, err := h.getPackageButton(pkg)
-			if err != nil {
-				return nil, err
-			}
-			rows = append(rows, tgbotapi.NewInlineKeyboardRow(*button))
-		}
-
-		id, err := utils.ConvertToInt64(update.UserSystem.TelegramID)
+		res, err := h.getResponseAskPackage(update.UserSystem)
 		if err != nil {
 			return nil, err
 		}
 
-		askingPackageTitle, err := telegrammessages.GetMessage("inbound.extend.ask_package", map[string]string{})
-		if err != nil {
-			return nil, err
-		}
-
-		msg := tgbotapi.NewMessage(id, askingPackageTitle)
-
-		msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(rows...)
-
-		state.state = AnswerPackage
+		state.state = answerPackage
 		cache.Set(key, state)
-
-		return &core.ResponseHandlerFunc{
-			Result: msg,
-		}, nil
+		return res, nil
 	}
 }
 
-func (h *Handler) getPackageButton(pkg *entity.Package) (*tgbotapi.InlineKeyboardButton, error) {
-	var titleDuration string
-	var err error
-
-	if pkg.Days > 1 {
-		titleDuration, err = telegrammessages.GetMessage("inbound.extend.many_days", map[string]string{
-			"count": strconv.Itoa(int(pkg.Days)),
-		})
-	} else if pkg.Days == 0 {
-		titleDuration, err = telegrammessages.GetMessage("inbound.extend.one_day", map[string]string{})
-	} else if pkg.Months > 1 {
-		titleDuration, err = telegrammessages.GetMessage("inbound.extend.many_months", map[string]string{
-			"count": strconv.Itoa(int(pkg.Months)),
-		})
-	} else {
-		titleDuration, err = telegrammessages.GetMessage("inbound.extend.one_month", map[string]string{})
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
-	titlePkg, err := telegrammessages.GetMessage("inbound.extend.package_buttom", map[string]string{
-		"timeDuration": titleDuration,
-	})
-	if err != nil {
-		return nil, err
-	}
-	button := tgbotapi.NewInlineKeyboardButtonData(titlePkg, pkg.ID)
-	return &button, nil
-}
-
-func (h *Handler) AnswerPackage(next core.HandlerFunc) core.HandlerFunc {
+func (h *Handler) AnswerPackageExtendingInbound(next core.HandlerFunc) core.HandlerFunc {
 	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		scope := "telegram.AnswerPackage"
 		user := update.UserSystem
@@ -281,20 +216,12 @@ func (h *Handler) AnswerPackage(next core.HandlerFunc) core.HandlerFunc {
 
 		packageID := update.CallbackQuery.Data
 
-		var pkgSelected *entity.Package
-
-		for _, pkg := range packages {
-			if pkg.ID == packageID {
-				pkgSelected = pkg
-				break
-			}
+		pkg, err := h.answerPackage(packageID)
+		if err != nil {
+			return nil, err
 		}
-
-		if pkgSelected != nil {
-			return nil, momoError.Scope(scope).Errorf("pkg wasn't found")
-		}
-
-		state.Package = pkgSelected
+		state.pkg = pkg
+		state.state = extendingInboundDone
 		cache.Set(key, state)
 		return next(update)
 	}
@@ -307,7 +234,7 @@ func (h *Handler) ExtendInbound(update *core.Update) (*core.ResponseHandlerFunc,
 	key := getExtendingInboundKey(user.ID)
 
 	state, isExist, err := getExtendingInboundState(key)
-	if err != nil || !isExist || h.isExtendingInboundValid(state) {
+	if err != nil || !isExist || state.state != extendingInboundDone {
 		return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
 	}
 
@@ -327,11 +254,4 @@ func (h *Handler) ExtendInbound(update *core.Update) (*core.ResponseHandlerFunc,
 		ReleaseState: true,
 		RedirectRoot: true,
 	}, nil
-}
-
-func (h *Handler) isExtendingInboundValid(state *ExtendingInboundState) bool {
-	if state.Inbound == nil || state.Package == nil {
-		return false
-	}
-	return true
 }
