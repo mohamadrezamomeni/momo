@@ -18,7 +18,7 @@ const (
 	answerPackage
 )
 
-var packages []*entity.Package = []*entity.Package{
+var packages []*entity.VPNPackage = []*entity.VPNPackage{
 	{
 		ID:           "1",
 		TrafficLimit: 50000,
@@ -58,7 +58,7 @@ func (h *Handler) getResponseAskPackage(user *entity.User) (*core.ResponseHandle
 	}, nil
 }
 
-func (h *Handler) getPackageButton(pkg *entity.Package) (*tgbotapi.InlineKeyboardButton, error) {
+func (h *Handler) getPackageButton(pkg *entity.VPNPackage) (*tgbotapi.InlineKeyboardButton, error) {
 	var titleDuration string
 	var err error
 
@@ -91,9 +91,9 @@ func (h *Handler) getPackageButton(pkg *entity.Package) (*tgbotapi.InlineKeyboar
 	return &button, nil
 }
 
-func (h *Handler) answerPackage(packageID string) (*entity.Package, error) {
+func (h *Handler) answerPackage(packageID string) (*entity.VPNPackage, error) {
 	scope := "telegram.controller.answerPackage"
-	var pkgSelected *entity.Package
+	var pkgSelected *entity.VPNPackage
 
 	for _, pkg := range packages {
 		if pkg.ID == packageID {

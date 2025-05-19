@@ -24,7 +24,7 @@ const (
 type CreateVPNState struct {
 	state   CreatingTypeState
 	VPNType entity.VPNType
-	pkg     *entity.Package
+	pkg     *entity.VPNPackage
 }
 
 func generateCreatingState(id string) string {

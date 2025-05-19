@@ -1,9 +1,12 @@
 package entity
 
-type Package struct {
-	ID           string
-	TrafficLimit uint64
-	Days         uint64
-	Months       uint64
-	Price        uint64
+type VPNPackage struct {
+	ID                string
+	TrafficLimit      uint64
+	TrafficLimitTitle string
+	Days              uint64
+	Months            uint64
+	Price             uint64
+	PriceTitle        string
+	IsActive          bool
 }

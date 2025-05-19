@@ -24,7 +24,7 @@ const (
 
 type ExtendingInboundState struct {
 	inbound *entity.Inbound
-	pkg     *entity.Package
+	pkg     *entity.VPNPackage
 	state   ExtendingInboundStatus
 }
 
