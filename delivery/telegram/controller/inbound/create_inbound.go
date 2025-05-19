@@ -213,6 +213,7 @@ func (h *Handler) CreateInbound(update *core.Update) (*core.ResponseHandlerFunc,
 	_, err = h.inboundSvc.Create(&inboundServiceDto.CreateInbound{
 		ServerType:   entity.High,
 		UserID:       update.UserSystem.ID,
+		VPNType:      state.VPNType,
 		TrafficLimit: state.pkg.TrafficLimit,
 		Start:        now,
 		End:          now.AddDate(0, int(state.pkg.Months), int(state.pkg.Days)),
