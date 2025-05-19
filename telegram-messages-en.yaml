@@ -36,7 +36,7 @@ inbound:
     ask_id: "<b>📝 select one of your VPNs:</b>\n\n"
     item: "ID:  :ID: - :VPNType:"
     package_buttom: "📶 10GB ⏳ :timeDuration: 💵 :price:"
-    ask_package: "📶 10GB ⏳ :timeDuration:"
+    ask_package: "😊 please choose your desire package "
     one_month: "1 month"
     many_months: ":count: months"
     one_day: "1 day"
