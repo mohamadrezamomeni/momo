@@ -12,5 +12,5 @@ type CreateInbound struct {
 	End          time.Time
 	VPNType      entity.VPNType
 	ServerType   entity.HostStatus
-	TrafficLimit uint32
+	TrafficLimit uint64
 }
