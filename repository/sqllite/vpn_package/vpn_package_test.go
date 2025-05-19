@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	vpnpackage "github.com/mohamadrezamomeni/momo/dto/repository/vpn_package"
+	vpnpackageRepositoryDto "github.com/mohamadrezamomeni/momo/dto/repository/vpn_package"
 	"github.com/mohamadrezamomeni/momo/repository/migrate"
 	"github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
@@ -34,6 +34,7 @@ func TestMain(m *testing.M) {
 
 func TestCreateVPNPackage(t *testing.T) {
 	vpnPackageCreated, err := vpnPackageRepo.Create(vpnPackage1)
+	defer vpnPackageRepo.DeleteAll()
 	if err != nil {
 		t.Fatalf("something went wrong the problem was %v", err)
 	}
@@ -50,6 +51,7 @@ func TestCreateVPNPackage(t *testing.T) {
 
 func TestFindVPNPackage(t *testing.T) {
 	vpnCreated, _ := vpnPackageRepo.Create(vpnPackage1)
+	defer vpnPackageRepo.DeleteAll()
 
 	vpnPackageFound, err := vpnPackageRepo.FindVPNPackageByID(vpnCreated.ID)
 	if err != nil {
@@ -68,9 +70,10 @@ func TestFindVPNPackage(t *testing.T) {
 }
 
 func TestUpdateVPNPackage(t *testing.T) {
+	defer vpnPackageRepo.DeleteAll()
 	vpnCreated, _ := vpnPackageRepo.Create(vpnPackage1)
 	deactive := false
-	err := vpnPackageRepo.Update(vpnCreated.ID, &vpnpackage.UpdateVPNPackage{
+	err := vpnPackageRepo.Update(vpnCreated.ID, &vpnpackageRepositoryDto.UpdateVPNPackage{
 		IsActive: &deactive,
 	})
 	if err != nil {
@@ -81,5 +84,34 @@ func TestUpdateVPNPackage(t *testing.T) {
 
 	if vpnPackageFound.IsActive != false {
 		t.Fatalf("we expected the vpn was deactive")
+	}
+}
+
+func TestFilterVPNPackages(t *testing.T) {
+	defer vpnPackageRepo.DeleteAll()
+
+	vpnPackageRepo.Create(vpnPackage1)
+	vpnPackageRepo.Create(vpnPackage2)
+	vpnPackageRepo.Create(vpnPackage3)
+
+	active := false
+	vpnPackages, err := vpnPackageRepo.Filter(&vpnpackageRepositoryDto.FilterVPNPackage{
+		IsActive: &active,
+	})
+	if err != nil {
+		t.Fatalf("something went wrong the error was %v", err)
+	}
+
+	if len(vpnPackages) != 2 {
+		t.Errorf("the lengh of result must be 2 but we got %d", len(vpnPackages))
+	}
+
+	vpnPackages, err = vpnPackageRepo.Filter(&vpnpackageRepositoryDto.FilterVPNPackage{})
+	if err != nil {
+		t.Fatalf("something went wrong the error was %v", err)
+	}
+
+	if len(vpnPackages) != 3 {
+		t.Errorf("the lengh of result must be 3 but we got %d", len(vpnPackages))
 	}
 }

@@ -3,6 +3,7 @@ package vpnpackage
 import (
 	"database/sql"
 	"fmt"
+	"reflect"
 	"strings"
 
 	vpnPackageRepositoryDto "github.com/mohamadrezamomeni/momo/dto/repository/vpn_package"
@@ -97,4 +98,103 @@ func (vp *VPNPackage) FindVPNPackageByID(id string) (*entity.VPNPackage, error) 
 		return nil, momoError.Wrap(err).Scope(scope).NotFound().Input(id).DebuggingError()
 	}
 	return nil, momoError.Wrap(err).Scope(scope).Input(id).UnExpected().DebuggingError()
+}
+
+func (vp *VPNPackage) DeleteAll() error {
+	scope := "vpnPackageRepository.DeleteAll"
+
+	sql := "DELETE FROM vpn_package"
+	res, err := vp.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).ErrorWrite()
+	}
+
+	_, err = res.RowsAffected()
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).ErrorWrite()
+	}
+
+	return nil
+}
+
+func (vp *VPNPackage) Delete(id string) error {
+	scope := "vpnPackageRepository.Delete"
+
+	sql := fmt.Sprintf("DELETE FROM vpn_package WHERE id = '%s'", id)
+	res, err := vp.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).ErrorWrite()
+	}
+
+	_, err = res.RowsAffected()
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).ErrorWrite()
+	}
+
+	return nil
+}
+
+func (vp *VPNPackage) Filter(inpt *vpnPackageRepositoryDto.FilterVPNPackage) ([]*entity.VPNPackage, error) {
+	scope := "vpnpackage.repository.Filter"
+
+	query := vp.makeQueryFilter(inpt)
+
+	rows, err := vp.db.Conn().Query(query)
+	if err != nil {
+		return nil, momoError.Wrap(err).Input(inpt).Scope(scope).DebuggingError()
+	}
+
+	vpnPackages := make([]*entity.VPNPackage, 0)
+
+	for rows.Next() {
+		pkg, err := vp.scan(rows)
+		if err != nil {
+			return nil, err
+		}
+		vpnPackages = append(vpnPackages, pkg)
+	}
+	return vpnPackages, nil
+}
+
+func (vp *VPNPackage) makeQueryFilter(inpt *vpnPackageRepositoryDto.FilterVPNPackage) string {
+	v := reflect.ValueOf(*inpt)
+	t := reflect.TypeOf(*inpt)
+	subQueries := []string{}
+
+	for i := 0; i < v.NumField(); i++ {
+		field := t.Field(i)
+		value := v.Field(i)
+
+		if field.Name == "IsActive" && !value.IsNil() {
+			subQueries = append(subQueries, fmt.Sprintf("is_active = %v", value.Elem().Bool()))
+		}
+	}
+
+	sql := "SELECT * FROM vpn_package"
+	if len(subQueries) > 0 {
+		sql += fmt.Sprintf(" WHERE %s", strings.Join(subQueries, " AND "))
+	}
+	return sql
+}
+
+func (vp *VPNPackage) scan(rows *sql.Rows) (*entity.VPNPackage, error) {
+	scope := "vpnPackage.repositroy.scan"
+
+	vpnPackage := &entity.VPNPackage{}
+	var createdAt interface{}
+	err := rows.Scan(
+		&vpnPackage.ID,
+		&vpnPackage.PriceTitle,
+		&vpnPackage.Price,
+		&vpnPackage.Days,
+		&vpnPackage.Months,
+		&vpnPackage.TrafficLimit,
+		&vpnPackage.TrafficLimitTitle,
+		&vpnPackage.IsActive,
+		&createdAt,
+	)
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).Input(rows).DebuggingError()
+	}
+	return vpnPackage, nil
 }
