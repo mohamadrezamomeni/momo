@@ -13,6 +13,7 @@ import (
 	authHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/auth"
 	inboundHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/inbound"
 	rootHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/root"
+	inboundValidator "github.com/mohamadrezamomeni/momo/validator/inbound"
 )
 
 type Telegram struct {
@@ -39,7 +40,7 @@ func New(cfg *TelegramConfig, userSvc *userService.User, authSvc *authService.Au
 		userSvc:        userSvc,
 		rootHandler:    rootHandler.New(userSvc),
 		authHandler:    authHandler.New(authSvc, userSvc),
-		inboundHandler: inboundHandler.New(userSvc, inboundSvc),
+		inboundHandler: inboundHandler.New(userSvc, inboundSvc, inboundValidator.New(userSvc, inboundSvc)),
 	}
 }
 

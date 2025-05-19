@@ -167,6 +167,10 @@ func (h *Handler) ChooseInbound(next core.HandlerFunc) core.HandlerFunc {
 			return nil, err
 		}
 
+		err = h.inboundValidator.ValidateExtendingInboundByUser(inbound, user)
+		if err != nil {
+			return nil, err
+		}
 		state.state = askPackage
 		state.inbound = inbound
 		cache.Set(key, state)
