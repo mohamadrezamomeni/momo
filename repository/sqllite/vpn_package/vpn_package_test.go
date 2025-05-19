@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	vpnpackage "github.com/mohamadrezamomeni/momo/dto/repository/vpn_package"
 	"github.com/mohamadrezamomeni/momo/repository/migrate"
 	"github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
@@ -36,7 +37,6 @@ func TestCreateVPNPackage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("something went wrong the problem was %v", err)
 	}
-
 	if vpnPackageCreated.Days != vpnPackage1.Days ||
 		vpnPackageCreated.Months != vpnPackage1.Months ||
 		vpnPackageCreated.IsActive != vpnPackage1.IsActive ||
@@ -45,5 +45,41 @@ func TestCreateVPNPackage(t *testing.T) {
 		vpnPackageCreated.TrafficLimit != vpnPackage1.TrafficLimit ||
 		vpnPackageCreated.TrafficLimitTitle != vpnPackage1.TrafficLimitTitle {
 		t.Error("we got unexpected result")
+	}
+}
+
+func TestFindVPNPackage(t *testing.T) {
+	vpnCreated, _ := vpnPackageRepo.Create(vpnPackage1)
+
+	vpnPackageFound, err := vpnPackageRepo.FindVPNPackageByID(vpnCreated.ID)
+	if err != nil {
+		t.Fatalf("something went wrong the problem was %v", err)
+	}
+
+	if vpnPackageFound.Days != vpnPackage1.Days ||
+		vpnPackageFound.Months != vpnPackage1.Months ||
+		vpnPackageFound.IsActive != vpnPackage1.IsActive ||
+		vpnPackageFound.Price != vpnPackage1.Price ||
+		vpnPackageFound.PriceTitle != vpnPackage1.PriceTitle ||
+		vpnPackageFound.TrafficLimit != vpnPackage1.TrafficLimit ||
+		vpnPackageFound.TrafficLimitTitle != vpnPackage1.TrafficLimitTitle {
+		t.Error("we got unexpected result")
+	}
+}
+
+func TestUpdateVPNPackage(t *testing.T) {
+	vpnCreated, _ := vpnPackageRepo.Create(vpnPackage1)
+	deactive := false
+	err := vpnPackageRepo.Update(vpnCreated.ID, &vpnpackage.UpdateVPNPackage{
+		IsActive: &deactive,
+	})
+	if err != nil {
+		t.Fatalf("something went wrong the problem was %v", err)
+	}
+
+	vpnPackageFound, err := vpnPackageRepo.FindVPNPackageByID(vpnCreated.ID)
+
+	if vpnPackageFound.IsActive != false {
+		t.Fatalf("we expected the vpn was deactive")
 	}
 }
