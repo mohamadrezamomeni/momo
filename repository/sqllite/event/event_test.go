@@ -84,3 +84,20 @@ func TestFilter(t *testing.T) {
 		t.Errorf("we expected lengh of result be 0 but we got %d", len(events))
 	}
 }
+
+func TestUpdateEvent(t *testing.T) {
+	event, err := eventRepo.Create(data1)
+	if err != nil {
+		t.Fatalf("something went wrong the problem was %v", err)
+	}
+
+	defer eventRepo.DeleteAll()
+
+	dective := false
+	err = eventRepo.Update(event.ID, &eventRepositoryDto.UpdateEvent{
+		IsProcessed: &dective,
+	})
+	if err != nil {
+		t.Fatalf("something went wrong the probelem was %v", err)
+	}
+}

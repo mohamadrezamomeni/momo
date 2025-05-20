@@ -118,3 +118,26 @@ func (e *Event) DeleteAll() error {
 
 	return nil
 }
+
+func (e *Event) Update(id string, inpt *eventRepositoryDto.UpdateEvent) error {
+	scope := "eventRepository.Update"
+	subModifies := []string{}
+
+	if inpt.IsProcessed != nil {
+		subModifies = append(subModifies, fmt.Sprintf("is_processed = %v", *inpt.IsProcessed))
+	}
+	if len(subModifies) == 0 {
+		return momoError.Scope(scope).DebuggingErrorf("input was empty")
+	}
+	sql := fmt.Sprintf(
+		"UPDATE events SET %s WHERE id = %v",
+		strings.Join(subModifies, ", "),
+		id,
+	)
+
+	_, err := e.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).Input(id, inpt).DebuggingError()
+	}
+	return nil
+}
