@@ -6,6 +6,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/mohamadrezamomeni/momo/delivery/telegram/core"
 	telegramState "github.com/mohamadrezamomeni/momo/delivery/telegram/state"
+	"github.com/mohamadrezamomeni/momo/dto/service/auth"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 	telegramMessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
 )
@@ -46,7 +47,6 @@ func (h *Handler) CheckDuplicateRegistration(next core.HandlerFunc) core.Handler
 		if !ok {
 			return nil, momoError.Wrap(err).Scope(scope).Input(update).ErrorWrite()
 		}
-
 		if momoErr.GetErrorType() != momoError.NotFound {
 			return nil, err
 		}
@@ -71,8 +71,11 @@ func (h *Handler) SetUserRegisteration(next core.HandlerFunc) core.HandlerFunc {
 	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		idStr := strconv.Itoa(int(update.FromChat().ID))
 
-		stateRegisteration := telegramState.GetControllerState(idStr, registerationKey)
-		if stateRegisteration != nil {
+		val := telegramState.GetControllerState(idStr, registerationKey)
+
+		_, ok := val.(*UserRegisteration)
+
+		if !ok {
 			userRegisteration := &UserRegisteration{
 				ID:        update.FromChat().ID,
 				FirstName: update.FromChat().FirstName,
@@ -95,8 +98,9 @@ func (h *Handler) AskUsername(next core.HandlerFunc) core.HandlerFunc {
 		if !ok {
 			return nil, momoError.Scope(scope)
 		}
+
 		if registerationState.State != AskUsername {
-			next(update)
+			return next(update)
 		}
 
 		title, err := telegramMessages.GetMessage("auth.registeration.input_username", map[string]string{})
@@ -110,7 +114,7 @@ func (h *Handler) AskUsername(next core.HandlerFunc) core.HandlerFunc {
 		return &core.ResponseHandlerFunc{
 			Result:       tgbotapi.NewMessage(update.FromChat().ID, title),
 			ReleaseState: false,
-			RedirectRoot: true,
+			RedirectRoot: false,
 		}, nil
 	}
 }
@@ -118,7 +122,6 @@ func (h *Handler) AskUsername(next core.HandlerFunc) core.HandlerFunc {
 func (h *Handler) AnswerUsername(next core.HandlerFunc) core.HandlerFunc {
 	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		scope := "register.askUser.AnswerUsername"
-
 		idStr := strconv.Itoa(int(update.FromChat().ID))
 		val := telegramState.GetControllerState(idStr, registerationKey)
 		registerationState, ok := val.(*UserRegisteration)
@@ -148,13 +151,25 @@ func (h *Handler) Register(update *core.Update) (*core.ResponseHandlerFunc, erro
 		return nil, momoError.Scope(scope).DebuggingErrorf("error to compare state")
 	}
 
-	msg, err := telegramMessages.GetMessage("auth.registeration.successfully_registeration", map[string]string{
+	_, err := h.authSvc.Register(&auth.RegisterDto{
+		Username:   registerationState.Username,
+		Firstname:  registerationState.FirstName,
+		Lastname:   registerationState.LastName,
+		TelegramID: strconv.Itoa(int(registerationState.ID)),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	title, err := telegramMessages.GetMessage("auth.registeration.successfully_registeration", map[string]string{
 		"username": registerationState.Username,
 	})
-
+	if err != nil {
+		return nil, err
+	}
 	return &core.ResponseHandlerFunc{
-		Result:       tgbotapi.NewMessage(update.Message.Chat.ID, msg),
+		Result:       tgbotapi.NewMessage(update.Message.Chat.ID, title),
 		ReleaseState: true,
 		RedirectRoot: true,
-	}, err
+	}, nil
 }
