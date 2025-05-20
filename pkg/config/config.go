@@ -5,6 +5,7 @@ import (
 	httpserver "github.com/mohamadrezamomeni/momo/delivery/http_server"
 	telegramConfig "github.com/mohamadrezamomeni/momo/delivery/telegram"
 	"github.com/mohamadrezamomeni/momo/pkg/log"
+	notification "github.com/mohamadrezamomeni/momo/pkg/notification"
 	"github.com/mohamadrezamomeni/momo/repository/sqllite"
 	auth "github.com/mohamadrezamomeni/momo/service/auth"
 	encrypt "github.com/mohamadrezamomeni/momo/service/crypt"
@@ -28,4 +29,5 @@ type Config struct {
 	PortAssignment workerServer.PortAssignment   `koanf:"port_assignment"`
 	WorkerServer   workerServer.WorkerConfig     `koanf:"worker_server"`
 	TelegramConfig telegramConfig.TelegramConfig `koanf:"telegram"`
+	Notification   notification.Notification     `koanf:"notification"`
 }
