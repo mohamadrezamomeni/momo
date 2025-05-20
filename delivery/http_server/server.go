@@ -12,7 +12,7 @@ import (
 	metricHandler "github.com/mohamadrezamomeni/momo/delivery/http_server/controller/metric"
 	userHandler "github.com/mohamadrezamomeni/momo/delivery/http_server/controller/user"
 	vpnHandler "github.com/mohamadrezamomeni/momo/delivery/http_server/controller/vpn"
-	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
+	momoLog "github.com/mohamadrezamomeni/momo/pkg/log"
 	authSvc "github.com/mohamadrezamomeni/momo/service/auth"
 	cryptService "github.com/mohamadrezamomeni/momo/service/crypt"
 	hostService "github.com/mohamadrezamomeni/momo/service/host"
@@ -63,8 +63,6 @@ func New(cfg *HTTPConfig,
 }
 
 func (s *Server) Serve() {
-	scope := "httpserver.serve"
-
 	s.router.Use(middleware.RequestID())
 	s.router.Use(middleware.Recover())
 
@@ -79,7 +77,7 @@ func (s *Server) Serve() {
 
 	address := fmt.Sprintf(":%s", s.config.Port)
 	if err := s.router.Start(address); err != nil {
-		momoError.Wrap(err).Scope(scope).Fatal()
+		momoLog.Info(err.Error())
 	}
 }
 

@@ -76,7 +76,7 @@ func main() {
 	defer cancel()
 
 	if err := server.Shutdown(ctxWithTimeout); err != nil {
-		momoError.Wrap(err).Scope("main").DebuggingError()
+		momoLog.Info(err.Error())
 	}
 
 	eventSvc.Shutdown()
