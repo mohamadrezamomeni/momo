@@ -170,6 +170,6 @@ func (h *Handler) Register(update *core.Update) (*core.ResponseHandlerFunc, erro
 	return &core.ResponseHandlerFunc{
 		Result:       tgbotapi.NewMessage(update.Message.Chat.ID, title),
 		ReleaseState: true,
-		RedirectRoot: true,
+		RedirectRoot: false,
 	}, nil
 }
