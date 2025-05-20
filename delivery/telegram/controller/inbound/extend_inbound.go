@@ -3,12 +3,13 @@ package inbound
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/mohamadrezamomeni/momo/delivery/telegram/core"
+	telegramState "github.com/mohamadrezamomeni/momo/delivery/telegram/state"
 	inboundServiceDto "github.com/mohamadrezamomeni/momo/dto/service/inbound"
 	"github.com/mohamadrezamomeni/momo/entity"
-	"github.com/mohamadrezamomeni/momo/pkg/cache"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 	telegrammessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
@@ -28,43 +29,20 @@ type ExtendingInboundState struct {
 	state   ExtendingInboundStatus
 }
 
-func getExtendingInboundKey(id string) string {
-	return id + "-extend_Inbound"
-}
-
-func getExtendingInboundState(id string) (*ExtendingInboundState, bool, error) {
-	scope := "telegram.extendinginbound.getExtendingInboundState"
-
-	value, isExist := cache.Get(id)
-	if !isExist {
-		return nil, false, nil
-	}
-
-	state, ok := value.(*ExtendingInboundState)
-	if !ok {
-		return nil, false, momoError.Scope(scope).UnExpected().ErrorWrite()
-	}
-
-	return state, true, nil
-}
+var exteningInboundKey = "extend_Inbound"
 
 func (h *Handler) SetExtendingInboundState(next core.HandlerFunc) core.HandlerFunc {
 	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
-		user := update.UserSystem
+		val := telegramState.GetControllerState(update.UserSystem.TelegramID, exteningInboundKey)
+		_, ok := val.(*ExtendingInboundState)
 
-		key := getExtendingInboundKey(user.ID)
-
-		_, isExist, err := getExtendingInboundState(key)
-		if err != nil {
-			return nil, err
-		}
-
-		if !isExist {
+		if !ok {
 			extendingInboundState := &ExtendingInboundState{
 				state: askID,
 			}
-			cache.Set(key, extendingInboundState)
+			telegramState.SetControllerState(update.UserSystem.TelegramID, exteningInboundKey, extendingInboundState)
 		}
+
 		return next(update)
 	}
 }
@@ -72,13 +50,11 @@ func (h *Handler) SetExtendingInboundState(next core.HandlerFunc) core.HandlerFu
 func (h *Handler) SelectInboundIDInExtendingInbound(next core.HandlerFunc) core.HandlerFunc {
 	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		scope := "telegram.SelectInboundIDInExtendingInbound"
-		user := update.UserSystem
+		val := telegramState.GetControllerState(update.UserSystem.TelegramID, exteningInboundKey)
 
-		key := getExtendingInboundKey(user.ID)
-
-		state, isExist, err := getExtendingInboundState(key)
-		if err != nil || !isExist {
-			return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
+		state, ok := val.(*ExtendingInboundState)
+		if !ok {
+			return nil, momoError.Scope(scope).Errorf("the type is difference")
 		}
 
 		if state.state != askID {
@@ -86,32 +62,25 @@ func (h *Handler) SelectInboundIDInExtendingInbound(next core.HandlerFunc) core.
 		}
 
 		inbounds, err := h.inboundSvc.Filter(&inboundServiceDto.FilterInbounds{
-			UserID: user.ID,
+			UserID: update.UserSystem.ID,
 		})
 
 		if len(inbounds) == 0 {
-			cache.Delete(key)
-			return h.sendNotFoundInbounds(user)
+			return h.sendNotFoundInbounds(update.UserSystem)
 		}
 
-		state.state = answerID
-		defer cache.Set(key, state)
-
-		id, err := utils.ConvertToInt64(user.TelegramID)
+		id, err := utils.ConvertToInt64(update.UserSystem.TelegramID)
 		if err != nil {
-			cache.Delete(key)
 			return nil, err
 		}
 		askInboundID, err := telegrammessages.GetMessage("inbound.extend.ask_id", map[string]string{})
 		if err != nil {
-			cache.Delete(key)
 			return nil, err
 		}
 		msg := tgbotapi.NewMessage(id, askInboundID)
 
 		title, err := telegrammessages.GetMessage("inbound.extend.ask_id", map[string]string{})
 		if err != nil {
-			cache.Delete(key)
 			return nil, err
 		}
 
@@ -124,7 +93,6 @@ func (h *Handler) SelectInboundIDInExtendingInbound(next core.HandlerFunc) core.
 		for _, inbound := range inbounds {
 			button, err := h.makeExtendingInboundButtom(inbound)
 			if err != nil {
-				cache.Delete(key)
 				return nil, err
 			}
 			rows = append(rows, tgbotapi.NewInlineKeyboardRow(*button))
@@ -132,6 +100,9 @@ func (h *Handler) SelectInboundIDInExtendingInbound(next core.HandlerFunc) core.
 
 		msg.ParseMode = "HTML"
 		msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(rows...)
+
+		state.state = answerID
+		telegramState.SetControllerState(update.UserSystem.TelegramID, exteningInboundKey, state)
 
 		return &core.ResponseHandlerFunc{
 			Result: msg,
@@ -154,35 +125,31 @@ func (h *Handler) makeExtendingInboundButtom(inbound *entity.Inbound) (*tgbotapi
 func (h *Handler) ChooseInbound(next core.HandlerFunc) core.HandlerFunc {
 	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		scope := "telegram.ChooseInbound"
-		user := update.UserSystem
+		val := telegramState.GetControllerState(update.UserSystem.TelegramID, exteningInboundKey)
 
-		key := getExtendingInboundKey(user.ID)
+		state, ok := val.(*ExtendingInboundState)
 
-		state, isExist, err := getExtendingInboundState(key)
-		if err != nil || !isExist {
-			return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
+		if !ok {
+			return nil, momoError.Scope(scope).Errorf("the type is difference")
 		}
 
 		if state.state != answerID {
 			return next(update)
 		}
-
 		inboundID := update.CallbackQuery.Data
 
 		inbound, err := h.inboundSvc.FindInboundByID(inboundID)
 		if err != nil {
-			cache.Delete(key)
 			return nil, err
 		}
 
-		err = h.inboundValidator.ValidateExtendingInboundByUser(inbound, user)
+		err = h.inboundValidator.ValidateExtendingInboundByUser(inbound, update.UserSystem)
 		if err != nil {
-			cache.Delete(key)
 			return nil, err
 		}
 		state.state = askPackage
 		state.inbound = inbound
-		cache.Set(key, state)
+		telegramState.SetControllerState(update.UserSystem.TelegramID, exteningInboundKey, state)
 
 		return next(update)
 	}
@@ -191,26 +158,25 @@ func (h *Handler) ChooseInbound(next core.HandlerFunc) core.HandlerFunc {
 func (h *Handler) AskPackagesExtending(next core.HandlerFunc) core.HandlerFunc {
 	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		scope := "telegram.AskServices"
-		user := update.UserSystem
+		val := telegramState.GetControllerState(update.UserSystem.TelegramID, exteningInboundKey)
 
-		key := getExtendingInboundKey(user.ID)
+		state, ok := val.(*ExtendingInboundState)
 
-		state, isExist, err := getExtendingInboundState(key)
-		if err != nil || !isExist {
-			return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
+		if !ok {
+			return nil, momoError.Scope(scope).Errorf("the type is difference")
 		}
+
 		if state.state != askPackage {
 			return next(update)
 		}
 
 		res, err := h.getResponseAskPackage(update.UserSystem)
 		if err != nil {
-			cache.Delete(key)
 			return nil, err
 		}
 
 		state.state = answerPackage
-		cache.Set(key, state)
+		telegramState.SetControllerState(update.UserSystem.TelegramID, exteningInboundKey, state)
 		return res, nil
 	}
 }
@@ -218,39 +184,48 @@ func (h *Handler) AskPackagesExtending(next core.HandlerFunc) core.HandlerFunc {
 func (h *Handler) AnswerPackageExtendingInbound(next core.HandlerFunc) core.HandlerFunc {
 	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		scope := "telegram.AnswerPackage"
-		user := update.UserSystem
 
-		key := getExtendingInboundKey(user.ID)
-		state, isExist, err := getExtendingInboundState(key)
-		if err != nil || !isExist {
-			return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
+		val := telegramState.GetControllerState(update.UserSystem.TelegramID, exteningInboundKey)
+
+		state, ok := val.(*ExtendingInboundState)
+
+		if !ok {
+			return nil, momoError.Scope(scope).Errorf("the type is difference")
 		}
 
 		packageID := update.CallbackQuery.Data
 
 		pkg, err := h.answerPackage(packageID)
 		if err != nil {
-			cache.Delete(key)
 			return nil, err
 		}
 		state.pkg = pkg
 		state.state = extendingInboundDone
-		cache.Set(key, state)
+		telegramState.SetControllerState(update.UserSystem.TelegramID, exteningInboundKey, state)
 		return next(update)
 	}
 }
 
 func (h *Handler) ExtendInbound(update *core.Update) (*core.ResponseHandlerFunc, error) {
 	scope := "telegram.ExtendInbound"
-	user := update.UserSystem
-	key := getExtendingInboundKey(user.ID)
+	val := telegramState.GetControllerState(update.UserSystem.TelegramID, exteningInboundKey)
 
-	state, isExist, err := getExtendingInboundState(key)
-	if err != nil || !isExist || state.state != extendingInboundDone {
-		return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
+	state, ok := val.(*ExtendingInboundState)
+
+	if !ok {
+		return nil, momoError.Scope(scope).Errorf("the type is difference")
 	}
+	if state.state != extendingInboundDone {
+		return nil, momoError.Scope(scope).Errorf("state must be done")
+	}
+	now := time.Now()
 
-	defer cache.Delete(key)
+	err := h.inboundSvc.ExtendInbound(strconv.Itoa(state.inbound.ID), &inboundServiceDto.ExtendInboundDto{
+		Start:                now,
+		End:                  now.AddDate(0, int(state.pkg.Months), int(state.pkg.Days)),
+		ExtendedTrafficLimit: state.pkg.TrafficLimit,
+	})
+
 	extendingInboundTitle, err := telegrammessages.GetMessage("inbound.extend.successfully_extending", map[string]string{})
 	if err != nil {
 		return nil, err

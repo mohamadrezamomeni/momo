@@ -5,9 +5,9 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/mohamadrezamomeni/momo/delivery/telegram/core"
+	telegramState "github.com/mohamadrezamomeni/momo/delivery/telegram/state"
 	inboundServiceDto "github.com/mohamadrezamomeni/momo/dto/service/inbound"
 	"github.com/mohamadrezamomeni/momo/entity"
-	"github.com/mohamadrezamomeni/momo/pkg/cache"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 	telegrammessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
@@ -27,38 +27,17 @@ type CreateVPNState struct {
 	pkg     *entity.VPNPackage
 }
 
-func generateCreatingState(id string) string {
-	return id + "creating_inbound"
-}
-
-func getCreatingVPNState(key string) (*CreateVPNState, bool, error) {
-	scope := "telegram.inbound.getCreatingVPNState"
-	value, isExist := cache.Get(key)
-	if !isExist {
-		return nil, false, nil
-	}
-
-	creatingVPNState, ok := value.(*CreateVPNState)
-	if !ok {
-		return nil, true, momoError.Scope(scope).UnExpected().DebuggingError()
-	}
-	return creatingVPNState, true, nil
-}
+var creatingInboundKey = "creating_inbound"
 
 func (h *Handler) SetState(next core.HandlerFunc) core.HandlerFunc {
 	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
-		key := generateCreatingState(update.UserSystem.ID)
-		_, isExist, err := getCreatingVPNState(key)
-		if err != nil {
-			return nil, err
-		}
-
-		if !isExist {
-
+		val := telegramState.GetControllerState(update.UserSystem.TelegramID, creatingInboundKey)
+		_, ok := val.(*CreateVPNState)
+		if !ok {
 			state := &CreateVPNState{
 				state: askVPNType,
 			}
-			cache.Set(key, state)
+			telegramState.SetControllerState(update.UserSystem.TelegramID, creatingInboundKey, state)
 		}
 
 		return next(update)
@@ -67,38 +46,41 @@ func (h *Handler) SetState(next core.HandlerFunc) core.HandlerFunc {
 
 func (h *Handler) AskVPNType(next core.HandlerFunc) core.HandlerFunc {
 	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
-		scope := "telegram.controller.fillVPNType"
+		scope := "telegram.controller.AskVPNType"
 
-		key := generateCreatingState(update.UserSystem.ID)
+		val := telegramState.GetControllerState(update.UserSystem.TelegramID, creatingInboundKey)
 
-		state, isExist, err := getCreatingVPNState(key)
-		if err != nil || !isExist {
-			return nil, momoError.Scope(scope).ErrorWrite()
+		state, ok := val.(*CreateVPNState)
+
+		if !ok {
+			return nil, momoError.Scope(scope).Errorf("the type is difference")
 		}
+
 		if state.state != askVPNType {
 			return next(update)
 		}
-		xray := tgbotapi.NewInlineKeyboardButtonData(
-			entity.VPNTypeString(entity.XRAY_VPN), entity.VPNTypeString(entity.XRAY_VPN),
-		)
 
-		markup := tgbotapi.NewInlineKeyboardMarkup(
-			tgbotapi.NewInlineKeyboardRow(xray),
-		)
+		markup := h.getVPNTypeButtoms()
 
-		id, _ := utils.ConvertToInt64(update.UserSystem.TelegramID)
+		id, err := utils.ConvertToInt64(update.UserSystem.TelegramID)
+		if err != nil {
+			return nil, err
+		}
 
 		text, err := telegrammessages.GetMessage(
 			"inbound.create.select_vpn",
 			map[string]string{},
 		)
+		if err != nil {
+			return nil, err
+		}
 
 		msg := tgbotapi.NewMessage(id, text)
 
 		msg.ReplyMarkup = markup
 		state.state = answerVPNType
 
-		cache.Set(key, state)
+		telegramState.SetControllerState(update.UserSystem.TelegramID, creatingInboundKey, state)
 
 		return &core.ResponseHandlerFunc{
 			Result: msg,
@@ -106,16 +88,27 @@ func (h *Handler) AskVPNType(next core.HandlerFunc) core.HandlerFunc {
 	}
 }
 
+func (h *Handler) getVPNTypeButtoms() tgbotapi.InlineKeyboardMarkup {
+	xray := tgbotapi.NewInlineKeyboardButtonData(
+		entity.VPNTypeString(entity.XRAY_VPN), entity.VPNTypeString(entity.XRAY_VPN),
+	)
+
+	return tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(xray),
+	)
+}
+
 func (h *Handler) FillVPNType(next core.HandlerFunc) core.HandlerFunc {
 	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		scope := "telegram.controller.fillVPNType"
 
-		key := generateCreatingState(update.UserSystem.ID)
+		val := telegramState.GetControllerState(update.UserSystem.TelegramID, creatingInboundKey)
+		state, ok := val.(*CreateVPNState)
 
-		state, isExist, err := getCreatingVPNState(key)
-		if err != nil || !isExist {
-			return nil, momoError.Scope(scope).ErrorWrite()
+		if !ok {
+			return nil, momoError.Scope(scope).Errorf("the type is difference")
 		}
+
 		if state.state != answerVPNType {
 			return next(update)
 		}
@@ -128,7 +121,8 @@ func (h *Handler) FillVPNType(next core.HandlerFunc) core.HandlerFunc {
 
 		state.VPNType = vpnType
 		state.state = askPackage
-		cache.Set(key, state)
+
+		telegramState.SetControllerState(update.UserSystem.TelegramID, creatingInboundKey, state)
 
 		return next(update)
 	}
@@ -137,13 +131,13 @@ func (h *Handler) FillVPNType(next core.HandlerFunc) core.HandlerFunc {
 func (h *Handler) AskPackagesCreatingInbound(next core.HandlerFunc) core.HandlerFunc {
 	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		scope := "telegram.AskPackagesCreatingInbound"
-		user := update.UserSystem
 
-		key := generateCreatingState(user.ID)
+		val := telegramState.GetControllerState(update.UserSystem.TelegramID, creatingInboundKey)
 
-		state, isExist, err := getCreatingVPNState(key)
-		if err != nil || !isExist {
-			return nil, momoError.Wrap(err).Scope(scope).UnExpected().Errorf("error to get state")
+		state, ok := val.(*CreateVPNState)
+
+		if !ok {
+			return nil, momoError.Scope(scope).Errorf("the type is difference")
 		}
 
 		if state.state != askPackage {
@@ -156,7 +150,7 @@ func (h *Handler) AskPackagesCreatingInbound(next core.HandlerFunc) core.Handler
 		}
 
 		state.state = answerPackage
-		cache.Set(key, state)
+		telegramState.SetControllerState(update.UserSystem.TelegramID, creatingInboundKey, state)
 		return res, nil
 	}
 }
@@ -164,13 +158,11 @@ func (h *Handler) AskPackagesCreatingInbound(next core.HandlerFunc) core.Handler
 func (h *Handler) AnswerPackageCreatingInbound(next core.HandlerFunc) core.HandlerFunc {
 	return func(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		scope := "telegram.AnswerPackageCreatingInbound"
-		user := update.UserSystem
+		val := telegramState.GetControllerState(update.UserSystem.TelegramID, creatingInboundKey)
 
-		key := generateCreatingState(user.ID)
-
-		state, isExist, err := getCreatingVPNState(key)
-		if err != nil || !isExist {
-			return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
+		state, ok := val.(*CreateVPNState)
+		if !ok {
+			return nil, momoError.Scope(scope).Errorf("the type is difference")
 		}
 
 		packageID := update.CallbackQuery.Data
@@ -181,7 +173,7 @@ func (h *Handler) AnswerPackageCreatingInbound(next core.HandlerFunc) core.Handl
 		}
 		state.pkg = pkg
 		state.state = creatingInboundDone
-		cache.Set(key, state)
+		telegramState.SetControllerState(update.UserSystem.TelegramID, creatingInboundKey, state)
 		return next(update)
 	}
 }
@@ -189,27 +181,25 @@ func (h *Handler) AnswerPackageCreatingInbound(next core.HandlerFunc) core.Handl
 func (h *Handler) CreateInbound(update *core.Update) (*core.ResponseHandlerFunc, error) {
 	scope := "telegram.controller.CreateVPN"
 
-	key := generateCreatingState(update.UserSystem.ID)
+	val := telegramState.GetControllerState(update.UserSystem.TelegramID, creatingInboundKey)
 
-	state, isExist, err := getCreatingVPNState(key)
-	if err != nil || !isExist || state.state != creatingInboundDone {
-		return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
+	state, ok := val.(*CreateVPNState)
+
+	if !ok {
+		return nil, momoError.Scope(scope).Errorf("the type is difference")
 	}
 
-	defer func() {
-		cache.Delete(key)
-	}()
+	if state.state != creatingInboundDone {
+		return nil, momoError.Scope(scope).Errorf("state must be done")
+	}
 
 	id, err := utils.ConvertToInt64(update.UserSystem.TelegramID)
 	if err != nil {
 		return nil, err
 	}
 
-	text, err := telegrammessages.GetMessage("inbound.create.successfully_creation", map[string]string{})
-	if err != nil {
-		return nil, err
-	}
 	now := time.Now()
+
 	_, err = h.inboundSvc.Create(&inboundServiceDto.CreateInbound{
 		ServerType:   entity.High,
 		UserID:       update.UserSystem.ID,
@@ -218,6 +208,10 @@ func (h *Handler) CreateInbound(update *core.Update) (*core.ResponseHandlerFunc,
 		Start:        now,
 		End:          now.AddDate(0, int(state.pkg.Months), int(state.pkg.Days)),
 	})
+	if err != nil {
+		return nil, err
+	}
+	text, err := telegrammessages.GetMessage("inbound.create.successfully_creation", map[string]string{})
 	if err != nil {
 		return nil, err
 	}

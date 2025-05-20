@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/mohamadrezamomeni/momo/pkg/cache"
+	telegramState "github.com/mohamadrezamomeni/momo/delivery/telegram/state"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 )
 
@@ -40,6 +40,11 @@ func (r *Router) Route(update *Update) (*ResponseHandlerFunc, error) {
 	var path string
 	var err error
 
+	id, err := GetID(update)
+	if err != nil {
+		return nil, nil
+	}
+
 	if update.CallbackQuery != nil {
 		res, path, err = r.callbackQuery(update)
 	}
@@ -52,11 +57,10 @@ func (r *Router) Route(update *Update) (*ResponseHandlerFunc, error) {
 		return nil, nil
 	}
 
-	key := r.getKey(update)
 	if res != nil && !res.ReleaseState && len(path) > 0 {
-		cache.Set(key, path)
-	} else if res != nil && (res.ReleaseState || len(path) == 0) {
-		cache.Delete(key)
+		telegramState.SetPath(id, path)
+	} else if err != nil || (res != nil && (res.ReleaseState || len(path) == 0)) {
+		telegramState.DeleteState(id)
 	}
 
 	if res == nil {
@@ -76,27 +80,26 @@ func (r *Router) message(update *Update) (*ResponseHandlerFunc, string, error) {
 }
 
 func (r *Router) getResponse(text string, update *Update) (*ResponseHandlerFunc, string, error) {
-	key := r.getKey(update)
+	id, err := GetID(update)
+
 	if r.isPath(text) {
 		path := r.getPathFromText(text)
 		res, err := r.routeFromText(path, update)
 		return res, path, err
 	}
 
-	value, isExist := cache.Get(key)
+	state, isExist := telegramState.Get(id)
 	if !isExist {
 		res, _ := r.RootHandler(update)
 		return res, "", nil
 	}
 
-	path, ok := value.(string)
-
-	if !ok {
+	if len(state.Path) == 0 {
 		res, _ := r.RootHandler(update)
 		return res, "", nil
 	}
 
-	handler := r.getHandler(path)
+	handler := r.getHandler(state.Path)
 
 	res, err := handler(update)
 	if err != nil {
@@ -104,7 +107,7 @@ func (r *Router) getResponse(text string, update *Update) (*ResponseHandlerFunc,
 		return res, "", err
 	}
 
-	return res, path, nil
+	return res, state.Path, nil
 }
 
 func (r *Router) isPath(text string) bool {
@@ -129,14 +132,6 @@ func (r *Router) routeFromText(path string, update *Update) (*ResponseHandlerFun
 		return res, err
 	}
 	return res, nil
-}
-
-func (r *Router) getKey(update *Update) string {
-	id, err := GetID(update)
-	if err != nil {
-		momoError.Wrap(err).Input(update).Fatal()
-	}
-	return id
 }
 
 func (r *Router) RootHandler(update *Update) (*ResponseHandlerFunc, error) {

@@ -411,7 +411,6 @@ func (i *Inbound) ExtendInbound(id string, inpt *inboundDto.ExtendInboundDto) er
 		inpt.TrafficExtended,
 		id,
 	)
-
 	result, err := i.db.Conn().Exec(sql)
 	if err != nil {
 		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
