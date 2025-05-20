@@ -90,6 +90,7 @@ func (h *Handler) SelectInboundIDInExtendingInbound(next core.HandlerFunc) core.
 		})
 
 		if len(inbounds) == 0 {
+			cache.Delete(key)
 			return h.sendNotFoundInbounds(user)
 		}
 
@@ -97,15 +98,20 @@ func (h *Handler) SelectInboundIDInExtendingInbound(next core.HandlerFunc) core.
 		defer cache.Set(key, state)
 
 		id, err := utils.ConvertToInt64(user.TelegramID)
-
+		if err != nil {
+			cache.Delete(key)
+			return nil, err
+		}
 		askInboundID, err := telegrammessages.GetMessage("inbound.extend.ask_id", map[string]string{})
 		if err != nil {
+			cache.Delete(key)
 			return nil, err
 		}
 		msg := tgbotapi.NewMessage(id, askInboundID)
 
 		title, err := telegrammessages.GetMessage("inbound.extend.ask_id", map[string]string{})
 		if err != nil {
+			cache.Delete(key)
 			return nil, err
 		}
 
@@ -118,6 +124,7 @@ func (h *Handler) SelectInboundIDInExtendingInbound(next core.HandlerFunc) core.
 		for _, inbound := range inbounds {
 			button, err := h.makeExtendingInboundButtom(inbound)
 			if err != nil {
+				cache.Delete(key)
 				return nil, err
 			}
 			rows = append(rows, tgbotapi.NewInlineKeyboardRow(*button))
@@ -164,11 +171,13 @@ func (h *Handler) ChooseInbound(next core.HandlerFunc) core.HandlerFunc {
 
 		inbound, err := h.inboundSvc.FindInboundByID(inboundID)
 		if err != nil {
+			cache.Delete(key)
 			return nil, err
 		}
 
 		err = h.inboundValidator.ValidateExtendingInboundByUser(inbound, user)
 		if err != nil {
+			cache.Delete(key)
 			return nil, err
 		}
 		state.state = askPackage
@@ -190,13 +199,13 @@ func (h *Handler) AskPackagesExtending(next core.HandlerFunc) core.HandlerFunc {
 		if err != nil || !isExist {
 			return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
 		}
-
 		if state.state != askPackage {
 			return next(update)
 		}
 
 		res, err := h.getResponseAskPackage(update.UserSystem)
 		if err != nil {
+			cache.Delete(key)
 			return nil, err
 		}
 
@@ -212,7 +221,6 @@ func (h *Handler) AnswerPackageExtendingInbound(next core.HandlerFunc) core.Hand
 		user := update.UserSystem
 
 		key := getExtendingInboundKey(user.ID)
-
 		state, isExist, err := getExtendingInboundState(key)
 		if err != nil || !isExist {
 			return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
@@ -222,6 +230,7 @@ func (h *Handler) AnswerPackageExtendingInbound(next core.HandlerFunc) core.Hand
 
 		pkg, err := h.answerPackage(packageID)
 		if err != nil {
+			cache.Delete(key)
 			return nil, err
 		}
 		state.pkg = pkg
@@ -233,7 +242,6 @@ func (h *Handler) AnswerPackageExtendingInbound(next core.HandlerFunc) core.Hand
 
 func (h *Handler) ExtendInbound(update *core.Update) (*core.ResponseHandlerFunc, error) {
 	scope := "telegram.ExtendInbound"
-
 	user := update.UserSystem
 	key := getExtendingInboundKey(user.ID)
 
@@ -242,6 +250,7 @@ func (h *Handler) ExtendInbound(update *core.Update) (*core.ResponseHandlerFunc,
 		return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
 	}
 
+	defer cache.Delete(key)
 	extendingInboundTitle, err := telegrammessages.GetMessage("inbound.extend.successfully_extending", map[string]string{})
 	if err != nil {
 		return nil, err

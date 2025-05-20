@@ -18,16 +18,6 @@ const (
 	answerPackage
 )
 
-var packages []*entity.VPNPackage = []*entity.VPNPackage{
-	{
-		ID:           "1",
-		TrafficLimit: 50000,
-		Months:       1,
-		Days:         0,
-		Price:        20000,
-	},
-}
-
 func (h *Handler) getResponseAskPackage(user *entity.User) (*core.ResponseHandlerFunc, error) {
 	var rows [][]tgbotapi.InlineKeyboardButton
 	vpnPackages, err := h.vpnPackageSvc.Filter(&vpnPackageServiceDto.FilterVPNPackage{})
