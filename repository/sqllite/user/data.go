@@ -30,4 +30,14 @@ var (
 		Password:     "1244",
 		IsSuperAdmin: false,
 	}
+
+	user4 = &userDto.Create{
+		Username:     "madona",
+		FirstName:    "micka",
+		LastName:     "castarica",
+		IsAdmin:      true,
+		Password:     "1244",
+		IsSuperAdmin: false,
+		IsApproved:   false,
+	}
 )

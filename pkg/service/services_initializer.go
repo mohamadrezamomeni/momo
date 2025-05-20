@@ -43,11 +43,11 @@ func GetServices(cfg *config.Config) (
 	hostSvc := hostService.New(hostRepo, adapter.AdaptedWorkerFactory)
 	vpnSvc := vpnService.New(vpnRepo, adapter.AdaptedVPNProxyFactory)
 	cryptSvc := cryptService.New(&cfg.CryptConfig)
-	userSvc := userService.New(userRepo, cryptSvc)
+
+	eventSvc := eventService.New(eventRepo)
+	userSvc := userService.New(userRepo, cryptSvc, eventSvc)
 	authSvc := authService.New(userSvc, cryptSvc, &cfg.AuthConfig)
 	vpnPackageSvc := vpnPackageService.New(vpnPackageRepo)
-	eventSvc := eventService.New(eventRepo)
-
 	inbouncSvc := inboundService.New(inboundRepo, vpnSvc, userSvc, hostSvc)
 	return hostSvc, vpnSvc, userSvc, inbouncSvc, authSvc, cryptSvc, vpnPackageSvc, eventSvc
 }

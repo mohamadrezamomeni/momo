@@ -224,3 +224,22 @@ func TestDeletePreviousSuperAdmins(t *testing.T) {
 		t.Fatal("super admine must be deleted")
 	}
 }
+
+func TestUpdateUser(t *testing.T) {
+	defer userRepo.DeleteAll()
+	userCreated, _ := userRepo.Create(user4)
+
+	active := true
+	err := userRepo.Update(userCreated.ID, &userDto.UpdateUser{
+		IsApproved: &active,
+	})
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	userFound, _ := userRepo.FindUserByID(userCreated.ID)
+
+	if userFound.IsApproved != true {
+		t.Error("we expected the is_approved be true")
+	}
+}

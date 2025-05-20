@@ -2,10 +2,17 @@ package user
 
 import (
 	userRepoDto "github.com/mohamadrezamomeni/momo/dto/repository/user"
+	eventServiceDto "github.com/mohamadrezamomeni/momo/dto/service/event"
 	userServiceDto "github.com/mohamadrezamomeni/momo/dto/service/user"
 	"github.com/mohamadrezamomeni/momo/entity"
 	crypt "github.com/mohamadrezamomeni/momo/service/crypt"
 )
+
+type User struct {
+	userRepo UserRepo
+	crypt    *crypt.Crypt
+	eventSvc EventService
+}
 
 type UserRepo interface {
 	FindUserByID(string) (*entity.User, error)
@@ -16,15 +23,16 @@ type UserRepo interface {
 	DeletePreviousSuperAdmins() error
 	FilterUsers(*userRepoDto.FilterUsers) ([]*entity.User, error)
 	FindByTelegramID(string) (*entity.User, error)
+	Update(string, *userRepoDto.UpdateUser) error
 }
 
-type User struct {
-	userRepo UserRepo
-	crypt    *crypt.Crypt
+type EventService interface {
+	Create(*eventServiceDto.CreateEventDto)
 }
 
-func New(userRepo UserRepo, crypt *crypt.Crypt) *User {
+func New(userRepo UserRepo, crypt *crypt.Crypt, eventSvc EventService) *User {
 	return &User{
+		eventSvc: eventSvc,
 		userRepo: userRepo,
 		crypt:    crypt,
 	}
@@ -64,6 +72,23 @@ func (u *User) CreateUserAdmin(userDto *userServiceDto.AddUser) (*entity.User, e
 		Username:  userDto.Username,
 		Password:  passwordHashed,
 	})
+}
+
+func (u *User) ApproveUser(id string) error {
+	approve := true
+	err := u.userRepo.Update(id, &userRepoDto.UpdateUser{
+		IsApproved: &approve,
+	})
+	if err != nil {
+		return err
+	}
+
+	u.eventSvc.Create(&eventServiceDto.CreateEventDto{
+		Name: "approve_user",
+		Data: id,
+	})
+
+	return nil
 }
 
 func (u *User) FindByID(id string) (*entity.User, error) {

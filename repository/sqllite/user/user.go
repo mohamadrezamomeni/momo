@@ -261,3 +261,25 @@ func (u *User) DeletePreviousSuperAdmins() error {
 
 	return nil
 }
+
+func (u *User) Update(id string, inpt *dto.UpdateUser) error {
+	scope := "userRepository.update"
+	subModifies := []string{}
+	if inpt.IsApproved != nil {
+		subModifies = append(subModifies, fmt.Sprintf("is_approved = %v", *inpt.IsApproved))
+	}
+
+	if len(subModifies) == 0 {
+		return momoError.Scope(scope).DebuggingErrorf("input was empty")
+	}
+	sql := fmt.Sprintf(
+		"UPDATE users SET %s WHERE id = '%s'",
+		strings.Join(subModifies, ", "),
+		id,
+	)
+	_, err := u.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).Input(id, inpt).DebuggingError()
+	}
+	return nil
+}
