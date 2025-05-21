@@ -1,10 +1,14 @@
 package user
 
 import (
+	"encoding/json"
+
 	userRepoDto "github.com/mohamadrezamomeni/momo/dto/repository/user"
 	eventServiceDto "github.com/mohamadrezamomeni/momo/dto/service/event"
 	userServiceDto "github.com/mohamadrezamomeni/momo/dto/service/user"
 	"github.com/mohamadrezamomeni/momo/entity"
+	userEvent "github.com/mohamadrezamomeni/momo/event/user"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 	crypt "github.com/mohamadrezamomeni/momo/service/crypt"
 )
 
@@ -75,6 +79,7 @@ func (u *User) CreateUserAdmin(userDto *userServiceDto.AddUser) (*entity.User, e
 }
 
 func (u *User) ApproveUser(id string) error {
+	scope := "user.service.ApproveUser"
 	approve := true
 	err := u.userRepo.Update(id, &userRepoDto.UpdateUser{
 		IsApproved: &approve,
@@ -82,10 +87,16 @@ func (u *User) ApproveUser(id string) error {
 	if err != nil {
 		return err
 	}
-
+	eventData := userEvent.UserApproved{
+		UserID: id,
+	}
+	jsonStr, err := json.Marshal(eventData)
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope)
+	}
 	u.eventSvc.Create(&eventServiceDto.CreateEventDto{
 		Name: "approve_user",
-		Data: id,
+		Data: string(jsonStr),
 	})
 
 	return nil
