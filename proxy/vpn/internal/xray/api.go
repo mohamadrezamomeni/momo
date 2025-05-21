@@ -53,14 +53,7 @@ func (x *Xray) GetAddress() string {
 }
 
 func (x *Xray) Add(inpt *vpnProxyDto.Inbound) error {
-	isExisted, err := x.DoesExist(inpt)
-	if err != nil {
-		return err
-	}
-	if isExisted {
-		return nil
-	}
-	_, err = x.addInbound(&dto.AddInbound{
+	_, err := x.addInbound(&dto.AddInbound{
 		Port:     inpt.Port,
 		Tag:      inpt.Tag,
 		Protocol: inpt.Protocol,
@@ -77,7 +70,7 @@ func (x *Xray) Add(inpt *vpnProxyDto.Inbound) error {
 }
 
 func (x *Xray) Disable(inpt *vpnProxyDto.Inbound) error {
-	isExisted, err := x.DoesExist(inpt)
+	isExisted, err := x.IsExisted(inpt)
 	if err != nil {
 		return err
 	}
@@ -108,12 +101,18 @@ func (x *Xray) GetTraffic(inpt *vpnProxyDto.Inbound) (*vpnSerializer.Traffic, er
 	}, nil
 }
 
-func (x *Xray) DoesExist(inpt *vpnProxyDto.Inbound) (bool, error) {
-	data, err := x.getUsers(inpt.Tag)
-	if err == nil && len(data.Usernames) > 0 {
+func (x *Xray) IsExisted(inpt *vpnProxyDto.Inbound) (bool, error) {
+	_, err := x.getUsers(inpt.Tag)
+
+	if err == nil {
 		return true, nil
 	}
-	return false, err
+
+	if momoErr, ok := momoError.GetMomoError(err); !ok ||
+		momoErr.GetErrorType() != momoError.NotFound {
+		return false, err
+	}
+	return false, nil
 }
 
 func (x *Xray) Test() error {

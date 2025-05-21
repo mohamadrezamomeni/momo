@@ -15,7 +15,7 @@ type VPN interface {
 	Add(*proxyVpnDto.Inbound) error
 	Disable(*proxyVpnDto.Inbound) error
 	GetTraffic(*proxyVpnDto.Inbound) (*vpnSerializer.Traffic, error)
-	DoesExist(*proxyVpnDto.Inbound) (bool, error)
+	IsExisted(*proxyVpnDto.Inbound) (bool, error)
 	GetAddress() string
 	Test() error
 	Close()
