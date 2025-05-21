@@ -281,7 +281,7 @@ func (i *Inbound) RetriveFaultyInbounds() ([]*entity.Inbound, error) {
 func (i *Inbound) FindInboundIsNotAssigned() ([]*entity.Inbound, error) {
 	scope := "inboundRepository.FindInboundIsNotAssigned"
 
-	query := "SELECT * FROM inbounds WHERE is_assigned = false"
+	query := "SELECT * FROM inbounds WHERE is_assigned = false AND is_block = false"
 	rows, err := i.db.Conn().Query(query)
 	if err != nil {
 		return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()

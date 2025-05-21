@@ -256,4 +256,18 @@ var (
 		TrafficLimit: 50,
 		TrafficUsage: 50,
 	}
+	inbound17 = &inboundDto.CreateInbound{
+		Tag:        fmt.Sprintf("inbound-%s", port2),
+		Protocol:   "http",
+		Port:       "",
+		Domain:     "",
+		UserID:     userID9,
+		IsBlock:    false,
+		IsActive:   false,
+		IsAssigned: false,
+		IsNotified: false,
+		VPNType:    entity.XRAY_VPN,
+		Start:      utils.GetDateTime("2024-04-21 14:30:00"),
+		End:        utils.GetDateTime("2024-04-22 14:30:00"),
+	}
 )

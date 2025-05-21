@@ -158,21 +158,21 @@ func TestRertriveFaultyInbounds(t *testing.T) {
 }
 
 func TestInboundsIsNotAssigned(t *testing.T) {
+	defer inboundRepo.DeleteAll()
 	inboundRepo.Create(inbound10)
 	inboundRepo.Create(inbound11)
+	inboundRepo.Create(inbound17)
 
 	inbounds, err := inboundRepo.FindInboundIsNotAssigned()
 	if err != nil {
 		t.Fatalf("someting went wront the problem was %v", err)
 	}
-
 	if len(inbounds) != 1 {
 		t.Fatalf("we expected we got 1 items but we got %v", len(inbounds))
 	}
-	if inbounds[0].UserID != userID8 {
+	if inbounds[0].UserID != userID9 {
 		t.Fatalf("the answer was wrong")
 	}
-	inboundRepo.DeleteAll()
 }
 
 func TestFindInboundByUserID(t *testing.T) {
