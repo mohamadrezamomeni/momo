@@ -77,7 +77,14 @@ func (x *Xray) Add(inpt *vpnProxyDto.Inbound) error {
 }
 
 func (x *Xray) Disable(inpt *vpnProxyDto.Inbound) error {
-	_, err := x.removeInbound(&dto.RemoveInbound{
+	isExisted, err := x.DoesExist(inpt)
+	if err != nil {
+		return err
+	}
+	if !isExisted {
+		return nil
+	}
+	_, err = x.removeInbound(&dto.RemoveInbound{
 		Tag: inpt.Tag,
 	})
 	if err != nil {
