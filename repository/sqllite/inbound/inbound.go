@@ -301,7 +301,7 @@ func (i *Inbound) UpdateDomainPort(id int, domain string, port string) error {
 	scope := "inboundRepository.UpdateDomainPort"
 
 	sql := fmt.Sprintf(
-		"UPDATE inbounds SET domain = '%s', port = '%s' WHERE id = %v",
+		"UPDATE inbounds SET domain = '%s', port = '%s', is_assigned = true WHERE id = %v",
 		domain,
 		port,
 		id,

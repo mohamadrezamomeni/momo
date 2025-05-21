@@ -199,7 +199,7 @@ func TestUpdateInbound(t *testing.T) {
 
 	inbound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
 
-	if inbound.Domain != newDomain || inbound.Port != newPort {
+	if inbound.Domain != newDomain || inbound.Port != newPort || inbound.IsAssigned != true {
 		t.Fatalf("update hasn't worked carefuly")
 	}
 }
