@@ -53,7 +53,14 @@ func (x *Xray) GetAddress() string {
 }
 
 func (x *Xray) Add(inpt *vpnProxyDto.Inbound) error {
-	_, err := x.addInbound(&dto.AddInbound{
+	isExisted, err := x.DoesExist(inpt)
+	if err != nil {
+		return err
+	}
+	if isExisted {
+		return nil
+	}
+	_, err = x.addInbound(&dto.AddInbound{
 		Port:     inpt.Port,
 		Tag:      inpt.Tag,
 		Protocol: inpt.Protocol,
