@@ -67,7 +67,9 @@ func (x *Xray) addInbound(inpt *dto.AddInbound) (*serializer.AddInboundSerialize
 	}
 
 	_, err = x.hsClient.AddInbound(context.Background(), addInboundRequest)
-	if err != nil {
+	if err != nil && isExisted(err, inpt.Tag) {
+		return nil, momoError.Wrap(err).Scope(scope).Duplicate().Input(inpt).ErrorWrite()
+	} else if err != nil {
 		return nil, momoError.Wrap(err).Scope(scope).Input(inpt).ErrorWrite()
 	}
 	return &serializer.AddInboundSerializer{}, nil

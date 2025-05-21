@@ -3,6 +3,7 @@ package xray
 import (
 	"testing"
 
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 	"github.com/mohamadrezamomeni/momo/proxy/vpn/internal/xray/dto"
 )
 
@@ -69,8 +70,8 @@ func TestGetTraffic(t *testing.T) {
 
 func TestInboundDoesntExist(t *testing.T) {
 	_, err := xrayU.getUsers(inboundDoesntExist)
-	if err == nil {
-		t.Error("error could be existed. It was unexpected situation")
+	if momoErr, ok := err.(*momoError.MomoError); !ok || momoErr.GetErrorType() != momoError.NotFound {
+		t.Fatal("error could be existed. It was unexpected situation")
 	}
 
 	xrayU.addInbound(&dto.AddInbound{
@@ -84,10 +85,16 @@ func TestInboundDoesntExist(t *testing.T) {
 		},
 	})
 
+	data, err := xrayU.getUsers(inboundDoesntExist)
+
+	if err != nil || len(data.Usernames) == 0 {
+		t.Fatal("error could be existed. It was unexpected situation")
+	}
+
 	xrayU.removeInbound(&dto.RemoveInbound{Tag: inboundDoesntExist})
-	data, _ := xrayU.getUsers(inboundDoesntExist)
-	if data != nil && len(data.Usernames) > 0 {
-		t.Error("error could be existed. It was unexpected situation")
+	_, err = xrayU.getUsers(inboundDoesntExist)
+	if momoErr, ok := err.(*momoError.MomoError); !ok || momoErr.GetErrorType() != momoError.NotFound {
+		t.Fatal("error could be existed. It was unexpected situation")
 	}
 }
 

@@ -58,12 +58,17 @@ func (x *Xray) getUsers(tag string) (*serializer.GetUsers, error) {
 	res, err := x.hsClient.GetInboundUsers(context.Background(), &command.GetInboundUserRequest{
 		Tag: tag,
 	})
-	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Input(tag).ErrorWrite()
+	if err != nil && isNotFoundError(err, tag) {
+		return nil, momoError.Wrap(err).Scope(scope).NotFound().Input(tag).ErrorWrite()
+	} else if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).UnExpected().Input(tag).ErrorWrite()
 	}
 	usernames := make([]string, 0)
 	for _, user := range res.Users {
 		usernames = append(usernames, user.Email)
+	}
+	if len(usernames) == 0 {
+		return nil, momoError.Wrap(err).Scope(scope).NotFound().Input(tag).ErrorWrite()
 	}
 	return &serializer.GetUsers{
 		Usernames: usernames,
