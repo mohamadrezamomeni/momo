@@ -39,7 +39,10 @@ type InboundRepo interface {
 	FindInboundByID(id string) (*entity.Inbound, error)
 	UpdateDomainPort(int, string, string) error
 	ChangeBlockState(string, bool) error
-	RetriveFaultyInbounds() ([]*entity.Inbound, error)
+	RetriveActiveInboundBlocked() ([]*entity.Inbound, error)
+	RetriveActiveInboundExpired() ([]*entity.Inbound, error)
+	RetriveActiveInboundsOverQuota() ([]*entity.Inbound, error)
+	RetriveDeactiveInboundsCharged() ([]*entity.Inbound, error)
 	Active(id int) error
 	Filter(*inboundRepoDto.FilterInbound) ([]*entity.Inbound, error)
 	DeActive(id int) error
@@ -161,6 +164,18 @@ func (i *Inbound) AssignDomainToInbounds() {
 	return
 }
 
+func (i *Inbound) summeryDomainPorts() (map[string][]string, error) {
+	summery, err := i.inboundRepo.GetListOfPortsByDomain()
+	if err != nil {
+		return nil, err
+	}
+	res := map[string][]string{}
+	for _, item := range summery {
+		res[item.Domain] = item.Ports
+	}
+	return res, nil
+}
+
 func (i *Inbound) shuffleHostPortPairs(hostPortPairs [][2]string) [][2]string {
 	rand := rand.New(rand.NewSource(time.Now().UnixNano()))
 
@@ -178,8 +193,8 @@ func (i *Inbound) makeHostPairWiPort(host string, ports []string) [][2]string {
 	return hostPortPairs
 }
 
-func (i *Inbound) HealingUpInbounds() {
-	inbounds, err := i.inboundRepo.RetriveFaultyInbounds()
+func (i *Inbound) HealingUpInboundExpired() {
+	inbounds, err := i.inboundRepo.RetriveActiveInboundExpired()
 	if err != nil {
 		return
 	}
@@ -189,38 +204,54 @@ func (i *Inbound) HealingUpInbounds() {
 	}
 	defer proxy.Close()
 	for _, inbound := range inbounds {
-		i.HealingUpInbound(inbound, proxy)
+		i.deActiveInbound(inbound, proxy)
 	}
 }
 
-func (i *Inbound) summeryDomainPorts() (map[string][]string, error) {
-	summery, err := i.inboundRepo.GetListOfPortsByDomain()
+func (i *Inbound) HealingUpInboundOverQuoted() {
+	inbounds, err := i.inboundRepo.RetriveActiveInboundsOverQuota()
 	if err != nil {
-		return nil, err
+		return
 	}
-	res := map[string][]string{}
-	for _, item := range summery {
-		res[item.Domain] = item.Ports
-	}
-	return res, nil
+	i.deactiveInbounds(inbounds)
 }
 
-func (i *Inbound) HealingUpInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) {
-	if i.mustItBeActive(inbound) {
-		i.activeInbound(inbound, vpnProxy)
-	} else {
-		i.deActiveInbound(inbound, vpnProxy)
+func (i *Inbound) HealingUpInboundBlocked() {
+	inbounds, err := i.inboundRepo.RetriveActiveInboundBlocked()
+	if err != nil {
+		return
+	}
+	i.deactiveInbounds(inbounds)
+}
+
+func (i *Inbound) HealingUpInboundCharged() {
+	inbounds, err := i.inboundRepo.RetriveDeactiveInboundsCharged()
+	if err != nil {
+		return
+	}
+	i.activeInbounds(inbounds)
+}
+
+func (i *Inbound) activeInbounds(inbounds []*entity.Inbound) {
+	proxy, err := i.vpnService.MakeProxy()
+	if err != nil {
+		return
+	}
+	defer proxy.Close()
+	for _, inbound := range inbounds {
+		i.activeInbound(inbound, proxy)
 	}
 }
 
-func (i *Inbound) mustItBeActive(inbound *entity.Inbound) bool {
-	if now := time.Now(); inbound.IsBlock == false &&
-		!now.After(inbound.End) &&
-		!now.Before(inbound.Start) &&
-		inbound.TrafficLimit > inbound.TrafficUsage {
-		return true
+func (i *Inbound) deactiveInbounds(inbounds []*entity.Inbound) {
+	proxy, err := i.vpnService.MakeProxy()
+	if err != nil {
+		return
 	}
-	return false
+	defer proxy.Close()
+	for _, inbound := range inbounds {
+		i.deActiveInbound(inbound, proxy)
+	}
 }
 
 func (i *Inbound) deActiveInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) error {

@@ -117,17 +117,47 @@ func (i *MockInbound) Filter(inpt *inboundDto.FilterInbound) ([]*entity.Inbound,
 	return nil, nil
 }
 
-func (i *MockInbound) RetriveFaultyInbounds() ([]*entity.Inbound, error) {
-	result := make([]*entity.Inbound, 0)
-	now := time.Now()
+func (i *MockInbound) RetriveActiveInboundBlocked() ([]*entity.Inbound, error) {
+	inbounds := make([]*entity.Inbound, 0)
 	for _, inbound := range i.inbounds {
-		if now.After(inbound.End) ||
-			(inbound.IsBlock == true && inbound.IsActive == true) ||
-			(inbound.IsBlock == false && !now.After(inbound.Start) && !inbound.End.After(now) && inbound.IsBlock == false) {
-			result = append(result, inbound)
+		if inbound.IsActive && inbound.IsBlock {
+			inbounds = append(inbounds, inbound)
 		}
 	}
-	return result, nil
+	return inbounds, nil
+}
+
+func (i *MockInbound) RetriveActiveInboundExpired() ([]*entity.Inbound, error) {
+	inbounds := make([]*entity.Inbound, 0)
+	now := time.Now()
+	for _, inbound := range i.inbounds {
+		if now.After(inbound.End) {
+			inbounds = append(inbounds, inbound)
+		}
+	}
+	return inbounds, nil
+}
+
+func (i *MockInbound) RetriveActiveInboundsOverQuota() ([]*entity.Inbound, error) {
+	inbounds := make([]*entity.Inbound, 0)
+	for _, inbound := range i.inbounds {
+		if inbound.TrafficLimit <= inbound.TrafficUsage {
+			inbounds = append(inbounds, inbound)
+		}
+	}
+	return inbounds, nil
+}
+
+func (i *MockInbound) RetriveDeactiveInboundsCharged() ([]*entity.Inbound, error) {
+	inbounds := make([]*entity.Inbound, 0)
+	now := time.Now()
+	for _, inbound := range i.inbounds {
+		if !(now.Before(inbound.Start) || now.After(inbound.End)) &&
+			inbound.TrafficLimit > inbound.TrafficUsage {
+			inbounds = append(inbounds, inbound)
+		}
+	}
+	return inbounds, nil
 }
 
 func (i *MockInbound) FindInboundIsNotAssigned() ([]*entity.Inbound, error) {

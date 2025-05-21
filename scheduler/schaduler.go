@@ -15,7 +15,10 @@ type Scheduler struct {
 }
 
 type InboundService interface {
-	HealingUpInbounds()
+	HealingUpInboundExpired()
+	HealingUpInboundOverQuoted()
+	HealingUpInboundBlocked()
+	HealingUpInboundCharged()
 	AssignDomainToInbounds()
 	UpdateTraffics()
 }
@@ -40,7 +43,10 @@ func New(inboundSvc InboundService, vpnSvc VPNService, hostSvc HostService) *Sch
 func (s *Scheduler) Start(done <-chan struct{}, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	s.sch.Cron("*/10 * * * *").Do(s.inboundSvc.HealingUpInbounds)
+	s.sch.Cron("*/10 * * * *").Do(s.inboundSvc.HealingUpInboundExpired)
+	s.sch.Cron("*/10 * * * *").Do(s.inboundSvc.HealingUpInboundOverQuoted)
+	s.sch.Cron("*/10 * * * *").Do(s.inboundSvc.HealingUpInboundBlocked)
+	s.sch.Cron("*/10 * * * *").Do(s.inboundSvc.HealingUpInboundCharged)
 	s.sch.Cron("*/5 * * * *").Do(s.inboundSvc.AssignDomainToInbounds)
 	s.sch.Cron("*/1 * * * *").Do(s.inboundSvc.UpdateTraffics)
 	s.sch.Cron("*/2 * * * *").Do(s.vpnSvc.MonitorVPNs)

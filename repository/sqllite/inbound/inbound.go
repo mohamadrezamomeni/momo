@@ -210,16 +210,7 @@ func (i *Inbound) Filter(inpt *inboundDto.FilterInbound) ([]*entity.Inbound, err
 		return nil, momoError.Wrap(err).Input(inpt).Scope(scope).DebuggingError()
 	}
 
-	inbounds := make([]*entity.Inbound, 0)
-
-	for rows.Next() {
-		inbound, err := i.scan(rows)
-		if err != nil {
-			return []*entity.Inbound{}, err
-		}
-		inbounds = append(inbounds, inbound)
-	}
-	return inbounds, nil
+	return i.getInboundsFromRows(rows)
 }
 
 func (i *Inbound) makeQueryFilter(inpt *inboundDto.FilterInbound) string {
@@ -255,27 +246,56 @@ func (i *Inbound) makeQueryFilter(inpt *inboundDto.FilterInbound) string {
 	return sql
 }
 
-func (i *Inbound) RetriveFaultyInbounds() ([]*entity.Inbound, error) {
-	scope := "inboundRepository.RetriveFaultyInbounds"
+func (i *Inbound) RetriveActiveInboundBlocked() ([]*entity.Inbound, error) {
+	scope := "inboundRepository.RetriveActiveInboundBlocked"
 
-	query := "SELECT * FROM inbounds WHERE (is_active = true AND end < ?) OR (is_block = true AND is_active = true) OR (is_block = false AND start <= ? AND ? <= end AND is_active = false) OR (is_active = true AND traffic_limit <= traffic_usage)"
+	query := "SELECT * FROM inbounds WHERE  is_block = true AND is_active = true"
 	now := time.Now()
 	rows, err := i.db.Conn().Query(query, now, now, now)
-
-	inbounds := make([]*entity.Inbound, 0)
 	if err != nil {
 		return nil, momoError.Wrap(err).Scope(scope).UnExpected().DebuggingError()
 	}
 
-	for rows.Next() {
-		inbound, err := i.scan(rows)
-		if err != nil {
-			return nil, momoError.Wrap(err).Scope(scope).UnExpected().DebuggingError()
-		}
-		inbounds = append(inbounds, inbound)
+	return i.getInboundsFromRows(rows)
+}
+
+func (i *Inbound) RetriveActiveInboundExpired() ([]*entity.Inbound, error) {
+	scope := "inboundRepository.RetriveActiveInboundExpired"
+
+	query := "SELECT * FROM inbounds WHERE is_active = true AND end < ?"
+	now := time.Now()
+	rows, err := i.db.Conn().Query(query, now)
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).UnExpected().DebuggingError()
 	}
 
-	return inbounds, nil
+	return i.getInboundsFromRows(rows)
+}
+
+func (i *Inbound) RetriveActiveInboundsOverQuota() ([]*entity.Inbound, error) {
+	scope := "inboundRepository.RetriveFaultyInbounds"
+
+	query := "SELECT * FROM inbounds WHERE (is_active = true AND traffic_limit <= traffic_usage)"
+
+	rows, err := i.db.Conn().Query(query)
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).UnExpected().DebuggingError()
+	}
+
+	return i.getInboundsFromRows(rows)
+}
+
+func (i *Inbound) RetriveDeactiveInboundsCharged() ([]*entity.Inbound, error) {
+	scope := "inboundRepository.RetriveFaultyInbounds"
+
+	query := "SELECT * FROM inbounds WHERE (is_block = false AND start <= ? AND ? <= end AND is_active = false AND traffic_limit > traffic_usage)"
+	now := time.Now()
+	rows, err := i.db.Conn().Query(query, now, now)
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).UnExpected().DebuggingError()
+	}
+
+	return i.getInboundsFromRows(rows)
 }
 
 func (i *Inbound) FindInboundIsNotAssigned() ([]*entity.Inbound, error) {
@@ -312,39 +332,6 @@ func (i *Inbound) UpdateDomainPort(id int, domain string, port string) error {
 		return momoError.Wrap(err).Scope(scope).Input(id, domain, port).DebuggingError()
 	}
 	return nil
-}
-
-func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
-	scope := "inboundRepository.scan"
-
-	inbound := &entity.Inbound{}
-	var createdAt, updatedAt interface{}
-	var vpnType string
-	err := rows.Scan(
-		&inbound.ID,
-		&inbound.Protocol,
-		&inbound.IsActive,
-		&inbound.Domain,
-		&vpnType,
-		&inbound.Port,
-		&inbound.UserID,
-		&inbound.Tag,
-		&inbound.IsBlock,
-		&inbound.Start,
-		&inbound.End,
-		&inbound.IsNotified,
-		&inbound.IsAssigned,
-		&inbound.ChargeCount,
-		&inbound.TrafficUsage,
-		&inbound.TrafficLimit,
-		&createdAt,
-		&updatedAt,
-	)
-	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Input(rows).DebuggingError()
-	}
-	inbound.VPNType = entity.ConvertStringVPNTypeToEnum(vpnType)
-	return inbound, nil
 }
 
 func (i *Inbound) ChangeBlockState(id string, state bool) error {
@@ -419,4 +406,53 @@ func (i *Inbound) ExtendInbound(id string, inpt *inboundDto.ExtendInboundDto) er
 		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
 	}
 	return nil
+}
+
+func (i *Inbound) getInboundsFromRows(rows *sql.Rows) ([]*entity.Inbound, error) {
+	scope := "inboundRepository.getInboundsFromRows"
+
+	inbounds := make([]*entity.Inbound, 0)
+
+	for rows.Next() {
+		inbound, err := i.scan(rows)
+		if err != nil {
+			return nil, momoError.Wrap(err).Scope(scope).UnExpected().DebuggingError()
+		}
+		inbounds = append(inbounds, inbound)
+	}
+
+	return inbounds, nil
+}
+
+func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
+	scope := "inboundRepository.scan"
+
+	inbound := &entity.Inbound{}
+	var createdAt, updatedAt interface{}
+	var vpnType string
+	err := rows.Scan(
+		&inbound.ID,
+		&inbound.Protocol,
+		&inbound.IsActive,
+		&inbound.Domain,
+		&vpnType,
+		&inbound.Port,
+		&inbound.UserID,
+		&inbound.Tag,
+		&inbound.IsBlock,
+		&inbound.Start,
+		&inbound.End,
+		&inbound.IsNotified,
+		&inbound.IsAssigned,
+		&inbound.ChargeCount,
+		&inbound.TrafficUsage,
+		&inbound.TrafficLimit,
+		&createdAt,
+		&updatedAt,
+	)
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).Input(rows).DebuggingError()
+	}
+	inbound.VPNType = entity.ConvertStringVPNTypeToEnum(vpnType)
+	return inbound, nil
 }

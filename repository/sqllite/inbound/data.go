@@ -270,4 +270,19 @@ var (
 		Start:      utils.GetDateTime("2024-04-21 14:30:00"),
 		End:        utils.GetDateTime("2024-04-22 14:30:00"),
 	}
+
+	inbound18 = &inboundDto.CreateInbound{
+		Tag:          fmt.Sprintf("inbound-%s", port3),
+		Protocol:     "http",
+		Port:         port5,
+		Domain:       "yahoo.com",
+		UserID:       userID6,
+		VPNType:      entity.XRAY_VPN,
+		IsActive:     false,
+		IsBlock:      false,
+		Start:        time.Now().AddDate(0, -2, 0),
+		End:          time.Now().AddDate(0, 1, 0),
+		TrafficLimit: 50,
+		TrafficUsage: 0,
+	}
 )

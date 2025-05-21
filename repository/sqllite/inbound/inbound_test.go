@@ -120,7 +120,8 @@ func TestFilterInbounds(t *testing.T) {
 	}
 }
 
-func TestRertriveFaultyInbounds(t *testing.T) {
+func TestRetriveActiveInboundBlocked(t *testing.T) {
+	defer inboundRepo.DeleteAll()
 	inboundRepo.Create(inbound4)
 	inboundRepo.Create(inbound5)
 	inboundRepo.Create(inbound6)
@@ -128,32 +129,94 @@ func TestRertriveFaultyInbounds(t *testing.T) {
 	inboundRepo.Create(inbound15)
 	inboundRepo.Create(inbound16)
 
-	defer inboundRepo.DeleteAll()
-
-	inbounds, err := inboundRepo.RetriveFaultyInbounds()
+	inbounds, err := inboundRepo.RetriveActiveInboundBlocked()
 	if err != nil {
-		t.Errorf("the problem has happend that was %v", err)
+		t.Errorf("something went wrong the problem was %v", err)
 	}
-	if len(inbounds) != 3 {
-		t.Errorf("the number of inbouns could be 3 but system got %v", len(inbounds))
+
+	if len(inbounds) != 1 {
+		t.Errorf("we expected the lengh of result be 1 but we got %d", len(inbounds))
 	}
-	userID4Status := false
-	userID6Status := false
+
+	if inbounds[0].UserID != userID4 ||
+		inbounds[0].Domain != "twitter.com" {
+		t.Error("error to compare data")
+	}
+}
+
+func TestRetriveActiveInboundExpired(t *testing.T) {
+	defer inboundRepo.DeleteAll()
+	inboundRepo.Create(inbound4)
+	inboundRepo.Create(inbound5)
+	inboundRepo.Create(inbound6)
+	inboundCreated1, _ := inboundRepo.Create(inbound7)
+	inboundRepo.Create(inbound15)
+	inboundCreated2, _ := inboundRepo.Create(inbound16)
+
+	inbounds, err := inboundRepo.RetriveActiveInboundExpired()
+	if err != nil {
+		t.Errorf("something went wrong the problem was %v", err)
+	}
+
+	if len(inbounds) != 2 {
+		t.Errorf("we expected the lengh of result be 2 but we got %d", len(inbounds))
+	}
+	seen := map[int]struct{}{}
 	for _, inbound := range inbounds {
-		switch inbound.UserID {
-		case userID4:
-			userID4Status = true
-		case userID6:
-			userID6Status = true
-		default:
-			t.Errorf("un expected vpn with userID %v", inbound.UserID)
-		}
+		seen[inbound.ID] = struct{}{}
 	}
-	if !userID4Status {
-		t.Error("we didn't get the userID4")
+	if _, ok := seen[inboundCreated1.ID]; !ok {
+		t.Error("error to compare data")
 	}
-	if !userID6Status {
-		t.Error("we didn't get the userID6")
+	if _, ok := seen[inboundCreated2.ID]; !ok {
+		t.Error("error to compare data")
+	}
+}
+
+func TestRetriveActiveInboundsOverQuota(t *testing.T) {
+	defer inboundRepo.DeleteAll()
+	inboundRepo.Create(inbound4)
+	inboundRepo.Create(inbound5)
+	inboundRepo.Create(inbound6)
+	inboundRepo.Create(inbound7)
+	inboundRepo.Create(inbound15)
+	inboundCreated, _ := inboundRepo.Create(inbound16)
+
+	inbounds, err := inboundRepo.RetriveActiveInboundsOverQuota()
+	if err != nil {
+		t.Errorf("something went wrong the problem was %v", err)
+	}
+
+	if len(inbounds) != 1 {
+		t.Errorf("we expected the lengh of result be 1 but we got %d", len(inbounds))
+	}
+
+	if inbounds[0].ID != inboundCreated.ID {
+		t.Error("error to compare data")
+	}
+}
+
+func TestRetriveDeactiveInboundsCharged(t *testing.T) {
+	defer inboundRepo.DeleteAll()
+	inboundRepo.Create(inbound4)
+	inboundRepo.Create(inbound5)
+	inboundRepo.Create(inbound6)
+	inboundRepo.Create(inbound7)
+	inboundRepo.Create(inbound15)
+	inboundRepo.Create(inbound16)
+	inboundCreated, _ := inboundRepo.Create(inbound18)
+
+	inbounds, err := inboundRepo.RetriveDeactiveInboundsCharged()
+	if err != nil {
+		t.Errorf("something went wrong the problem was %v", err)
+	}
+
+	if len(inbounds) != 1 {
+		t.Errorf("we expected the lengh of result be 1 but we got %d", len(inbounds))
+	}
+
+	if inbounds[0].ID != inboundCreated.ID {
+		t.Error("error to compare data")
 	}
 }
 

@@ -63,7 +63,7 @@ func TestHealingUpInbounds(t *testing.T) {
 	ret1, _ := inboundRepo.Create(inbound4)
 	ret2, _ := inboundRepo.Create(inbound5)
 	ret3, _ := inboundRepo.Create(inbound6)
-	inboundSvc.HealingUpInbound(ret1, proxy)
+	inboundSvc.activeInbound(ret1, proxy)
 
 	inboundEnableInpt := utils.ReadPrivateField(proxy, "addInboundData")
 	disableInpt := utils.ReadPrivateField(proxy, "disableInboundData")
@@ -74,7 +74,7 @@ func TestHealingUpInbounds(t *testing.T) {
 	}
 	proxy.Close()
 
-	inboundSvc.HealingUpInbound(ret2, proxy)
+	inboundSvc.deActiveInbound(ret2, proxy)
 
 	inboundEnableInpt = utils.ReadPrivateField(proxy, "addInboundData")
 	disableInpt = utils.ReadPrivateField(proxy, "disableInboundData")
@@ -86,7 +86,7 @@ func TestHealingUpInbounds(t *testing.T) {
 
 	proxy.Close()
 
-	inboundSvc.HealingUpInbound(ret3, proxy)
+	inboundSvc.deActiveInbound(ret3, proxy)
 
 	inboundEnableInpt = utils.ReadPrivateField(proxy, "addInboundData")
 	disableInpt = utils.ReadPrivateField(proxy, "disableInboundData")
