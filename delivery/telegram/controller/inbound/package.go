@@ -44,8 +44,8 @@ func (h *Handler) getResponseAskPackage(user *entity.User) (*core.ResponseHandle
 	msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(rows...)
 
 	return &core.ResponseHandlerFunc{
-		Result:  &msgConfig,
-		MenuTab: true,
+		MessageConfig: &msgConfig,
+		MenuTab:       true,
 	}, nil
 }
 

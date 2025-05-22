@@ -33,9 +33,9 @@ func IdentifyUser(userSvc UserService) core.Middleware {
 				message, _ := telegrammessages.GetMessage("error.forbidden_access", map[string]string{})
 				msgConfig := tgbotapi.NewMessage(id, message)
 				return &core.ResponseHandlerFunc{
-					Result:       &msgConfig,
-					ReleaseState: true,
-					RedirectRoot: false,
+					MessageConfig: &msgConfig,
+					ReleaseState:  true,
+					RedirectRoot:  false,
 				}, nil
 			}
 			update.UserSystem = user

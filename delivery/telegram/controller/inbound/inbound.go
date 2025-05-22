@@ -17,8 +17,8 @@ func (h *Handler) sendNotFoundInbounds(user *entity.User) (*core.ResponseHandler
 
 	msgConfig := tgbotapi.NewMessage(id, inboundNotFoundText)
 	return &core.ResponseHandlerFunc{
-		Result:       &msgConfig,
-		ReleaseState: true,
-		RedirectRoot: true,
+		MessageConfig: &msgConfig,
+		ReleaseState:  true,
+		RedirectRoot:  true,
 	}, nil
 }

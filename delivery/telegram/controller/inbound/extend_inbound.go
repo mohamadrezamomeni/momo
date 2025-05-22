@@ -105,7 +105,7 @@ func (h *Handler) SelectInboundIDInExtendingInbound(next core.HandlerFunc) core.
 		telegramState.SetControllerState(update.UserSystem.TelegramID, exteningInboundKey, state)
 
 		return &core.ResponseHandlerFunc{
-			Result: &msgConfig,
+			MessageConfig: &msgConfig,
 		}, nil
 	}
 }
@@ -238,8 +238,8 @@ func (h *Handler) ExtendInbound(update *core.Update) (*core.ResponseHandlerFunc,
 
 	msgConfig := tgbotapi.NewMessage(id, extendingInboundTitle)
 	return &core.ResponseHandlerFunc{
-		Result:       &msgConfig,
-		ReleaseState: true,
-		RedirectRoot: true,
+		MessageConfig: &msgConfig,
+		ReleaseState:  true,
+		RedirectRoot:  true,
 	}, nil
 }

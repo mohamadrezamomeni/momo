@@ -54,9 +54,9 @@ func (h *Handler) ListInbounds(update *core.Update) (*core.ResponseHandlerFunc, 
 	msgConfig := tgbotapi.NewMessage(id, message)
 	msgConfig.ParseMode = "HTML"
 	return &core.ResponseHandlerFunc{
-		Result:       &msgConfig,
-		ReleaseState: true,
-		RedirectRoot: true,
+		MessageConfig: &msgConfig,
+		ReleaseState:  true,
+		RedirectRoot:  true,
 	}, nil
 }
 

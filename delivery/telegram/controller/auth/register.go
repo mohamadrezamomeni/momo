@@ -62,9 +62,9 @@ func (h *Handler) getDuplicateUserResponse(update *core.Update) (*core.ResponseH
 
 	msgConfig := tgbotapi.NewMessage(update.FromChat().ID, msg)
 	return &core.ResponseHandlerFunc{
-		Result:       &msgConfig,
-		ReleaseState: false,
-		RedirectRoot: true,
+		MessageConfig: &msgConfig,
+		ReleaseState:  false,
+		RedirectRoot:  true,
 	}, nil
 }
 
@@ -114,9 +114,9 @@ func (h *Handler) AskUsername(next core.HandlerFunc) core.HandlerFunc {
 
 		msgConfig := tgbotapi.NewMessage(update.FromChat().ID, title)
 		return &core.ResponseHandlerFunc{
-			Result:       &msgConfig,
-			ReleaseState: false,
-			RedirectRoot: false,
+			MessageConfig: &msgConfig,
+			ReleaseState:  false,
+			RedirectRoot:  false,
 		}, nil
 	}
 }
@@ -172,8 +172,8 @@ func (h *Handler) Register(update *core.Update) (*core.ResponseHandlerFunc, erro
 
 	msgConfig := tgbotapi.NewMessage(update.Message.Chat.ID, title)
 	return &core.ResponseHandlerFunc{
-		Result:       &msgConfig,
-		ReleaseState: true,
-		RedirectRoot: false,
+		MessageConfig: &msgConfig,
+		ReleaseState:  true,
+		RedirectRoot:  false,
 	}, nil
 }

@@ -44,8 +44,8 @@ func (h *Handler) Root(update *core.Update) (*core.ResponseHandlerFunc, error) {
 	msgConfig.ReplyMarkup = markup
 
 	return &core.ResponseHandlerFunc{
-		Result:       &msgConfig,
-		ReleaseState: true,
+		MessageConfig: &msgConfig,
+		ReleaseState:  true,
 	}, nil
 }
 

@@ -83,8 +83,8 @@ func (h *Handler) AskVPNType(next core.HandlerFunc) core.HandlerFunc {
 		telegramState.SetControllerState(update.UserSystem.TelegramID, creatingInboundKey, state)
 
 		return &core.ResponseHandlerFunc{
-			Result:  &msgConfig,
-			MenuTab: true,
+			MessageConfig: &msgConfig,
+			MenuTab:       true,
 		}, nil
 	}
 }
@@ -220,8 +220,8 @@ func (h *Handler) CreateInbound(update *core.Update) (*core.ResponseHandlerFunc,
 	msgConfig := tgbotapi.NewMessage(id, text)
 
 	return &core.ResponseHandlerFunc{
-		Result:       &msgConfig,
-		ReleaseState: true,
-		RedirectRoot: true,
+		MessageConfig: &msgConfig,
+		ReleaseState:  true,
+		RedirectRoot:  true,
 	}, nil
 }

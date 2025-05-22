@@ -19,8 +19,8 @@ func (h *Handler) Start(update *core.Update) (*core.ResponseHandlerFunc, error) 
 	msgConfig := tgbotapi.NewMessage(int64(id), "hello welcome to our home")
 
 	return &core.ResponseHandlerFunc{
-		Result:       &msgConfig,
-		ReleaseState: true,
-		RedirectRoot: true,
+		MessageConfig: &msgConfig,
+		ReleaseState:  true,
+		RedirectRoot:  true,
 	}, nil
 }

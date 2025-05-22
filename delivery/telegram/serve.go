@@ -82,11 +82,11 @@ func (t *Telegram) Serve() {
 }
 
 func (t *Telegram) send(res *core.ResponseHandlerFunc, update *core.Update) {
-	t.bot.Send(res.Result)
+	t.bot.Send(res.MessageConfig)
 
 	if res.RedirectRoot {
 		r, _ := t.core.RootHandler(update)
-		t.bot.Send(r.Result)
+		t.bot.Send(r.MessageConfig)
 	}
 }
 
