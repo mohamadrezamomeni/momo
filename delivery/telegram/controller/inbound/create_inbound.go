@@ -83,8 +83,9 @@ func (h *Handler) AskVPNType(next core.HandlerFunc) core.HandlerFunc {
 		telegramState.SetControllerState(update.UserSystem.TelegramID, creatingInboundKey, state)
 
 		return &core.ResponseHandlerFunc{
-			Result: msg,
-		}, err
+			Result:  msg,
+			MenuTab: true,
+		}, nil
 	}
 }
 
