@@ -6,4 +6,5 @@ type CreateDto struct {
 	InboundID string
 	Detail    string
 	Status    entity.ChargeStatus
+	UserID    string
 }

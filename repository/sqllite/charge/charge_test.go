@@ -44,6 +44,7 @@ func TestCharge(t *testing.T) {
 		chargeCreated.Detail != charge1.Detail ||
 		chargeCreated.InboundID != charge1.InboundID ||
 		chargeCreated.Status != charge1.Status ||
+		chargeCreated.UserID != charge1.UserID ||
 		chargeCreated.ID == "" {
 		t.Fatal("error to comapre data")
 	}

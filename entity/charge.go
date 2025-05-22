@@ -6,6 +6,7 @@ type Charge struct {
 	AdminComment string
 	Detail       string
 	InboundID    string
+	UserID       string
 }
 
 type ChargeStatus = int
