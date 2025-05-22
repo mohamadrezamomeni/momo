@@ -4,6 +4,8 @@ import (
 	"os"
 	"testing"
 
+	chargeRepositoryDto "github.com/mohamadrezamomeni/momo/dto/repository/charge"
+	"github.com/mohamadrezamomeni/momo/entity"
 	"github.com/mohamadrezamomeni/momo/repository/migrate"
 	"github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
@@ -58,5 +60,28 @@ func TestFindChargeByID(t *testing.T) {
 
 	if chargeFound.ID != chargeCreated.ID {
 		t.Fatalf("error to compare data")
+	}
+}
+
+func TestUpdateCharge(t *testing.T) {
+	defer chargeRepo.DeleteAll()
+	chargeCreated, _ := chargeRepo.Create(charge1)
+
+	newDetail := "goodBye"
+	adminComment := "sorry"
+	err := chargeRepo.UpdateCharge(chargeCreated.ID, &chargeRepositoryDto.UpdateChargeDto{
+		Detail:       newDetail,
+		AdminComment: adminComment,
+		Status:       entity.RegejectedStatusCharge,
+	})
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	chargeFound, _ := chargeRepo.FindChargeByID(chargeCreated.ID)
+	if chargeFound.AdminComment != adminComment ||
+		chargeFound.Detail != newDetail ||
+		chargeFound.Status != entity.RegejectedStatusCharge {
+		t.Fatal("error to comapre data")
 	}
 }

@@ -3,6 +3,7 @@ package charge
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	chargeRepositoryDto "github.com/mohamadrezamomeni/momo/dto/repository/charge"
 	"github.com/mohamadrezamomeni/momo/entity"
@@ -83,4 +84,36 @@ func (c *Charge) FindChargeByID(id string) (*entity.Charge, error) {
 		return nil, momoError.Wrap(err).Scope(scope).NotFound().Input(id).DebuggingError()
 	}
 	return nil, momoError.Wrap(err).Scope(scope).Input(id).UnExpected().DebuggingError()
+}
+
+func (c *Charge) UpdateCharge(id string, inpt *chargeRepositoryDto.UpdateChargeDto) error {
+	scope := "chargeRepository.Update"
+	subModifies := []string{}
+
+	if inpt.Status != 0 {
+		subModifies = append(subModifies, fmt.Sprintf("status = '%s'", entity.TranslateChargeStatus(inpt.Status)))
+	}
+
+	if inpt.AdminComment != "" {
+		subModifies = append(subModifies, fmt.Sprintf("admin_comment = '%s'", inpt.AdminComment))
+	}
+
+	if inpt.Detail != "" {
+		subModifies = append(subModifies, fmt.Sprintf("detail = '%s'", inpt.Detail))
+	}
+
+	if len(subModifies) == 0 {
+		return momoError.Scope(scope).DebuggingErrorf("input was empty")
+	}
+	sql := fmt.Sprintf(
+		"UPDATE charges SET %s WHERE id = %v",
+		strings.Join(subModifies, ", "),
+		id,
+	)
+	fmt.Println(sql)
+	_, err := c.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).Input(id, inpt).DebuggingError()
+	}
+	return nil
 }

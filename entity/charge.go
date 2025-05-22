@@ -11,7 +11,7 @@ type Charge struct {
 type ChargeStatus = int
 
 const (
-	UnkhownStatusCharge = iota
+	UnkhownStatusCharge = iota + 1
 	ApprovedStatusCharge
 	PendingStatusCharge
 	RegejectedStatusCharge
