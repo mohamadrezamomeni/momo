@@ -8,6 +8,7 @@ type ResponseHandlerFunc struct {
 	Result       tgbotapi.MessageConfig
 	ReleaseState bool
 	RedirectRoot bool
+	MenuTab      bool
 }
 
 type HandlerFunc = func(*Update) (*ResponseHandlerFunc, error)

@@ -13,6 +13,7 @@ auth:
     input_lastname: 📝 Please enter your lastname.
 root:
   menu: 😊 Where would you like to go next?
+  menu_buttom: menu
 
 inbound:
   not_found_package: unforunetly admin haven't introduced any packages please wait admin will do that

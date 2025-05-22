@@ -1,8 +1,10 @@
 package core
 
 import (
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	telegramState "github.com/mohamadrezamomeni/momo/delivery/telegram/state"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
+	telegrammessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
 )
 
 type Router struct {
@@ -57,6 +59,10 @@ func (r *Router) Route(update *Update) (*ResponseHandlerFunc, error) {
 		return nil, nil
 	}
 
+	if res.MenuTab {
+		res.Result.ReplyMarkup = r.enrichKeyboardMarkup(res.Result.ReplyMarkup)
+	}
+
 	if res != nil && !res.ReleaseState && len(path) > 0 {
 		telegramState.SetPath(id, path)
 	} else if err != nil || (res != nil && (res.ReleaseState || len(path) == 0)) {
@@ -67,6 +73,25 @@ func (r *Router) Route(update *Update) (*ResponseHandlerFunc, error) {
 		res, _ = r.RootHandler(update)
 	}
 	return res, err
+}
+
+func (r *Router) enrichKeyboardMarkup(replyMarkup interface{}) interface{} {
+	inlineKeyboardMarkup, ok := replyMarkup.(tgbotapi.InlineKeyboardMarkup)
+	if !ok {
+		return replyMarkup
+	}
+
+	menuButtomText, err := telegrammessages.GetMessage("root.menu_buttom", map[string]string{})
+	if err != nil {
+		menuButtomText = "menu"
+	}
+
+	menu := tgbotapi.NewInlineKeyboardButtonData(
+		menuButtomText, "/menu",
+	)
+	row := tgbotapi.NewInlineKeyboardRow(menu)
+	inlineKeyboardMarkup.InlineKeyboard = append(inlineKeyboardMarkup.InlineKeyboard, row)
+	return inlineKeyboardMarkup
 }
 
 func (r *Router) callbackQuery(update *Update) (*ResponseHandlerFunc, string, error) {
