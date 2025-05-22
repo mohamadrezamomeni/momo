@@ -35,14 +35,15 @@ func (c *Charge) Create(inpt *chargeRepositoryDto.CreateDto) (*entity.Charge, er
 	charge := &entity.Charge{}
 	status := ""
 	err := c.db.Conn().QueryRow(`
-	INSERT INTO charges (status, detail, admin_comment, inbound_id, user_id)
-	VALUES (?, ?, ?, ?, ?)
-	RETURNING id, status, detail, admin_comment, inbound_id, user_id
+	INSERT INTO charges (status, detail, admin_comment, inbound_id, user_id, package_id)
+	VALUES (?, ?, ?, ?, ?, ?)
+	RETURNING id, status, detail, admin_comment, inbound_id, user_id, package_id
 	`, entity.TranslateChargeStatus(inpt.Status),
 		inpt.Detail,
 		"",
 		inpt.InboundID,
 		inpt.UserID,
+		inpt.PackageID,
 	).Scan(
 		&charge.ID,
 		&status,
@@ -50,6 +51,7 @@ func (c *Charge) Create(inpt *chargeRepositoryDto.CreateDto) (*entity.Charge, er
 		&charge.AdminComment,
 		&charge.InboundID,
 		&charge.UserID,
+		&charge.PackageID,
 	)
 
 	if err == nil {
@@ -77,6 +79,7 @@ func (c *Charge) FindChargeByID(id string) (*entity.Charge, error) {
 		&charge.AdminComment,
 		&charge.InboundID,
 		&charge.UserID,
+		&charge.PackageID,
 		&createdAt,
 	)
 
@@ -180,6 +183,7 @@ func (e *Charge) scan(rows *sql.Rows) (*entity.Charge, error) {
 		&charge.AdminComment,
 		&charge.InboundID,
 		&charge.UserID,
+		&charge.PackageID,
 		&createdAt,
 	)
 	if err != nil {

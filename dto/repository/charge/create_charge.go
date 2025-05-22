@@ -7,4 +7,5 @@ type CreateDto struct {
 	Detail    string
 	Status    entity.ChargeStatus
 	UserID    string
+	PackageID string
 }

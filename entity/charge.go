@@ -7,6 +7,7 @@ type Charge struct {
 	Detail       string
 	InboundID    string
 	UserID       string
+	PackageID    string
 }
 
 type ChargeStatus = int

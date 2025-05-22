@@ -11,12 +11,14 @@ var (
 		UserID:    "f47ac10b-58cc-4372-a567-0e02b2c3d479",
 		Detail:    "hello",
 		InboundID: "12",
+		PackageID: "1",
 	}
 	charge2 = &chargeRepositoryDto.CreateDto{
 		Status:    entity.PendingStatusCharge,
 		UserID:    "f47ac10b-58cc-4372-a567-0e02b2c3d477",
 		Detail:    "hi",
 		InboundID: "12",
+		PackageID: "3",
 	}
 
 	charge3 = &chargeRepositoryDto.CreateDto{
@@ -24,5 +26,6 @@ var (
 		UserID:    "f47ac10b-58cc-4372-a567-0e02b2c3d477",
 		Detail:    "hi",
 		InboundID: "13",
+		PackageID: "4",
 	}
 )
