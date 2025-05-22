@@ -14,7 +14,7 @@ import (
 func (e *Charge) DeleteAll() error {
 	scope := "chargeRepository.DeleteAll"
 
-	sql := "DELETE FROM events"
+	sql := "DELETE FROM charges"
 	res, err := e.db.Conn().Exec(sql)
 	if err != nil {
 		return momoError.Wrap(err).Scope(scope).UnExpected().DebuggingError()
