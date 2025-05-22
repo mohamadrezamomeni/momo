@@ -77,7 +77,7 @@ func (h *Handler) SelectInboundIDInExtendingInbound(next core.HandlerFunc) core.
 		if err != nil {
 			return nil, err
 		}
-		msg := tgbotapi.NewMessage(id, askInboundID)
+		msgConfig := tgbotapi.NewMessage(id, askInboundID)
 
 		title, err := telegrammessages.GetMessage("inbound.extend.ask_id", map[string]string{})
 		if err != nil {
@@ -98,14 +98,14 @@ func (h *Handler) SelectInboundIDInExtendingInbound(next core.HandlerFunc) core.
 			rows = append(rows, tgbotapi.NewInlineKeyboardRow(*button))
 		}
 
-		msg.ParseMode = "HTML"
-		msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(rows...)
+		msgConfig.ParseMode = "HTML"
+		msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(rows...)
 
 		state.state = answerID
 		telegramState.SetControllerState(update.UserSystem.TelegramID, exteningInboundKey, state)
 
 		return &core.ResponseHandlerFunc{
-			Result: msg,
+			Result: &msgConfig,
 		}, nil
 	}
 }
@@ -236,9 +236,9 @@ func (h *Handler) ExtendInbound(update *core.Update) (*core.ResponseHandlerFunc,
 		return nil, err
 	}
 
-	msg := tgbotapi.NewMessage(id, extendingInboundTitle)
+	msgConfig := tgbotapi.NewMessage(id, extendingInboundTitle)
 	return &core.ResponseHandlerFunc{
-		Result:       msg,
+		Result:       &msgConfig,
 		ReleaseState: true,
 		RedirectRoot: true,
 	}, nil

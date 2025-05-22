@@ -5,7 +5,7 @@ import (
 )
 
 type ResponseHandlerFunc struct {
-	Result       tgbotapi.MessageConfig
+	Result       *tgbotapi.MessageConfig
 	ReleaseState bool
 	RedirectRoot bool
 	MenuTab      bool

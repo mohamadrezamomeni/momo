@@ -60,8 +60,9 @@ func (h *Handler) getDuplicateUserResponse(update *core.Update) (*core.ResponseH
 		return nil, err
 	}
 
+	msgConfig := tgbotapi.NewMessage(update.FromChat().ID, msg)
 	return &core.ResponseHandlerFunc{
-		Result:       tgbotapi.NewMessage(update.FromChat().ID, msg),
+		Result:       &msgConfig,
 		ReleaseState: false,
 		RedirectRoot: true,
 	}, nil
@@ -111,8 +112,9 @@ func (h *Handler) AskUsername(next core.HandlerFunc) core.HandlerFunc {
 		registerationState.State = AnswerUsername
 		telegramState.SetControllerState(idStr, registerationKey, registerationState)
 
+		msgConfig := tgbotapi.NewMessage(update.FromChat().ID, title)
 		return &core.ResponseHandlerFunc{
-			Result:       tgbotapi.NewMessage(update.FromChat().ID, title),
+			Result:       &msgConfig,
 			ReleaseState: false,
 			RedirectRoot: false,
 		}, nil
@@ -167,8 +169,10 @@ func (h *Handler) Register(update *core.Update) (*core.ResponseHandlerFunc, erro
 	if err != nil {
 		return nil, err
 	}
+
+	msgConfig := tgbotapi.NewMessage(update.Message.Chat.ID, title)
 	return &core.ResponseHandlerFunc{
-		Result:       tgbotapi.NewMessage(update.Message.Chat.ID, title),
+		Result:       &msgConfig,
 		ReleaseState: true,
 		RedirectRoot: false,
 	}, nil

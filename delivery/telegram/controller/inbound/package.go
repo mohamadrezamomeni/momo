@@ -39,12 +39,12 @@ func (h *Handler) getResponseAskPackage(user *entity.User) (*core.ResponseHandle
 		return nil, err
 	}
 
-	msg := tgbotapi.NewMessage(id, askingPackageTitle)
+	msgConfig := tgbotapi.NewMessage(id, askingPackageTitle)
 
-	msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(rows...)
+	msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(rows...)
 
 	return &core.ResponseHandlerFunc{
-		Result:  msg,
+		Result:  &msgConfig,
 		MenuTab: true,
 	}, nil
 }

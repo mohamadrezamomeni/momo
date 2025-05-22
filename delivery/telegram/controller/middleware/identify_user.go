@@ -31,8 +31,9 @@ func IdentifyUser(userSvc UserService) core.Middleware {
 
 			if user != nil && !user.IsApproved {
 				message, _ := telegrammessages.GetMessage("error.forbidden_access", map[string]string{})
+				msgConfig := tgbotapi.NewMessage(id, message)
 				return &core.ResponseHandlerFunc{
-					Result:       tgbotapi.NewMessage(id, message),
+					Result:       &msgConfig,
 					ReleaseState: true,
 					RedirectRoot: false,
 				}, nil

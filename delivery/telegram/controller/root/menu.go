@@ -22,7 +22,7 @@ func (h *Handler) Root(update *core.Update) (*core.ResponseHandlerFunc, error) {
 		return nil, err
 	}
 
-	msg := tgbotapi.NewMessage(int64(id), titleMenu)
+	msgConfig := tgbotapi.NewMessage(int64(id), titleMenu)
 
 	inlineKeyboard := [][]tgbotapi.InlineKeyboardButton{}
 
@@ -41,10 +41,10 @@ func (h *Handler) Root(update *core.Update) (*core.ResponseHandlerFunc, error) {
 
 	markup := tgbotapi.NewInlineKeyboardMarkup(inlineKeyboard...)
 
-	msg.ReplyMarkup = markup
+	msgConfig.ReplyMarkup = markup
 
 	return &core.ResponseHandlerFunc{
-		Result:       msg,
+		Result:       &msgConfig,
 		ReleaseState: true,
 	}, nil
 }

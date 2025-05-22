@@ -16,10 +16,10 @@ func (h *Handler) Start(update *core.Update) (*core.ResponseHandlerFunc, error) 
 		return nil, momoError.Wrap(err).Scope(scope).Input(update).ErrorWrite()
 	}
 
-	msg := tgbotapi.NewMessage(int64(id), "hello welcome to our home")
+	msgConfig := tgbotapi.NewMessage(int64(id), "hello welcome to our home")
 
 	return &core.ResponseHandlerFunc{
-		Result:       msg,
+		Result:       &msgConfig,
 		ReleaseState: true,
 		RedirectRoot: true,
 	}, nil
