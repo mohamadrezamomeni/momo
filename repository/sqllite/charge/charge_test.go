@@ -86,3 +86,65 @@ func TestUpdateCharge(t *testing.T) {
 		t.Fatal("error to comapre data")
 	}
 }
+
+func TestFilterCharges(t *testing.T) {
+	defer chargeRepo.DeleteAll()
+	chargeRepo.Create(charge1)
+	chargeRepo.Create(charge2)
+	chargeRepo.Create(charge3)
+
+	charges, err := chargeRepo.FilterCharges(&chargeRepositoryDto.FilterChargesDto{})
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	if len(charges) != 3 {
+		t.Fatalf("we expected the lengh of charges be 3 but we got %v", len(charges))
+	}
+
+	charges, err = chargeRepo.FilterCharges(&chargeRepositoryDto.FilterChargesDto{
+		Status: entity.RegejectedStatusCharge,
+	})
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	if len(charges) != 0 {
+		t.Fatalf("we expected the lengh of charges be 0 but we got %v", len(charges))
+	}
+
+	charges, err = chargeRepo.FilterCharges(&chargeRepositoryDto.FilterChargesDto{
+		UserID: "f47ac10b-58cc-4372-a567-0e02b2c3d477",
+	})
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	if len(charges) != 2 {
+		t.Fatalf("we expected the lengh of charges be 2 but we got %v", len(charges))
+	}
+
+	charges, err = chargeRepo.FilterCharges(&chargeRepositoryDto.FilterChargesDto{
+		InboundID: "12",
+	})
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	if len(charges) != 2 {
+		t.Fatalf("we expected the lengh of charges be 2 but we got %v", len(charges))
+	}
+
+	charges, err = chargeRepo.FilterCharges(&chargeRepositoryDto.FilterChargesDto{
+		InboundID: "12",
+		UserID:    "f47ac10b-58cc-4372-a567-0e02b2c3d477",
+		Status:    entity.PendingStatusCharge,
+	})
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	if len(charges) != 1 {
+		t.Fatalf("we expected the lengh of charges be 1 but we got %v", len(charges))
+	}
+}
