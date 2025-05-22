@@ -46,3 +46,17 @@ func TestCharge(t *testing.T) {
 		t.Fatal("error to comapre data")
 	}
 }
+
+func TestFindChargeByID(t *testing.T) {
+	defer chargeRepo.DeleteAll()
+	chargeCreated, _ := chargeRepo.Create(charge1)
+
+	chargeFound, err := chargeRepo.FindChargeByID(chargeCreated.ID)
+	if err != nil {
+		t.Fatalf("something went wrong the problem was %v", err)
+	}
+
+	if chargeFound.ID != chargeCreated.ID {
+		t.Fatalf("error to compare data")
+	}
+}

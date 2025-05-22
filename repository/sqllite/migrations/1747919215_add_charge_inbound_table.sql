@@ -5,6 +5,7 @@ CREATE TABLE charges (
     detail TEXT,
     admin_comment TEXT,
     inbound_id INTEGER, 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (inbound_id) REFERENCES inbounds(inbound_id)
 );
 

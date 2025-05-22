@@ -1,6 +1,9 @@
 package charge
 
 import (
+	"database/sql"
+	"fmt"
+
 	chargeRepositoryDto "github.com/mohamadrezamomeni/momo/dto/repository/charge"
 	"github.com/mohamadrezamomeni/momo/entity"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
@@ -54,4 +57,30 @@ func (c *Charge) Create(inpt *chargeRepositoryDto.CreateDto) (*entity.Charge, er
 		return nil, momoError.Wrap(err).Input(inpt).Duplicate().Scope(scope).DebuggingError()
 	}
 	return nil, momoError.Wrap(err).Input(inpt).UnExpected().Scope(scope).DebuggingError()
+}
+
+func (c *Charge) FindChargeByID(id string) (*entity.Charge, error) {
+	scope := "chargeRepository.FindChargeByID"
+
+	var createdAt interface{}
+	charge := &entity.Charge{}
+	status := ""
+	s := fmt.Sprintf("SELECT * FROM charges WHERE id=%s LIMIT 1", id)
+	err := c.db.Conn().QueryRow(s).Scan(
+		&charge.ID,
+		&status,
+		&charge.Detail,
+		&charge.AdminComment,
+		&charge.InboundID,
+		&createdAt,
+	)
+
+	if err == nil {
+		charge.Status = entity.ConvertStringToChargeStatus(status)
+		return charge, nil
+	}
+	if err == sql.ErrNoRows {
+		return nil, momoError.Wrap(err).Scope(scope).NotFound().Input(id).DebuggingError()
+	}
+	return nil, momoError.Wrap(err).Scope(scope).Input(id).UnExpected().DebuggingError()
 }
