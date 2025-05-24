@@ -32,7 +32,7 @@ func (e *Event) Create(event *eventServiceDto.CreateEventDto) {
 	e.ch <- event
 }
 
-func (e *Event) ListEvents() {
+func (e *Event) ListenEvents() {
 	e.wg.Add(1)
 	go func() {
 		defer e.wg.Done()

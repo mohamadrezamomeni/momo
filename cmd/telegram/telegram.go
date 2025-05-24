@@ -30,7 +30,7 @@ func main() {
 
 	_, _, userSvc, inboundSvc, authSvc, _, vpnPackage, eventSvc, chargeSvc := serviceInitializer.GetServices(&cfg)
 
-	eventSvc.ListEvents()
+	eventSvc.ListenEvents()
 
 	t := telegram.New(&cfg.TelegramConfig, userSvc, authSvc, inboundSvc, vpnPackage, chargeSvc)
 	t.Serve()

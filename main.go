@@ -64,7 +64,7 @@ func main() {
 		server.Serve()
 	}()
 
-	eventSvc.ListEvents()
+	eventSvc.ListenEvents()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
