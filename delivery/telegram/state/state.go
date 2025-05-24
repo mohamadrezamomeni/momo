@@ -5,72 +5,77 @@ import (
 )
 
 type State struct {
-	Path             string
-	ControllerStates map[string]any
+	telegramID string
+	idx        int
+	Paths      []string
+	data       map[string]any
 }
 
-func NewState(path string) *State {
-	return &State{
-		Path:             path,
-		ControllerStates: make(map[string]any),
+func NewState(telegramID string, paths ...string) *State {
+	newState := &State{
+		telegramID: telegramID,
+		Paths:      paths,
+		idx:        0,
+		data:       make(map[string]any),
 	}
+	cache.Set(telegramID, newState)
+	return newState
 }
 
-func SetPath(id string, path string) {
-	val, isExist := cache.Get(id)
-	if !isExist {
-		state := NewState(path)
-		cache.Set(id, state)
-		return
-	}
-
-	state, ok := val.(*State)
-	if !ok {
-		state := NewState(path)
-		cache.Set(id, state)
-		return
-	}
-
-	state.Path = path
-	cache.Set(id, state)
-}
-
-func DeleteState(id string) {
-	cache.Delete(id)
-}
-
-func Get(id string) (*State, bool) {
-	val, isExist := cache.Get(id)
-	if !isExist {
+func FindState(id string) (*State, bool) {
+	val, isExisted := cache.Get(id)
+	if !isExisted {
 		return nil, false
 	}
 
-	state, ok := val.(*State)
-	if !ok {
-		return nil, false
-	}
-
+	state := val.(*State)
 	return state, true
 }
 
-func SetControllerState(id string, key string, controllerState any) {
-	state, isExist := Get(id)
-	if !isExist {
-		state = NewState("")
+func ResetState(id string) {
+	state, isExist := FindState(id)
+	if isExist {
+		state.Delete()
 	}
-	state.ControllerStates[key] = controllerState
-	replaceState(id, state)
 }
 
-func GetControllerState(id string, key string) any {
-	state, isExist := Get(id)
-	if !isExist {
-		state = NewState("")
-		replaceState(id, state)
-	}
-	return state.ControllerStates[key]
+func (s *State) Next() {
+	s.idx += 1
+	s.Save()
 }
 
-func replaceState(id string, state *State) {
-	cache.Set(id, state)
+func (s *State) Save() {
+	cache.Set(s.telegramID, s)
+}
+
+func (s *State) Delete() {
+	cache.Delete(s.telegramID)
+}
+
+func (s *State) IsRequestCopeleted() bool {
+	if s.idx >= len(s.Paths) {
+		return true
+	}
+	return false
+}
+
+func (s *State) ReleaseState() {
+	cache.Delete(s.telegramID)
+}
+
+func (s *State) GetPath() string {
+	return s.Paths[s.idx]
+}
+
+func (s *State) SetData(key string, value any) {
+	s.data[key] = value
+	s.Save()
+}
+
+func (s *State) GetData(key string) (any, bool) {
+	val, isExist := s.data[key]
+	if isExist {
+		return val, true
+	}
+	return nil, false
 }

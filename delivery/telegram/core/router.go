@@ -39,20 +39,14 @@ func (r *Router) getHandler(path string) HandlerFunc {
 
 func (r *Router) Route(update *Update) (*ResponseHandlerFunc, error) {
 	var res *ResponseHandlerFunc
-	var path string
 	var err error
 
-	id, err := GetID(update)
-	if err != nil {
-		return nil, nil
-	}
-
 	if update.CallbackQuery != nil {
-		res, path, err = r.callbackQuery(update)
+		res, err = r.callbackQuery(update)
 	}
 
 	if update.Message != nil {
-		res, path, err = r.message(update)
+		res, err = r.message(update)
 	}
 
 	if update.MyChatMember != nil {
@@ -61,12 +55,6 @@ func (r *Router) Route(update *Update) (*ResponseHandlerFunc, error) {
 
 	if res.MenuTab {
 		res.MessageConfig.ReplyMarkup = r.enrichKeyboardMarkup(res.MessageConfig.ReplyMarkup)
-	}
-
-	if res != nil && !res.ReleaseState && len(path) > 0 {
-		telegramState.SetPath(id, path)
-	} else if err != nil || (res != nil && (res.ReleaseState || len(path) == 0)) {
-		telegramState.DeleteState(id)
 	}
 
 	if res == nil {
@@ -94,45 +82,69 @@ func (r *Router) enrichKeyboardMarkup(replyMarkup interface{}) interface{} {
 	return inlineKeyboardMarkup
 }
 
-func (r *Router) callbackQuery(update *Update) (*ResponseHandlerFunc, string, error) {
+func (r *Router) callbackQuery(update *Update) (*ResponseHandlerFunc, error) {
 	text := update.CallbackQuery.Data
 	return r.getResponse(text, update)
 }
 
-func (r *Router) message(update *Update) (*ResponseHandlerFunc, string, error) {
+func (r *Router) message(update *Update) (*ResponseHandlerFunc, error) {
 	text := update.Message.Text
 	return r.getResponse(text, update)
 }
 
-func (r *Router) getResponse(text string, update *Update) (*ResponseHandlerFunc, string, error) {
+func (r *Router) getResponse(text string, update *Update) (*ResponseHandlerFunc, error) {
+	var res *ResponseHandlerFunc
+	var err error
 	id, err := GetID(update)
+	if err != nil {
+		return nil, err
+	}
 
 	if r.isPath(text) {
+		telegramState.ResetState(id)
 		path := r.getPathFromText(text)
-		res, err := r.routeFromText(path, update)
-		return res, path, err
+		res, err = r.routeFromText(path, update)
 	}
 
-	state, isExist := telegramState.Get(id)
+	maxLoop := 25
+	for i := 0; err == nil && res == nil && i < maxLoop; i++ {
+		res, err = r.getResponseFromState(update)
+	}
+	return res, err
+}
+
+func (r *Router) getResponseFromState(update *Update) (*ResponseHandlerFunc, error) {
+	scope := "telegram.router.getResponseFromState"
+	id, err := GetID(update)
+	if err != nil {
+		return nil, err
+	}
+	state, isExist := telegramState.FindState(id)
 	if !isExist {
-		res, _ := r.RootHandler(update)
-		return res, "", nil
+		return nil, momoError.Scope(scope).ErrorWrite()
 	}
 
-	if len(state.Path) == 0 {
+	if state.IsRequestCopeleted() {
 		res, _ := r.RootHandler(update)
-		return res, "", nil
+		return res, nil
 	}
 
-	handler := r.getHandler(state.Path)
-
+	path := state.GetPath()
+	handler := r.getHandler(path)
 	res, err := handler(update)
 	if err != nil {
 		res, _ := r.RootHandler(update)
-		return res, "", err
+		return res, err
 	}
 
-	return res, state.Path, nil
+	if err != nil || state.IsRequestCopeleted() {
+		state.ReleaseState()
+	} else {
+		state.Save()
+	}
+
+	state.Next()
+	return res, nil
 }
 
 func (r *Router) isPath(text string) bool {

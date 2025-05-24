@@ -60,13 +60,13 @@ func getInboundRow() ([]tgbotapi.InlineKeyboardButton, error) {
 		return nil, err
 	}
 
-	titleextendVPN, err := telegrammessages.GetMessage("inbound.extend_buttom", map[string]string{})
+	titleCreateCharge, err := telegrammessages.GetMessage("charge.extend_buttom", map[string]string{})
 	if err != nil {
 		return nil, err
 	}
 
 	listInboundsButtom := tgbotapi.NewInlineKeyboardButtonData(titleListVPNs, "/list_inbounds")
 	createInboundsButtom := tgbotapi.NewInlineKeyboardButtonData(titleCreateVPNs, "/create_inbound")
-	extendInboundsButtom := tgbotapi.NewInlineKeyboardButtonData(titleextendVPN, "/extend_inbound")
-	return tgbotapi.NewInlineKeyboardRow(listInboundsButtom, createInboundsButtom, extendInboundsButtom), nil
+	createChargeButtom := tgbotapi.NewInlineKeyboardButtonData(titleCreateCharge, "/create_charge")
+	return tgbotapi.NewInlineKeyboardRow(listInboundsButtom, createInboundsButtom, createChargeButtom), nil
 }

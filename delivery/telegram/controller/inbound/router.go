@@ -6,22 +6,21 @@ import (
 )
 
 func (h *Handler) SetRouter(telegramRouter *core.Router) {
-	telegramRouter.Register("list_inbounds", h.ListInbounds, middleware.IdentifyUser(h.userSvc))
+	telegramRouter.Register("list_inbounds",
+		h.ListInbounds,
+		middleware.IdentifyUser(h.userSvc),
+	)
 	telegramRouter.Register("create_inbound",
 		h.CreateInbound,
 		middleware.IdentifyUser(h.userSvc),
-		h.SetState,
-		h.AskVPNType,
-		h.FillVPNType,
-		h.AskPackagesCreatingInbound,
-		h.AnswerPackageCreatingInbound,
+		h.SetStateCreateInbound,
 	)
-	telegramRouter.Register("extend_inbound", h.ExtendInbound,
+	telegramRouter.Register("ask_selecting_inbound",
+		h.AskSelectingInbound,
 		middleware.IdentifyUser(h.userSvc),
-		h.SetExtendingInboundState,
-		h.SelectInboundIDInExtendingInbound,
-		h.ChooseInbound,
-		h.AskPackagesExtending,
-		h.AnswerPackageExtendingInbound,
+	)
+	telegramRouter.Register("answer_selecting_inbound",
+		h.AnswerSelectingInbound,
+		middleware.IdentifyUser(h.userSvc),
 	)
 }

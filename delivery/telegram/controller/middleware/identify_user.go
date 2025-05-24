@@ -28,7 +28,6 @@ func IdentifyUser(userSvc UserService) core.Middleware {
 			if momoErr, ok := momoError.GetMomoError(err); err != nil && (!ok || momoErr.GetErrorType() != momoError.NotFound) {
 				return nil, err
 			}
-
 			if user != nil && !user.IsApproved {
 				message, _ := telegrammessages.GetMessage("error.forbidden_access", map[string]string{})
 				msgConfig := tgbotapi.NewMessage(id, message)
