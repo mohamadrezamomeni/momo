@@ -61,3 +61,27 @@ func (c *Charge) Create(createChargeDto *chargeServiceDto.CreateChargeDto) (*ent
 
 	return chargeCreated, nil
 }
+
+func (c *Charge) ApproveCharge(id string) error {
+	scope := "charge.service.approveCharge"
+
+	err := c.chargeRepo.UpdateCharge(id, &chargeRepositoryDto.UpdateChargeDto{
+		Status: entity.ApprovedStatusCharge,
+	})
+	if err != nil {
+		return err
+	}
+
+	chargeApprovingString, err := json.Marshal(chargeEvent.ApproveChargeEvent{
+		ID: id,
+	})
+	if err != nil {
+		momoError.Wrap(err).Scope(scope).DebuggingError()
+	}
+
+	c.event.Create(&eventServiceDto.CreateEventDto{
+		Data: string(chargeApprovingString),
+		Name: "chargeApproving",
+	})
+	return nil
+}
