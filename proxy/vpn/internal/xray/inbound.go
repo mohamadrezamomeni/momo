@@ -104,7 +104,7 @@ func (x *Xray) resetTraffic(tag string) error {
 }
 
 func (x *Xray) getInboundTrafficWithoutBeigReseted(tag string) (*serializer.ReceiveInboundTraffic, error) {
-	return x.receiveInboundTraffic(tag, false)
+	return x.receiveInboundTraffic(tag, true)
 }
 
 func (x *Xray) getInboundTrafficWithBeigReseted(tag string) (*serializer.ReceiveInboundTraffic, error) {

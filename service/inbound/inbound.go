@@ -35,6 +35,7 @@ type UserService interface {
 }
 
 type InboundRepo interface {
+	IncreaseTrafficUsage(string, uint32) error
 	Update(string, *inboundRepoDto.UpdateInboundDto) error
 	FindInboundByID(id string) (*entity.Inbound, error)
 	UpdateDomainPort(int, string, string) error
@@ -380,7 +381,8 @@ func (i *Inbound) updateTraffic(inbound *entity.Inbound, proxy adapter.ProxyVPN)
 		return
 	}
 
-	i.inboundRepo.Update(strconv.Itoa(inbound.ID), &inboundRepoDto.UpdateInboundDto{
-		TrafficUsage: uint32(traffic.Download) + uint32(traffic.Upload),
-	})
+	i.inboundRepo.IncreaseTrafficUsage(
+		strconv.Itoa(inbound.ID),
+		uint32(traffic.Download)+uint32(traffic.Upload),
+	)
 }

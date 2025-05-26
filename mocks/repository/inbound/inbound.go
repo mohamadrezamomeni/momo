@@ -192,3 +192,7 @@ func (i *MockInbound) Update(_ string, _ *inboundDto.UpdateInboundDto) error {
 func (i *MockInbound) ExtendInbound(_ string, _ *inboundDto.ExtendInboundDto) error {
 	return nil
 }
+
+func (i *MockInbound) IncreaseTrafficUsage(_ string, _ uint32) error {
+	return nil
+}
