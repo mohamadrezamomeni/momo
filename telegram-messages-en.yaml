@@ -50,3 +50,5 @@ charge:
   extend_buttom: 📶 Extend your VPN now!
   detail_buttom: 📝 write your detail of payment
   successfully_extending: 🎉 Your VPN has been extended
+
+  approve_charge_admin: "🌟 Great News! 🌟 \n Your charge #:id: has been approved by the admin ✅ \n Thank you for your patience and trust. \n We're happy to have you with us! 💙"

@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	authHandler "github.com/mohamadrezamomeni/momo/delivery/http_server/controller/auth"
+	chargeHandler "github.com/mohamadrezamomeni/momo/delivery/http_server/controller/charge"
 	hostHandler "github.com/mohamadrezamomeni/momo/delivery/http_server/controller/host"
 	inboundHandler "github.com/mohamadrezamomeni/momo/delivery/http_server/controller/inbound"
 	metricHandler "github.com/mohamadrezamomeni/momo/delivery/http_server/controller/metric"
@@ -14,6 +15,7 @@ import (
 	vpnHandler "github.com/mohamadrezamomeni/momo/delivery/http_server/controller/vpn"
 	momoLog "github.com/mohamadrezamomeni/momo/pkg/log"
 	authSvc "github.com/mohamadrezamomeni/momo/service/auth"
+	chargeService "github.com/mohamadrezamomeni/momo/service/charge"
 	cryptService "github.com/mohamadrezamomeni/momo/service/crypt"
 	hostService "github.com/mohamadrezamomeni/momo/service/host"
 	inboundService "github.com/mohamadrezamomeni/momo/service/inbound"
@@ -35,6 +37,7 @@ type Server struct {
 	hostHandler    *hostHandler.Handler
 	vpnHandler     *vpnHandler.Handler
 	inboundHandler *inboundHandler.Handler
+	chargeHandler  *chargeHandler.Handler
 }
 
 func New(cfg *HTTPConfig,
@@ -44,6 +47,7 @@ func New(cfg *HTTPConfig,
 	hostSvc *hostService.Host,
 	vpnSvc *vpnService.VPNService,
 	inboundSvc *inboundService.Inbound,
+	chargeSvc *chargeService.Charge,
 	userValidation *userValidation.Validator,
 	authValidator *authValidation.Validation,
 	hostValidator *hostValidation.Validator,
@@ -59,6 +63,7 @@ func New(cfg *HTTPConfig,
 		hostHandler:    hostHandler.New(hostSvc, authSvc, hostValidator),
 		vpnHandler:     vpnHandler.New(vpnSvc, vpnValidator, authSvc),
 		inboundHandler: inboundHandler.New(inboundSvc, inboundValidator, authSvc),
+		chargeHandler:  chargeHandler.New(chargeSvc, authSvc),
 	}
 }
 
@@ -74,6 +79,7 @@ func (s *Server) Serve() {
 	s.hostHandler.SetRouter(api)
 	s.vpnHandler.SetRouter(api)
 	s.inboundHandler.SetRouter(api)
+	s.chargeHandler.SetRouter(api)
 
 	address := fmt.Sprintf(":%s", s.config.Port)
 	if err := s.router.Start(address); err != nil {

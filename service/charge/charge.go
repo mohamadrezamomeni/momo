@@ -85,7 +85,7 @@ func (c *Charge) ApproveCharge(id string) error {
 
 	c.event.Create(&eventServiceDto.CreateEventDto{
 		Data: string(chargeApprovingString),
-		Name: "chargeApproving",
+		Name: "charge_approve",
 	})
 	return nil
 }
