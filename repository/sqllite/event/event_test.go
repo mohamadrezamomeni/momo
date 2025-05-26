@@ -93,6 +93,17 @@ func TestFilter(t *testing.T) {
 	if len(events) != 0 {
 		t.Errorf("we expected lengh of result be 0 but we got %d", len(events))
 	}
+
+	events, err = eventRepo.Filter(&eventRepositoryDto.FilterEvents{
+		Names: []string{"test", "test1"},
+	})
+	if err != nil {
+		t.Fatalf("something went wrong the problem was %v", err)
+	}
+
+	if len(events) != 2 {
+		t.Errorf("we expected lengh of result be 2 but we got %d", len(events))
+	}
 }
 
 func TestUpdateEvent(t *testing.T) {

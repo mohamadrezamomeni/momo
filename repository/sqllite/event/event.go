@@ -73,6 +73,8 @@ func (e *Event) makeQueryFilter(inpt *eventRepositoryDto.FilterEvents) string {
 			subQueries = append(subQueries, fmt.Sprintf("name = '%s'", value.String()))
 		} else if field.Name == "IsNotificationProcessed" && !value.IsNil() {
 			subQueries = append(subQueries, fmt.Sprintf("is_notification_processed = %v", value.Elem().Bool()))
+		} else if field.Name == "Names" && (value.Kind() == reflect.Slice || value.Kind() == reflect.Array) && value.Len() > 0 {
+			subQueries = append(subQueries, fmt.Sprintf("name IN (\"%s\")", strings.Join(inpt.Names, "\", \"")))
 		}
 	}
 
@@ -80,6 +82,7 @@ func (e *Event) makeQueryFilter(inpt *eventRepositoryDto.FilterEvents) string {
 	if len(subQueries) > 0 {
 		sql += fmt.Sprintf(" WHERE %s", strings.Join(subQueries, " AND "))
 	}
+	fmt.Println(sql)
 
 	return sql
 }
