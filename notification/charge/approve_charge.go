@@ -6,7 +6,7 @@ import (
 	telegrammessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
 )
 
-func (h *Handler) ApproveCharge(c *core.Context) ([]*core.ResponseHandler, error) {
+func (h *Handler) ApproveCharge(c *core.Context) (*core.ResponseHandler, error) {
 	var approveChargeByAdmin chargeEvent.ApproveChargeEvent
 	if err := c.Bind(&approveChargeByAdmin); err != nil {
 		return nil, err
@@ -28,10 +28,14 @@ func (h *Handler) ApproveCharge(c *core.Context) ([]*core.ResponseHandler, error
 		return nil, err
 	}
 
-	return []*core.ResponseHandler{
-		{
-			Message: title,
-			ID:      user.TelegramID,
+	return &core.ResponseHandler{
+		Messages: []*core.Message{
+			{
+				User:    user,
+				MenuTab: true,
+				ID:      user.TelegramID,
+				Message: title,
+			},
 		},
 	}, nil
 }

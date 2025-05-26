@@ -1,8 +1,16 @@
 package core
 
-type HandlerFunc = func(*Context) ([]*ResponseHandler, error)
+import "github.com/mohamadrezamomeni/momo/entity"
+
+type HandlerFunc = func(*Context) (*ResponseHandler, error)
 
 type ResponseHandler struct {
+	Messages []*Message
+}
+
+type Message struct {
+	MenuTab bool
+	User    *entity.User
 	Message string
 	ID      string
 }

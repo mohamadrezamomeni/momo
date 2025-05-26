@@ -2,6 +2,8 @@ package core
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/mohamadrezamomeni/momo/entity"
+	telegramPKG "github.com/mohamadrezamomeni/momo/pkg/telegram"
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
 
@@ -10,7 +12,9 @@ type Core struct {
 	bot    *tgbotapi.BotAPI
 }
 
-func New(bot *tgbotapi.BotAPI) *Core {
+func New(
+	bot *tgbotapi.BotAPI,
+) *Core {
 	return &Core{
 		router: map[string]HandlerFunc{},
 		bot:    bot,
@@ -23,12 +27,22 @@ func (c *Core) Notify(path string, data string) {
 	if err != nil {
 		return
 	}
-	for _, msg := range res {
-		msg, err := c.makeMessageConfig(msg.ID, msg.Message)
-		if err == nil {
-			c.bot.Send(msg)
+	for _, msg := range res.Messages {
+		msgConfig, _ := c.makeMessageConfig(msg.ID, msg.Message)
+		c.bot.Send(msgConfig)
+
+		if msg.MenuTab {
+			c.SendMenuTab(msg.ID, msg.User)
 		}
 	}
+}
+
+func (c *Core) SendMenuTab(telegramID string, user *entity.User) {
+	msgConfig, err := telegramPKG.MenuConfigMessage(telegramID, user)
+	if err != nil {
+		return
+	}
+	c.bot.Send(msgConfig)
 }
 
 func (c *Core) makeMessageConfig(idStr string, message string) (*tgbotapi.MessageConfig, error) {
