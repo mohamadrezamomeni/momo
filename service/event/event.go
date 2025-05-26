@@ -28,3 +28,10 @@ func (e *Event) Create(event *eventServiceDto.CreateEventDto) {
 		Name: event.Name,
 	})
 }
+
+func (e *Event) markNotificationProcessed(id string) error {
+	active := true
+	return e.eventRepo.Update(id, &eventRepositoryDto.UpdateEvent{
+		IsNotificationProcessed: &active,
+	})
+}
