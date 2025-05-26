@@ -29,9 +29,16 @@ func (e *Event) Create(event *eventServiceDto.CreateEventDto) {
 	})
 }
 
-func (e *Event) markNotificationProcessed(id string) error {
+func (e *Event) MarkNotificationProcessed(id string) error {
 	active := true
 	return e.eventRepo.Update(id, &eventRepositoryDto.UpdateEvent{
 		IsNotificationProcessed: &active,
+	})
+}
+
+func (e *Event) FilterNotifications(filterDto *eventServiceDto.FilterEvents) ([]*entity.Event, error) {
+	return e.eventRepo.Filter(&eventRepositoryDto.FilterEvents{
+		Name:                    filterDto.Name,
+		IsNotificationProcessed: filterDto.IsNotificationProcessed,
 	})
 }
