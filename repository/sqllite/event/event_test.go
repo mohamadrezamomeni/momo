@@ -59,43 +59,40 @@ func TestFilter(t *testing.T) {
 		t.Errorf("we expected lengh of result be 3 but we got %d", len(events))
 	}
 
-	active := true
-
 	events, err = eventRepo.Filter(&eventRepositoryDto.FilterEvents{
-		IsProcessed: &active,
+		Name: "notification",
 	})
 	if err != nil {
 		t.Fatalf("something went wrong the problem was %v", err)
 	}
 
 	if len(events) != 1 {
-		t.Errorf("we expected lengh of result be 1 but we got %d", len(events))
+		t.Errorf("we expected lengh of result be 0 but we got %d", len(events))
 	}
 
 	events, err = eventRepo.Filter(&eventRepositoryDto.FilterEvents{
-		IsProcessed: &active,
-		Name:        "notification",
+		Name: "notification",
 	})
 	if err != nil {
 		t.Fatalf("something went wrong the problem was %v", err)
 	}
 
-	if len(events) != 0 {
+	if len(events) != 1 {
 		t.Errorf("we expected lengh of result be 0 but we got %d", len(events))
 	}
 }
 
 func TestUpdateEvent(t *testing.T) {
-	event, err := eventRepo.Create(data1)
+	event, err := eventRepo.Create(data2)
 	if err != nil {
 		t.Fatalf("something went wrong the problem was %v", err)
 	}
 
 	defer eventRepo.DeleteAll()
 
-	dective := false
+	active := true
 	err = eventRepo.Update(event.ID, &eventRepositoryDto.UpdateEvent{
-		IsProcessed: &dective,
+		IsNotificationProcessed: &active,
 	})
 	if err != nil {
 		t.Fatalf("something went wrong the probelem was %v", err)

@@ -17,17 +17,17 @@ func (e *Event) Create(inpt *eventRepositoryDto.CreateEvent) (*entity.Event, err
 
 	event := &entity.Event{}
 	err := e.db.Conn().QueryRow(`
-	INSERT INTO events (name, data, is_processed)
+	INSERT INTO events (name, data, is_notification_processed)
 	VALUES (?, ?, ?)
-	RETURNING id, name, data, is_processed
+	RETURNING id, name, data, is_notification_processed
 	`, inpt.Name,
 		inpt.Data,
-		inpt.IsProcessed,
+		inpt.IsNotificationProcessed,
 	).Scan(
 		&event.ID,
 		&event.Name,
 		&event.Data,
-		&event.IsProcessed,
+		&event.IsNotificationProcessed,
 	)
 
 	if err == nil {
@@ -69,9 +69,7 @@ func (e *Event) makeQueryFilter(inpt *eventRepositoryDto.FilterEvents) string {
 	for i := 0; i < v.NumField(); i++ {
 		field := t.Field(i)
 		value := v.Field(i)
-		if field.Name == "IsProcessed" && !value.IsNil() {
-			subQueries = append(subQueries, fmt.Sprintf("is_processed = %v", value.Elem().Bool()))
-		} else if field.Name == "Name" && len(value.String()) > 0 {
+		if field.Name == "Name" && len(value.String()) > 0 {
 			subQueries = append(subQueries, fmt.Sprintf("name = '%s'", value.String()))
 		}
 	}
@@ -93,7 +91,7 @@ func (e *Event) scan(rows *sql.Rows) (*entity.Event, error) {
 		&event.ID,
 		&event.Name,
 		&event.Data,
-		&event.IsProcessed,
+		&event.IsNotificationProcessed,
 		&createdAt,
 	)
 	if err != nil {
@@ -123,8 +121,8 @@ func (e *Event) Update(id string, inpt *eventRepositoryDto.UpdateEvent) error {
 	scope := "eventRepository.Update"
 	subModifies := []string{}
 
-	if inpt.IsProcessed != nil {
-		subModifies = append(subModifies, fmt.Sprintf("is_processed = %v", *inpt.IsProcessed))
+	if inpt.IsNotificationProcessed != nil {
+		subModifies = append(subModifies, fmt.Sprintf("is_notification_processed = %v", *inpt.IsNotificationProcessed))
 	}
 	if len(subModifies) == 0 {
 		return momoError.Scope(scope).DebuggingErrorf("input was empty")
