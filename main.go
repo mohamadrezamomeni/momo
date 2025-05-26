@@ -41,7 +41,7 @@ func main() {
 	migration := migrate.New(&cfg.DB)
 
 	migration.UP()
-	hostSvc, vpnSvc, userSvc, inboundSvc, authSvc, cryptSvc, _, eventSvc, _ := serviceInitializer.GetServices(&cfg)
+	hostSvc, vpnSvc, userSvc, inboundSvc, authSvc, cryptSvc, _, _, _ := serviceInitializer.GetServices(&cfg)
 
 	initializer(userSvc, &cfg)
 
@@ -64,8 +64,6 @@ func main() {
 		server.Serve()
 	}()
 
-	eventSvc.ListenEvents()
-
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
@@ -78,8 +76,6 @@ func main() {
 	if err := server.Shutdown(ctxWithTimeout); err != nil {
 		momoLog.Info(err.Error())
 	}
-
-	eventSvc.Shutdown()
 }
 
 func initializer(userSvc *userService.User, cfg *config.Config) {

@@ -28,9 +28,7 @@ func main() {
 
 	migration.UP()
 
-	_, _, userSvc, inboundSvc, authSvc, _, vpnPackage, eventSvc, chargeSvc := serviceInitializer.GetServices(&cfg)
-
-	eventSvc.ListenEvents()
+	_, _, userSvc, inboundSvc, authSvc, _, vpnPackage, _, chargeSvc := serviceInitializer.GetServices(&cfg)
 
 	t := telegram.New(&cfg.TelegramConfig, userSvc, authSvc, inboundSvc, vpnPackage, chargeSvc)
 	t.Serve()
