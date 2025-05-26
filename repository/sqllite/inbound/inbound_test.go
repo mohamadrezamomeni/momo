@@ -401,3 +401,18 @@ func TestExtendInbound(t *testing.T) {
 		t.Fatalf("the end field must be %s but we got %s", inboundFound.End.Format(time.DateTime), endTime.Format(time.DateTime))
 	}
 }
+
+func TestIncreateTrafficUsage(t *testing.T) {
+	defer inboundRepo.DeleteAll()
+	inboundCreated, _ := inboundRepo.Create(inbound1)
+
+	var trafficUsage uint32 = 50000
+	err := inboundRepo.IncreaseTrafficUsage(strconv.Itoa(inboundCreated.ID), trafficUsage)
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+	inboundFound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
+	if inboundFound.TrafficUsage != trafficUsage {
+		t.Fatalf("error to compare data")
+	}
+}

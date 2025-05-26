@@ -388,6 +388,24 @@ func (i *Inbound) Update(id string, inpt *inboundDto.UpdateInboundDto) error {
 	return nil
 }
 
+func (i *Inbound) IncreaseTrafficUsage(id string, trafficUsage uint32) error {
+	scope := "inboundRepository.IncreaseTrafficUsage"
+	sql := fmt.Sprintf(
+		"UPDATE inbounds SET traffic_usage = traffic_usage + %v WHERE id = %s",
+		trafficUsage,
+		id,
+	)
+
+	result, err := i.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
+	}
+	if rows, err := result.RowsAffected(); err != nil || rows == 0 {
+		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
+	}
+	return nil
+}
+
 func (i *Inbound) ExtendInbound(id string, inpt *inboundDto.ExtendInboundDto) error {
 	scope := "inboundRepository.extendinbound"
 
