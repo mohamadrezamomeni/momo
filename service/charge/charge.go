@@ -62,6 +62,10 @@ func (c *Charge) Create(createChargeDto *chargeServiceDto.CreateChargeDto) (*ent
 	return chargeCreated, nil
 }
 
+func (c *Charge) FindByID(id string) (*entity.Charge, error) {
+	return c.chargeRepo.FindChargeByID(id)
+}
+
 func (c *Charge) ApproveCharge(id string) error {
 	scope := "charge.service.approveCharge"
 
