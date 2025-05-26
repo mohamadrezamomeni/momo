@@ -71,6 +71,8 @@ func (e *Event) makeQueryFilter(inpt *eventRepositoryDto.FilterEvents) string {
 		value := v.Field(i)
 		if field.Name == "Name" && len(value.String()) > 0 {
 			subQueries = append(subQueries, fmt.Sprintf("name = '%s'", value.String()))
+		} else if field.Name == "IsNotificationProcessed" && !value.IsNil() {
+			subQueries = append(subQueries, fmt.Sprintf("is_notification_processed = %v", value.Elem().Bool()))
 		}
 	}
 

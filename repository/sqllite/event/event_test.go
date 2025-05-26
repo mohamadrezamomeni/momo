@@ -80,6 +80,19 @@ func TestFilter(t *testing.T) {
 	if len(events) != 1 {
 		t.Errorf("we expected lengh of result be 0 but we got %d", len(events))
 	}
+
+	isNotificationProcessed := false
+	events, err = eventRepo.Filter(&eventRepositoryDto.FilterEvents{
+		Name:                    "notification",
+		IsNotificationProcessed: &isNotificationProcessed,
+	})
+	if err != nil {
+		t.Fatalf("something went wrong the problem was %v", err)
+	}
+
+	if len(events) != 0 {
+		t.Errorf("we expected lengh of result be 0 but we got %d", len(events))
+	}
 }
 
 func TestUpdateEvent(t *testing.T) {

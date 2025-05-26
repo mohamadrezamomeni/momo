@@ -1,6 +1,6 @@
 package event
 
 type FilterEvents struct {
-	Name               string
-	NotContainProccess string
+	Name                    string
+	IsNotificationProcessed *bool
 }
