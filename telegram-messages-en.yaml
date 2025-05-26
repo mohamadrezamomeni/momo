@@ -5,6 +5,7 @@ error:
   forbidden_access: 🙏 Sorry, access is pending admin approval. Please be patient!
 auth:
   username_buttom: 📝 Please enter your username. This username may be used on the platform in the future.
+  approve_user: 🎉 You're already approved by admin.
   registeration:
     duplicate_register: 🎉 You're already registered! No need to do it again.
     username_existence: ❌ The username you chose has already been taken. Please try a different one.

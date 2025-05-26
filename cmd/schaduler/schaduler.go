@@ -8,11 +8,13 @@ import (
 
 	"github.com/mohamadrezamomeni/momo/pkg/config"
 	momoLog "github.com/mohamadrezamomeni/momo/pkg/log"
+	telegrammessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
 	"github.com/mohamadrezamomeni/momo/repository/migrate"
 	"github.com/mohamadrezamomeni/momo/scheduler"
 
 	_ "github.com/mattn/go-sqlite3"
 
+	notification "github.com/mohamadrezamomeni/momo/notification"
 	serviceInitializer "github.com/mohamadrezamomeni/momo/pkg/service"
 )
 
@@ -25,12 +27,16 @@ func main() {
 	}
 
 	momoLog.Init(cfg.Log)
-
+	telegrammessages.Load()
 	migration := migrate.New(&cfg.DB)
 
 	migration.UP()
 
-	hostSvc, vpnSvc, _, inboundSvc, _, _, _, _, _ := serviceInitializer.GetServices(&cfg)
+	hostSvc, vpnSvc, userSvc, inboundSvc, _, _, _, eventSvc, chargeSvc := serviceInitializer.GetServices(&cfg)
+
+	notification := notification.New(&cfg.Notification, inboundSvc, userSvc, chargeSvc, eventSvc)
+
+	notification.ServeRoutes()
 
 	done := make(chan struct{})
 
@@ -38,7 +44,7 @@ func main() {
 
 	go func() {
 		wg.Add(1)
-		scheduler := scheduler.New(inboundSvc, vpnSvc, hostSvc)
+		scheduler := scheduler.New(inboundSvc, vpnSvc, hostSvc, notification)
 		scheduler.Start(done, &wg)
 	}()
 

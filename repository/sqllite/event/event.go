@@ -82,7 +82,6 @@ func (e *Event) makeQueryFilter(inpt *eventRepositoryDto.FilterEvents) string {
 	if len(subQueries) > 0 {
 		sql += fmt.Sprintf(" WHERE %s", strings.Join(subQueries, " AND "))
 	}
-	fmt.Println(sql)
 
 	return sql
 }

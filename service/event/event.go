@@ -40,5 +40,6 @@ func (e *Event) FilterNotifications(filterDto *eventServiceDto.FilterEvents) ([]
 	return e.eventRepo.Filter(&eventRepositoryDto.FilterEvents{
 		Name:                    filterDto.Name,
 		IsNotificationProcessed: filterDto.IsNotificationProcessed,
+		Names:                   filterDto.Names,
 	})
 }

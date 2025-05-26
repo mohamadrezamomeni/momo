@@ -8,10 +8,11 @@ import (
 )
 
 type Scheduler struct {
-	inboundSvc InboundService
-	vpnSvc     VPNService
-	hostSvc    HostService
-	sch        *gocron.Scheduler
+	inboundSvc      InboundService
+	vpnSvc          VPNService
+	hostSvc         HostService
+	sch             *gocron.Scheduler
+	notificationSvc NotificationService
 }
 
 type InboundService interface {
@@ -23,6 +24,10 @@ type InboundService interface {
 	UpdateTraffics()
 }
 
+type NotificationService interface {
+	NotifyEvents()
+}
+
 type VPNService interface {
 	MonitorVPNs()
 }
@@ -31,18 +36,25 @@ type HostService interface {
 	MonitorHosts()
 }
 
-func New(inboundSvc InboundService, vpnSvc VPNService, hostSvc HostService) *Scheduler {
+func New(
+	inboundSvc InboundService,
+	vpnSvc VPNService,
+	hostSvc HostService,
+	notificationSvc NotificationService,
+) *Scheduler {
 	return &Scheduler{
-		inboundSvc: inboundSvc,
-		vpnSvc:     vpnSvc,
-		hostSvc:    hostSvc,
-		sch:        gocron.NewScheduler(time.UTC),
+		inboundSvc:      inboundSvc,
+		vpnSvc:          vpnSvc,
+		hostSvc:         hostSvc,
+		sch:             gocron.NewScheduler(time.UTC),
+		notificationSvc: notificationSvc,
 	}
 }
 
 func (s *Scheduler) Start(done <-chan struct{}, wg *sync.WaitGroup) {
 	defer wg.Done()
 
+	s.sch.Cron("*/1 * * * *").Do(s.notificationSvc.NotifyEvents)
 	s.sch.Cron("*/10 * * * *").Do(s.inboundSvc.HealingUpInboundExpired)
 	s.sch.Cron("*/10 * * * *").Do(s.inboundSvc.HealingUpInboundOverQuoted)
 	s.sch.Cron("*/10 * * * *").Do(s.inboundSvc.HealingUpInboundBlocked)
