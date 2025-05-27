@@ -21,6 +21,7 @@ type ChargeRepository interface {
 	FindChargeByID(string) (*entity.Charge, error)
 	UpdateCharge(string, *chargeRepositoryDto.UpdateChargeDto) error
 	FilterCharges(*chargeRepositoryDto.FilterChargesDto) ([]*entity.Charge, error)
+	GetFirstAvailbleInboundCharge(string) (*entity.Charge, error)
 }
 
 type EventService interface {
@@ -88,4 +89,8 @@ func (c *Charge) ApproveCharge(id string) error {
 		Name: "charge_approve",
 	})
 	return nil
+}
+
+func (c *Charge) FindAvailbleCharge(inboundID string) (*entity.Charge, error) {
+	return c.chargeRepo.GetFirstAvailbleInboundCharge(inboundID)
 }
