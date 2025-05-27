@@ -8,7 +8,7 @@ import (
 	vpnProxy "github.com/mohamadrezamomeni/momo/proxy/vpn"
 )
 
-func (i *Inbound) HealingUpInboundExpired() {
+func (i *Inbound) HealingUpExpiredInbounds() {
 	inbounds, err := i.inboundRepo.RetriveActiveInboundExpired()
 	if err != nil {
 		return
@@ -19,11 +19,11 @@ func (i *Inbound) HealingUpInboundExpired() {
 	}
 	defer proxy.Close()
 	for _, inbound := range inbounds {
-		i.healingUpExipredInbound(inbound, proxy)
+		i.healingUpExpiredInbound(inbound, proxy)
 	}
 }
 
-func (i *Inbound) HealingUpInboundOverQuoted() {
+func (i *Inbound) HealingUpOverQuotedInbounds() {
 	inbounds, err := i.inboundRepo.RetriveActiveInboundsOverQuota()
 	if err != nil {
 		return
@@ -34,11 +34,11 @@ func (i *Inbound) HealingUpInboundOverQuoted() {
 	}
 	defer proxy.Close()
 	for _, inbound := range inbounds {
-		i.healingUpExipredInbound(inbound, proxy)
+		i.healingUpExpiredInbound(inbound, proxy)
 	}
 }
 
-func (i *Inbound) HealingUpInboundBlocked() {
+func (i *Inbound) HealingUpBlockedInbounds() {
 	inbounds, err := i.inboundRepo.RetriveActiveInboundBlocked()
 	if err != nil {
 		return
@@ -46,7 +46,7 @@ func (i *Inbound) HealingUpInboundBlocked() {
 	i.deactiveInbounds(inbounds)
 }
 
-func (i *Inbound) HealingUpInboundCharged() {
+func (i *Inbound) HealingUpChargedInbounds() {
 	inbounds, err := i.inboundRepo.RetriveDeactiveInboundsCharged()
 	if err != nil {
 		return
@@ -76,7 +76,7 @@ func (i *Inbound) deactiveInbounds(inbounds []*entity.Inbound) {
 	}
 }
 
-func (i *Inbound) healingUpExipredInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) error {
+func (i *Inbound) healingUpExpiredInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) error {
 	charge, err := i.chargeSvc.FindAvailbleCharge(strconv.Itoa(inbound.ID))
 	if err != nil {
 		return i.deActiveInbound(inbound, vpnProxy)
