@@ -1,7 +1,7 @@
 package host
 
 import (
-	"sync"
+	"strconv"
 
 	"github.com/mohamadrezamomeni/momo/entity"
 )
@@ -12,25 +12,13 @@ func New() *MockHost {
 	return &MockHost{}
 }
 
-func (h *MockHost) ResolvePorts(
-	host *entity.Host,
-	numberPortNedded int,
-	ports []string,
-	wg *sync.WaitGroup,
-	ch chan<- struct {
-		Domain string
-		Ports  []string
-	},
-) {
-	defer wg.Done()
-
-	ch <- struct {
-		Domain string
-		Ports  []string
-	}{
-		Domain: host.Domain,
-		Ports:  []string{"1234", "3456"},
+func (h *MockHost) ResolveHostPortPair(hostPortUsed map[string][]string, requiredPorts int) ([][2]string, error) {
+	hostPairs := make([][2]string, 0)
+	for i := 0; i < requiredPorts; i++ {
+		hostPairs = append(hostPairs, [2]string{"google.com", strconv.Itoa(1000 + i)})
 	}
+
+	return hostPairs, nil
 }
 
 func (h *MockHost) FindRightHosts(status entity.HostStatus) ([]*entity.Host, error) {

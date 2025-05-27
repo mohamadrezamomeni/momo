@@ -2,10 +2,7 @@ package inbound
 
 import (
 	"fmt"
-	"math/rand"
 	"strconv"
-	"sync"
-	"time"
 
 	"github.com/mohamadrezamomeni/momo/adapter"
 	"github.com/mohamadrezamomeni/momo/entity"
@@ -57,17 +54,7 @@ type InboundRepo interface {
 }
 
 type HostService interface {
-	FindRightHosts(entity.HostStatus) ([]*entity.Host, error)
-	ResolvePorts(
-		*entity.Host,
-		int,
-		[]string,
-		*sync.WaitGroup,
-		chan<- struct {
-			Domain string
-			Ports  []string
-		},
-	)
+	ResolveHostPortPair(map[string][]string, int) ([][2]string, error)
 }
 
 func New(
@@ -108,61 +95,22 @@ func (i *Inbound) AssignDomainToInbounds() {
 	if err != nil {
 		return
 	}
-
-	hosts, err := i.hostService.FindRightHosts(entity.High)
-	if err != nil {
-		return
-	}
-
 	portUserSummery, err := i.summeryDomainPorts()
 	if err != nil {
 		return
 	}
 
-	ch := make(chan struct {
-		Domain string
-		Ports  []string
-	})
-
-	var wg sync.WaitGroup
-	seen := map[string]struct{}{}
-
-	for _, host := range hosts {
-		wg.Add(1)
-		if _, ok := seen[host.Domain]; ok {
-			continue
-		}
-
-		seen[host.Domain] = struct{}{}
-
-		go i.hostService.ResolvePorts(
-			host,
-			len(inbounds),
-			portUserSummery[host.Domain],
-			&wg,
-			ch,
-		)
+	hostPortPairs, err := i.hostService.ResolveHostPortPair(portUserSummery, len(inbounds))
+	if err != nil {
+		return
 	}
 
-	go func() {
-		wg.Wait()
-		close(ch)
-	}()
-
-	hostPortPairs := [][2]string{}
-
-	for item := range ch {
-		hostPortPairs = append(hostPortPairs, i.makeHostPairWiPort(item.Domain, item.Ports)...)
-	}
-
-	hostPortPairs = i.shuffleHostPortPairs(hostPortPairs)
 	for j := 0; j < utils.Min(len(inbounds), len(hostPortPairs)); j++ {
 		hostPort := hostPortPairs[j]
 		inbound := inbounds[j]
 		host, port := hostPort[0], hostPort[1]
 		i.inboundRepo.UpdateDomainPort(inbound.ID, host, port)
 	}
-	return
 }
 
 func (i *Inbound) summeryDomainPorts() (map[string][]string, error) {
@@ -175,23 +123,6 @@ func (i *Inbound) summeryDomainPorts() (map[string][]string, error) {
 		res[item.Domain] = item.Ports
 	}
 	return res, nil
-}
-
-func (i *Inbound) shuffleHostPortPairs(hostPortPairs [][2]string) [][2]string {
-	rand := rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	rand.Shuffle(len(hostPortPairs), func(i, j int) {
-		hostPortPairs[i], hostPortPairs[j] = hostPortPairs[j], hostPortPairs[i]
-	})
-	return hostPortPairs
-}
-
-func (i *Inbound) makeHostPairWiPort(host string, ports []string) [][2]string {
-	hostPortPairs := [][2]string{}
-	for _, port := range ports {
-		hostPortPairs = append(hostPortPairs, [2]string{host, port})
-	}
-	return hostPortPairs
 }
 
 func (i *Inbound) HealingUpInboundExpired() {

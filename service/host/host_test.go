@@ -47,7 +47,7 @@ func TestResolvePorts(t *testing.T) {
 	})
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go hostSvc.ResolvePorts(
+	go hostSvc.resolvePorts(
 		hostCreated1,
 		3,
 		[]string{"12345"},
