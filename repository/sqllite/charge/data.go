@@ -28,4 +28,19 @@ var (
 		InboundID: "13",
 		PackageID: "4",
 	}
+
+	charge4 = &chargeRepositoryDto.CreateDto{
+		Status:    entity.ApprovedStatusCharge,
+		UserID:    "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		Detail:    "hello",
+		InboundID: "12",
+		PackageID: "1",
+	}
+	charge5 = &chargeRepositoryDto.CreateDto{
+		Status:    entity.ApprovedStatusCharge,
+		UserID:    "f47ac10b-58cc-4372-a567-0e02b2c3d477",
+		Detail:    "hi",
+		InboundID: "12",
+		PackageID: "3",
+	}
 )

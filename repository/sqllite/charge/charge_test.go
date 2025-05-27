@@ -148,3 +148,19 @@ func TestFilterCharges(t *testing.T) {
 		t.Fatalf("we expected the lengh of charges be 1 but we got %v", len(charges))
 	}
 }
+
+func TestGetFirstAvailbleInboundCharge(t *testing.T) {
+	defer chargeRepo.DeleteAll()
+
+	chargeCreated, _ := chargeRepo.Create(charge4)
+	chargeRepo.Create(charge5)
+
+	chargeFound, err := chargeRepo.GetFirstAvailbleInboundCharge(chargeCreated.InboundID)
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	if chargeFound.ID != chargeCreated.ID {
+		t.Fatal("error to compare data")
+	}
+}

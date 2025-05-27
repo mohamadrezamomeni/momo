@@ -192,3 +192,31 @@ func (e *Charge) scan(rows *sql.Rows) (*entity.Charge, error) {
 	charge.Status = entity.ConvertStringToChargeStatus(status)
 	return charge, nil
 }
+
+func (e *Charge) GetFirstAvailbleInboundCharge(inboundID string) (*entity.Charge, error) {
+	scope := "chargeRepository.GetFirstAvailbleInboundCharge"
+
+	query := fmt.Sprintf("SELECT * FROM charges WHERE inbound_id = %s ORDER BY created_at DESC LIMIT 1", inboundID)
+
+	charge := &entity.Charge{}
+	status := ""
+	var createdAt interface{}
+	err := e.db.Conn().QueryRow(query).Scan(
+		&charge.ID,
+		&status,
+		&charge.Detail,
+		&charge.AdminComment,
+		&charge.InboundID,
+		&charge.UserID,
+		&charge.PackageID,
+		&createdAt,
+	)
+	if err == nil {
+		charge.Status = entity.ConvertStringToChargeStatus(status)
+		return charge, nil
+	}
+	if err == sql.ErrNoRows {
+		return nil, momoError.Wrap(err).Scope(scope).NotFound().Input(inboundID).DebuggingError()
+	}
+	return nil, momoError.Wrap(err).Scope(scope).Input(inboundID).UnExpected().DebuggingError()
+}
