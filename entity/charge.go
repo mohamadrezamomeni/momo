@@ -17,7 +17,7 @@ const (
 	ApprovedStatusCharge
 	PendingStatusCharge
 	RegejectedStatusCharge
-	Assigned
+	AssignedCharged
 )
 
 func TranslateChargeStatus(enum ChargeStatus) string {
@@ -28,7 +28,7 @@ func TranslateChargeStatus(enum ChargeStatus) string {
 		return "pending"
 	case RegejectedStatusCharge:
 		return "regected"
-	case Assigned:
+	case AssignedCharged:
 		return "assiggned"
 	default:
 		return "unkhown"
@@ -44,7 +44,7 @@ func ConvertStringToChargeStatus(s string) ChargeStatus {
 	case "regected":
 		return RegejectedStatusCharge
 	case "assiggned":
-		return Assigned
+		return AssignedCharged
 	default:
 		return UnkhownStatusCharge
 	}
