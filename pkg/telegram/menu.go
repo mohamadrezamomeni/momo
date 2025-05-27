@@ -29,8 +29,13 @@ func MenuConfigMessage(telegramID string, user *entity.User) (*tgbotapi.MessageC
 		return nil, err
 	}
 
+	chargeRow, err := getChargeRow()
+	if err != nil {
+		return nil, err
+	}
+
 	if user != nil {
-		inlineKeyboard = append(inlineKeyboard, inboundRow)
+		inlineKeyboard = append(inlineKeyboard, inboundRow, chargeRow)
 	} else {
 		button := tgbotapi.NewInlineKeyboardButtonData("register", "/register")
 
@@ -55,13 +60,17 @@ func getInboundRow() ([]tgbotapi.InlineKeyboardButton, error) {
 		return nil, err
 	}
 
+	listInboundsButtom := tgbotapi.NewInlineKeyboardButtonData(titleListVPNs, "/list_inbounds")
+	createInboundsButtom := tgbotapi.NewInlineKeyboardButtonData(titleCreateVPNs, "/create_inbound")
+	return tgbotapi.NewInlineKeyboardRow(listInboundsButtom, createInboundsButtom), nil
+}
+
+func getChargeRow() ([]tgbotapi.InlineKeyboardButton, error) {
 	titleCreateCharge, err := telegrammessages.GetMessage("charge.extend_buttom", map[string]string{})
 	if err != nil {
 		return nil, err
 	}
 
-	listInboundsButtom := tgbotapi.NewInlineKeyboardButtonData(titleListVPNs, "/list_inbounds")
-	createInboundsButtom := tgbotapi.NewInlineKeyboardButtonData(titleCreateVPNs, "/create_inbound")
 	createChargeButtom := tgbotapi.NewInlineKeyboardButtonData(titleCreateCharge, "/create_charge")
-	return tgbotapi.NewInlineKeyboardRow(listInboundsButtom, createInboundsButtom, createChargeButtom), nil
+	return tgbotapi.NewInlineKeyboardRow(createChargeButtom), nil
 }
