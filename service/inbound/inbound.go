@@ -13,10 +13,12 @@ import (
 )
 
 type Inbound struct {
-	inboundRepo InboundRepo
-	vpnService  VpnService
-	userService UserService
-	hostService HostService
+	inboundRepo      InboundRepo
+	vpnService       VpnService
+	userService      UserService
+	hostService      HostService
+	chargeSvc        ChargeService
+	inboundChargeSvc InboundChargeService
 }
 
 type VpnService interface {
@@ -53,17 +55,29 @@ type HostService interface {
 	ResolveHostPortPair(map[string][]string, int) ([][2]string, error)
 }
 
+type ChargeService interface {
+	FindAvailbleCharge(string) (*entity.Charge, error)
+}
+
+type InboundChargeService interface {
+	ChargeInbound(*entity.Inbound, *entity.Charge) error
+}
+
 func New(
 	repo InboundRepo,
 	vpnService VpnService,
 	userService UserService,
 	hostService HostService,
+	chargeService ChargeService,
+	inboundChargeService InboundChargeService,
 ) *Inbound {
 	return &Inbound{
-		inboundRepo: repo,
-		vpnService:  vpnService,
-		userService: userService,
-		hostService: hostService,
+		inboundRepo:      repo,
+		vpnService:       vpnService,
+		userService:      userService,
+		hostService:      hostService,
+		chargeSvc:        chargeService,
+		inboundChargeSvc: inboundChargeService,
 	}
 }
 

@@ -1,6 +1,8 @@
 package inbound
 
 import (
+	"strconv"
+
 	"github.com/mohamadrezamomeni/momo/adapter"
 	"github.com/mohamadrezamomeni/momo/entity"
 	vpnProxy "github.com/mohamadrezamomeni/momo/proxy/vpn"
@@ -17,7 +19,7 @@ func (i *Inbound) HealingUpInboundExpired() {
 	}
 	defer proxy.Close()
 	for _, inbound := range inbounds {
-		i.deActiveInbound(inbound, proxy)
+		i.healingUpExipredInbound(inbound, proxy)
 	}
 }
 
@@ -26,7 +28,14 @@ func (i *Inbound) HealingUpInboundOverQuoted() {
 	if err != nil {
 		return
 	}
-	i.deactiveInbounds(inbounds)
+	proxy, err := i.vpnService.MakeProxy()
+	if err != nil {
+		return
+	}
+	defer proxy.Close()
+	for _, inbound := range inbounds {
+		i.healingUpExipredInbound(inbound, proxy)
+	}
 }
 
 func (i *Inbound) HealingUpInboundBlocked() {
@@ -65,6 +74,14 @@ func (i *Inbound) deactiveInbounds(inbounds []*entity.Inbound) {
 	for _, inbound := range inbounds {
 		i.deActiveInbound(inbound, proxy)
 	}
+}
+
+func (i *Inbound) healingUpExipredInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) error {
+	charge, err := i.chargeSvc.FindAvailbleCharge(strconv.Itoa(inbound.ID))
+	if err != nil {
+		return i.deActiveInbound(inbound, vpnProxy)
+	}
+	return i.inboundChargeSvc.ChargeInbound(inbound, charge)
 }
 
 func (i *Inbound) deActiveInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) error {

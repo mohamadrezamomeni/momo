@@ -7,7 +7,9 @@ import (
 	"unsafe"
 
 	inboundRepository "github.com/mohamadrezamomeni/momo/mocks/repository/inbound"
+	chargeService "github.com/mohamadrezamomeni/momo/mocks/service/charge"
 	hostService "github.com/mohamadrezamomeni/momo/mocks/service/host"
+	inboundChargeService "github.com/mohamadrezamomeni/momo/mocks/service/inbound_charge"
 	userService "github.com/mohamadrezamomeni/momo/mocks/service/user"
 	vpnService "github.com/mohamadrezamomeni/momo/mocks/service/vpn"
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
@@ -18,8 +20,10 @@ func registerInboundSvc() (*Inbound, *inboundRepository.MockInbound, *vpnService
 	userSvc := userService.New()
 	hostSvc := hostService.New()
 	vpnSvc := vpnService.New()
+	chargeSvc := chargeService.New()
+	inboundChargeSvc := inboundChargeService.New()
 
-	inboundSvc := New(inboundRepo, vpnSvc, userSvc, hostSvc)
+	inboundSvc := New(inboundRepo, vpnSvc, userSvc, hostSvc, chargeSvc, inboundChargeSvc)
 	return inboundSvc, inboundRepo, vpnSvc
 }
 
