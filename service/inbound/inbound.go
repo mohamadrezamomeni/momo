@@ -6,7 +6,6 @@ import (
 	"github.com/mohamadrezamomeni/momo/adapter"
 	"github.com/mohamadrezamomeni/momo/entity"
 
-	vpnProxyDto "github.com/mohamadrezamomeni/momo/dto/proxy/vpn"
 	inboundRepoDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
 	inboundServiceDto "github.com/mohamadrezamomeni/momo/dto/service/inbound"
 
@@ -85,25 +84,6 @@ func (i *Inbound) Create(inpt *inboundServiceDto.CreateInbound) (*entity.Inbound
 		return nil, err
 	}
 	return inboundCreated, nil
-}
-
-func (i *Inbound) getInfo(inbound *entity.Inbound) (*vpnProxyDto.Inbound, error) {
-	user, err := i.userService.FindByID(inbound.UserID)
-	if err != nil {
-		return &vpnProxyDto.Inbound{}, err
-	}
-	info := &vpnProxyDto.Inbound{
-		User: &vpnProxyDto.User{
-			Username: user.Username,
-			ID:       user.ID,
-			Level:    "0",
-		},
-		VPNType: inbound.VPNType,
-		Address: inbound.Domain,
-		Port:    inbound.Port,
-		Tag:     inbound.Tag,
-	}
-	return info, nil
 }
 
 func (i *Inbound) Filter(inpt *inboundServiceDto.FilterInbounds) ([]*entity.Inbound, error) {

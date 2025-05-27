@@ -26,12 +26,13 @@ func (i *Inbound) UpdateTraffics() {
 }
 
 func (i *Inbound) updateTraffic(inbound *entity.Inbound, proxy adapter.ProxyVPN) {
-	info, err := i.getInfo(inbound)
+	user, err := i.userService.FindByID(inbound.UserID)
 	if err != nil {
 		return
 	}
 
-	traffic, err := proxy.GetTraffic(info)
+	vpnProxyInput := adapter.GenerateVPNProxyInput(inbound, user)
+	traffic, err := proxy.GetTraffic(vpnProxyInput)
 	if err != nil {
 		return
 	}

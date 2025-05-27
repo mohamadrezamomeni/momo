@@ -1,6 +1,7 @@
 package inbound
 
 import (
+	"github.com/mohamadrezamomeni/momo/adapter"
 	"github.com/mohamadrezamomeni/momo/entity"
 	vpnProxy "github.com/mohamadrezamomeni/momo/proxy/vpn"
 )
@@ -67,11 +68,13 @@ func (i *Inbound) deactiveInbounds(inbounds []*entity.Inbound) {
 }
 
 func (i *Inbound) deActiveInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) error {
-	info, err := i.getInfo(inbound)
+	user, err := i.userService.FindByID(inbound.UserID)
 	if err != nil {
 		return err
 	}
-	err = vpnProxy.DisableInbound(info)
+
+	vpnProxyInput := adapter.GenerateVPNProxyInput(inbound, user)
+	err = vpnProxy.DisableInbound(vpnProxyInput)
 	if err != nil {
 		return err
 	}
@@ -80,11 +83,17 @@ func (i *Inbound) deActiveInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IPr
 }
 
 func (i *Inbound) activeInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) error {
-	info, err := i.getInfo(inbound)
+	user, err := i.userService.FindByID(inbound.UserID)
 	if err != nil {
 		return err
 	}
-	err = vpnProxy.AddInbound(info)
+
+	vpnProxyInput := adapter.GenerateVPNProxyInput(inbound, user)
+
+	if err != nil {
+		return err
+	}
+	err = vpnProxy.AddInbound(vpnProxyInput)
 	if err != nil {
 		return err
 	}
