@@ -164,3 +164,29 @@ func TestGetFirstAvailbleInboundCharge(t *testing.T) {
 		t.Fatal("error to compare data")
 	}
 }
+
+func TestRetriveAvailbleChargesForInbounds(t *testing.T) {
+	defer chargeRepo.DeleteAll()
+
+	chargeCreated1, _ := chargeRepo.Create(charge6)
+	chargeRepo.Create(charge7)
+	chargeRepo.Create(charge8)
+	chargeCreated4, _ := chargeRepo.Create(charge9)
+
+	charges, err := chargeRepo.RetriveAvailbleChargesForInbounds([]string{"15", "16", "17"})
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	if len(charges) != 2 {
+		t.Fatalf("we expected the lengh of charges be 2 but we got %d", len(charges))
+	}
+
+	if !(chargeCreated1.ID == charges[0].ID || chargeCreated1.ID == charges[1].ID) {
+		t.Fatal("error to compare data")
+	}
+
+	if !(chargeCreated4.ID == charges[0].ID || chargeCreated4.ID == charges[1].ID) {
+		t.Fatal("error to compare data")
+	}
+}

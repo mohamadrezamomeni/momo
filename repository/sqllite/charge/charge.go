@@ -124,6 +124,42 @@ func (c *Charge) UpdateCharge(id string, inpt *chargeRepositoryDto.UpdateChargeD
 	return nil
 }
 
+func (c *Charge) RetriveAvailbleChargesForInbounds(inboundIDs []string) ([]*entity.Charge, error) {
+	scope := "chargeRepository.RetriveAvailbleChargesForInbounds"
+
+	queryFormat := `SELECT c.*
+		FROM charges c
+		JOIN (
+			SELECT id, MIN(created_at) AS min_created_at
+			FROM charges
+			WHERE inbound_id IN (%s) AND status = '%s'
+			GROUP BY inbound_id
+		) available_charge
+		ON c.id = available_charge.id `
+
+	query := fmt.Sprintf(
+		queryFormat,
+		strings.Join(inboundIDs, ", "),
+		entity.TranslateChargeStatus(entity.ApprovedStatusCharge),
+	)
+
+	rows, err := c.db.Conn().Query(query)
+	if err != nil {
+		return nil, momoError.Wrap(err).Input(inboundIDs).Scope(scope).DebuggingError()
+	}
+
+	charges := make([]*entity.Charge, 0)
+
+	for rows.Next() {
+		charge, err := c.scan(rows)
+		if err != nil {
+			return nil, err
+		}
+		charges = append(charges, charge)
+	}
+	return charges, nil
+}
+
 func (c *Charge) FilterCharges(filterChargesDto *chargeRepositoryDto.FilterChargesDto) ([]*entity.Charge, error) {
 	scope := "chargeRepository.Filter"
 

@@ -43,4 +43,36 @@ var (
 		InboundID: "12",
 		PackageID: "3",
 	}
+
+	charge6 = &chargeRepositoryDto.CreateDto{
+		Status:    entity.ApprovedStatusCharge,
+		UserID:    "f47ac10b-58cc-4372-a567-0e02b2c3d477",
+		Detail:    "hi",
+		InboundID: "15",
+		PackageID: "3",
+	}
+
+	charge7 = &chargeRepositoryDto.CreateDto{
+		Status:    entity.ApprovedStatusCharge,
+		UserID:    "f47ac10b-58cc-4372-a567-0e02b2c3d477",
+		Detail:    "hi",
+		InboundID: "15",
+		PackageID: "3",
+	}
+
+	charge8 = &chargeRepositoryDto.CreateDto{
+		Status:    entity.ApprovedStatusCharge,
+		UserID:    "f47ac10b-58cc-4372-a567-0e02b2c3d477",
+		Detail:    "hi",
+		InboundID: "15",
+		PackageID: "3",
+	}
+
+	charge9 = &chargeRepositoryDto.CreateDto{
+		Status:    entity.ApprovedStatusCharge,
+		UserID:    "f47ac10b-58cc-4372-a567-0e02b2c3d477",
+		Detail:    "hi",
+		InboundID: "16",
+		PackageID: "3",
+	}
 )

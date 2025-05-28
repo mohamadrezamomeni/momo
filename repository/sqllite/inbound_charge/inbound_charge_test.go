@@ -1,7 +1,6 @@
 package inboundcharge
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 	"testing"
@@ -65,7 +64,6 @@ func TestChargeInbound(t *testing.T) {
 	if chargeFound.Status != entity.AssignedCharged {
 		t.Fatalf("error to compare data charge status was wrong")
 	}
-	fmt.Println(inboundFound.Start, inboundFound.End)
 
 	yn, mn, dn := time.Now().Date()
 	yp, mp, dp := time.Now().AddDate(0, int(vpnPackage.Months), int(vpnPackage.Days)).Date()
