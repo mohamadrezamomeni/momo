@@ -285,4 +285,64 @@ var (
 		TrafficLimit: 50,
 		TrafficUsage: 0,
 	}
+
+	inbound19 = &inboundDto.CreateInbound{
+		Tag:          fmt.Sprintf("inbound-%s", port3),
+		Protocol:     "http",
+		Port:         port5,
+		Domain:       "yahoo.com",
+		UserID:       userID6,
+		VPNType:      entity.XRAY_VPN,
+		IsActive:     false,
+		IsBlock:      false,
+		Start:        time.Now().AddDate(0, -2, 0),
+		End:          time.Now().AddDate(0, 1, 0),
+		TrafficLimit: 50,
+		TrafficUsage: 51,
+	}
+
+	inbound20 = &inboundDto.CreateInbound{
+		Tag:          fmt.Sprintf("inbound-%s", port3),
+		Protocol:     "http",
+		Port:         port5,
+		Domain:       "yahoo.com",
+		UserID:       userID6,
+		VPNType:      entity.XRAY_VPN,
+		IsActive:     false,
+		IsBlock:      false,
+		Start:        time.Now().AddDate(0, -2, 0),
+		End:          time.Now().AddDate(0, -1, 0),
+		TrafficLimit: 50,
+		TrafficUsage: 2,
+	}
+
+	inbound21 = &inboundDto.CreateInbound{
+		Tag:          fmt.Sprintf("inbound-%s", port3),
+		Protocol:     "http",
+		Port:         port5,
+		Domain:       "yahoo.com",
+		UserID:       userID6,
+		VPNType:      entity.XRAY_VPN,
+		IsActive:     false,
+		IsBlock:      true,
+		Start:        time.Now().AddDate(0, -2, 0),
+		End:          time.Now().AddDate(0, -1, 0),
+		TrafficLimit: 50,
+		TrafficUsage: 2,
+	}
+
+	inbound22 = &inboundDto.CreateInbound{
+		Tag:          fmt.Sprintf("inbound-%s", port3),
+		Protocol:     "http",
+		Port:         port5,
+		Domain:       "yahoo.com",
+		UserID:       userID6,
+		VPNType:      entity.XRAY_VPN,
+		IsActive:     false,
+		IsBlock:      false,
+		Start:        time.Now().AddDate(0, -2, 0),
+		End:          time.Now().AddDate(0, 1, 0),
+		TrafficLimit: 50,
+		TrafficUsage: 2,
+	}
 )

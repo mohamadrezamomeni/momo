@@ -416,3 +416,25 @@ func TestIncreateTrafficUsage(t *testing.T) {
 		t.Fatalf("error to compare data")
 	}
 }
+
+func TestRetriveDeactivedInbounds(t *testing.T) {
+	defer inboundRepo.DeleteAll()
+
+	inboundRepo.Create(inbound19)
+	inboundRepo.Create(inbound20)
+	inboundRepo.Create(inbound21)
+	inboundCreated, _ := inboundRepo.Create(inbound22)
+
+	inbounds, err := inboundRepo.RetriveChargedInbounds()
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	if len(inbounds) != 1 {
+		t.Fatalf("we expected the lengh of inbound be 1 but we got %d", len(inbounds))
+	}
+
+	if inboundCreated.ID != inbounds[0].ID {
+		t.Fatalf("we expected the inbound that is returned be %s", strconv.Itoa(inboundCreated.ID))
+	}
+}
