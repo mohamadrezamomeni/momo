@@ -9,6 +9,8 @@ import (
 	inboundServiceDto "github.com/mohamadrezamomeni/momo/dto/service/inbound"
 
 	"github.com/google/uuid"
+
+	templategenerator "github.com/mohamadrezamomeni/momo/templates"
 )
 
 type Inbound struct {
@@ -102,4 +104,17 @@ func (i *Inbound) UpdateInbound(id string, inpt *inboundServiceDto.UpdateDto) er
 		return err
 	}
 	return nil
+}
+
+func (i *Inbound) GetClientConfig(id string) (string, error) {
+	inbound, err := i.inboundRepo.FindInboundByID(id)
+	if err != nil {
+		return "", err
+	}
+
+	template, err := templategenerator.LoadClientConfig(inbound.Domain, inbound.Port, inbound.UserID)
+	if err != nil {
+		return "", err
+	}
+	return template, nil
 }

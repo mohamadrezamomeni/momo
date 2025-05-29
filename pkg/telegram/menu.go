@@ -34,8 +34,13 @@ func MenuConfigMessage(telegramID string, user *entity.User) (*tgbotapi.MessageC
 		return nil, err
 	}
 
+	clienConfigRow, err := getClientConfigRow()
+	if err != nil {
+		return nil, err
+	}
+
 	if user != nil {
-		inlineKeyboard = append(inlineKeyboard, inboundRow, chargeRow)
+		inlineKeyboard = append(inlineKeyboard, inboundRow, clienConfigRow, chargeRow)
 	} else {
 		button := tgbotapi.NewInlineKeyboardButtonData("register", "/register")
 
@@ -47,6 +52,15 @@ func MenuConfigMessage(telegramID string, user *entity.User) (*tgbotapi.MessageC
 	msgConfig.ReplyMarkup = markup
 
 	return &msgConfig, nil
+}
+
+func getClientConfigRow() ([]tgbotapi.InlineKeyboardButton, error) {
+	titleGenerateClientConfig, err := telegrammessages.GetMessage("inbound.client_config_button", map[string]string{})
+	if err != nil {
+		return nil, err
+	}
+	generateClientConfig := tgbotapi.NewInlineKeyboardButtonData(titleGenerateClientConfig, "/generate_client_config")
+	return tgbotapi.NewInlineKeyboardRow(generateClientConfig), nil
 }
 
 func getInboundRow() ([]tgbotapi.InlineKeyboardButton, error) {

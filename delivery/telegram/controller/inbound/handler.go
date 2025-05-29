@@ -19,6 +19,7 @@ type InboundService interface {
 	Create(inpt *inboundServiceDto.CreateInbound) (*entity.Inbound, error)
 	FindInboundByID(string) (*entity.Inbound, error)
 	ExtendInbound(string, *inboundServiceDto.ExtendInboundDto) error
+	GetClientConfig(string) (string, error)
 }
 
 type UserService interface {

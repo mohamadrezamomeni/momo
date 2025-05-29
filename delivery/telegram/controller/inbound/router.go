@@ -23,4 +23,15 @@ func (h *Handler) SetRouter(telegramRouter *core.Router) {
 		h.AnswerSelectingInbound,
 		middleware.IdentifyUser(h.userSvc),
 	)
+
+	telegramRouter.Register("generate_client_config",
+		h.GetClientConfig,
+		middleware.IdentifyUser(h.userSvc),
+		h.SetStateGettingClientConfig,
+	)
+
+	telegramRouter.Register("render_client_config_buttoms",
+		h.RenderClientConfigButtons,
+		middleware.IdentifyUser(h.userSvc),
+	)
 }

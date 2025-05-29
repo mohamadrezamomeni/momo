@@ -17,8 +17,13 @@ root:
 inbound:
   list_buttom: 👀 See My VPNs
   create_buttom: 🚀 Create Your VPN
-
+  client_config_button: "👀 generate your client config"
   not_found: 🌐 You haven’t created a VPN yet — it would be our honor if you set one up!
+  client_config:
+    title_list_inbound: "inbound you will select must be ✅ in some situation your vpn is pending ⏳(isn't assigned to any server it will have been assigned soon) or your vpn is blocked ⛔ by admin you can communicate with admin about this subject"
+    client_config_item_block: "⛔ ID:  :ID: - :VPNType:"
+    client_config_item_pending: "⏳ ID:  :ID: - :VPNType:"
+    client_config_item_ok: "✅ ID:  :ID: - :VPNType:"
   list:
     inbounds_title: "<b>📊 VPN Report:</b>\n\n"
     inbound_traffic_used: "   🔄 Used: :traffic_used:MB / :traffic_limit:MB\n"
