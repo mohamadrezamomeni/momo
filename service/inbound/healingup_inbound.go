@@ -34,7 +34,7 @@ type VpnService interface {
 }
 
 type InboundChargeService interface {
-	ChargeInbound(*entity.Inbound, *entity.Charge) error
+	ChargeInbound(*entity.Charge) error
 }
 
 type ChargeService interface {
@@ -134,7 +134,7 @@ func (i *HealingUpInbound) healingUpExpiredInbound(inbound *entity.Inbound, vpnP
 	if err != nil {
 		return i.deActiveInbound(inbound, vpnProxy)
 	}
-	return i.inboundChargeSvc.ChargeInbound(inbound, charge)
+	return i.inboundChargeSvc.ChargeInbound(charge)
 }
 
 func (i *HealingUpInbound) deActiveInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) error {

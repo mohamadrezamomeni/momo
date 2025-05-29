@@ -160,6 +160,21 @@ func (i *MockInbound) RetriveDeactiveInboundsCharged() ([]*entity.Inbound, error
 	return inbounds, nil
 }
 
+func (i *MockInbound) RetriveChargedInbounds() ([]*entity.Inbound, error) {
+	inbounds := make([]*entity.Inbound, 0)
+	now := time.Now()
+	for _, inbound := range inbounds {
+		if inbound.TrafficLimit > inbound.TrafficUsage &&
+			inbound.IsActive == false &&
+			inbound.IsBlock == false &&
+			!now.Before(inbound.Start) &&
+			now.Before(inbound.End) {
+			inbounds = append(inbounds, inbound)
+		}
+	}
+	return inbounds, nil
+}
+
 func (i *MockInbound) FindInboundIsNotAssigned() ([]*entity.Inbound, error) {
 	result := make([]*entity.Inbound, 0)
 	for _, inbound := range i.inbounds {

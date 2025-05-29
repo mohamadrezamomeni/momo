@@ -272,10 +272,10 @@ func (i *Inbound) RetriveActiveInboundExpired() ([]*entity.Inbound, error) {
 	return i.getInboundsFromRows(rows)
 }
 
-func (i *Inbound) RetriveChargedInbounds() ([]*entity.Inbound, error) {
+func (i *Inbound) RetriveFinishedInbounds() ([]*entity.Inbound, error) {
 	scope := "inboundRepository.RetriveDeactivedInbounds"
 
-	query := "SELECT * FROM inbounds WHERE (is_active = false AND traffic_limit > traffic_usage AND is_block = false AND start <= $1 AND $2 < end)"
+	query := "SELECT * FROM inbounds WHERE (is_active = false AND is_block = false) AND (traffic_limit < traffic_usage   OR  $2 >= end)"
 
 	now := time.Now()
 	rows, err := i.db.Conn().Query(query, now, now)

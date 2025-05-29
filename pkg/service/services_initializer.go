@@ -58,7 +58,7 @@ func GetServices(cfg *config.Config) (
 	userSvc := userService.New(userRepo, cryptSvc, eventSvc)
 	authSvc := authService.New(userSvc, cryptSvc, &cfg.AuthConfig)
 	vpnPackageSvc := vpnPackageService.New(vpnPackageRepo)
-	inboundChargeSvc := inboundChargeService.New(inboundChargeRepo, vpnPackageSvc)
+	inboundChargeSvc := inboundChargeService.New(inboundChargeRepo, vpnPackageSvc, inboundRepo, chargeRepo)
 	chargeSvc := chargeService.New(eventSvc, chargeRepo)
 	inboundSvc := inboundService.New(inboundRepo)
 	healingUpInboundSvc := inboundService.NewHealingUpInbound(inboundRepo, vpnSvc, inboundChargeSvc, chargeSvc, userSvc)

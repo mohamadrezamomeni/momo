@@ -8,6 +8,6 @@ func New() *InboundChargeMock {
 	return &InboundChargeMock{}
 }
 
-func (ic *InboundChargeMock) ChargeInbound(_ *entity.Inbound, _ *entity.Charge) error {
+func (ic *InboundChargeMock) ChargeInbound(_ *entity.Charge) error {
 	return nil
 }

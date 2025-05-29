@@ -417,24 +417,28 @@ func TestIncreateTrafficUsage(t *testing.T) {
 	}
 }
 
-func TestRetriveDeactivedInbounds(t *testing.T) {
+func TestRetriveFinishedInbounds(t *testing.T) {
 	defer inboundRepo.DeleteAll()
 
-	inboundRepo.Create(inbound19)
-	inboundRepo.Create(inbound20)
+	inboundCreated1, _ := inboundRepo.Create(inbound19)
+	inboundCreated2, _ := inboundRepo.Create(inbound20)
 	inboundRepo.Create(inbound21)
-	inboundCreated, _ := inboundRepo.Create(inbound22)
+	inboundRepo.Create(inbound22)
 
-	inbounds, err := inboundRepo.RetriveChargedInbounds()
+	inbounds, err := inboundRepo.RetriveFinishedInbounds()
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
 	}
 
-	if len(inbounds) != 1 {
-		t.Fatalf("we expected the lengh of inbound be 1 but we got %d", len(inbounds))
+	if len(inbounds) != 2 {
+		t.Fatalf("we expected the lengh of inbound be 2 but we got %d", len(inbounds))
 	}
 
-	if inboundCreated.ID != inbounds[0].ID {
-		t.Fatalf("we expected the inbound that is returned be %s", strconv.Itoa(inboundCreated.ID))
+	if !(inboundCreated1.ID != inbounds[0].ID || inboundCreated1.ID != inbounds[1].ID) {
+		t.Fatalf("we expected the inbound that are returned contain %s", strconv.Itoa(inboundCreated1.ID))
+	}
+
+	if !(inboundCreated2.ID != inbounds[0].ID || inboundCreated2.ID != inbounds[1].ID) {
+		t.Fatalf("we expected the inbound that is returned contain %s", strconv.Itoa(inboundCreated2.ID))
 	}
 }
