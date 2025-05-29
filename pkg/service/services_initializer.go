@@ -36,6 +36,9 @@ func GetServices(cfg *config.Config) (
 	*vpnPackageService.VPNPackage,
 	*eventService.Event,
 	*chargeService.Charge,
+	*inboundService.HealingUpInbound,
+	*inboundService.HostInbound,
+	*inboundService.InboundTraffic,
 ) {
 	db := sqllite.New(&cfg.DB)
 	userRepo := userSqlite.New(db)
@@ -57,6 +60,20 @@ func GetServices(cfg *config.Config) (
 	vpnPackageSvc := vpnPackageService.New(vpnPackageRepo)
 	inboundChargeSvc := inboundChargeService.New(inboundChargeRepo, vpnPackageSvc)
 	chargeSvc := chargeService.New(eventSvc, chargeRepo)
-	inbouncSvc := inboundService.New(inboundRepo, vpnSvc, userSvc, hostSvc, chargeSvc, inboundChargeSvc)
-	return hostSvc, vpnSvc, userSvc, inbouncSvc, authSvc, cryptSvc, vpnPackageSvc, eventSvc, chargeSvc
+	inboundSvc := inboundService.New(inboundRepo)
+	healingUpInboundSvc := inboundService.NewHealingUpInbound(inboundRepo, vpnSvc, inboundChargeSvc, chargeSvc, userSvc)
+	hostInboundSvc := inboundService.NewHostInbound(inboundRepo, hostSvc)
+	inboundTrafficSvc := inboundService.NewInboundTraffic(inboundRepo, vpnSvc, userSvc)
+	return hostSvc,
+		vpnSvc,
+		userSvc,
+		inboundSvc,
+		authSvc,
+		cryptSvc,
+		vpnPackageSvc,
+		eventSvc,
+		chargeSvc,
+		healingUpInboundSvc,
+		hostInboundSvc,
+		inboundTrafficSvc
 }

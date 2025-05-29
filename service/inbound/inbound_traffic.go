@@ -8,7 +8,38 @@ import (
 	"github.com/mohamadrezamomeni/momo/entity"
 )
 
-func (i *Inbound) UpdateTraffics() {
+type InboundTraffic struct {
+	inboundRepo InboundTrafficRepository
+	vpnService  VpnTrafficService
+	userService UserTrafficService
+}
+
+type InboundTrafficRepository interface {
+	Filter(*inboundRepoDto.FilterInbound) ([]*entity.Inbound, error)
+	IncreaseTrafficUsage(string, uint32) error
+}
+
+type VpnTrafficService interface {
+	MakeProxy() (adapter.ProxyVPN, error)
+}
+
+type UserTrafficService interface {
+	FindByID(string) (*entity.User, error)
+}
+
+func NewInboundTraffic(
+	inboundTrafficRepository InboundTrafficRepository,
+	vpnTrafficService VpnTrafficService,
+	userService UserTrafficService,
+) *InboundTraffic {
+	return &InboundTraffic{
+		userService: userService,
+		vpnService:  vpnTrafficService,
+		inboundRepo: inboundTrafficRepository,
+	}
+}
+
+func (i *InboundTraffic) UpdateTraffics() {
 	active := true
 	inbounds, err := i.inboundRepo.Filter(&inboundRepoDto.FilterInbound{IsActive: &active})
 	if err != nil {
@@ -25,7 +56,7 @@ func (i *Inbound) UpdateTraffics() {
 	}
 }
 
-func (i *Inbound) updateTraffic(inbound *entity.Inbound, proxy adapter.ProxyVPN) {
+func (i *InboundTraffic) updateTraffic(inbound *entity.Inbound, proxy adapter.ProxyVPN) {
 	user, err := i.userService.FindByID(inbound.UserID)
 	if err != nil {
 		return

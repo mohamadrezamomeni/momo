@@ -8,7 +8,60 @@ import (
 	vpnProxy "github.com/mohamadrezamomeni/momo/proxy/vpn"
 )
 
-func (i *Inbound) HealingUpExpiredInbounds() {
+type HealingUpInbound struct {
+	inboundRepo      HealingUpInboundRepo
+	vpnService       VpnService
+	inboundChargeSvc InboundChargeService
+	chargeSvc        ChargeService
+	userService      UserService
+}
+
+type HealingUpInboundRepo interface {
+	RetriveActiveInboundBlocked() ([]*entity.Inbound, error)
+	RetriveActiveInboundExpired() ([]*entity.Inbound, error)
+	RetriveActiveInboundsOverQuota() ([]*entity.Inbound, error)
+	RetriveDeactiveInboundsCharged() ([]*entity.Inbound, error)
+	Active(id int) error
+	DeActive(id int) error
+}
+
+type UserService interface {
+	FindByID(string) (*entity.User, error)
+}
+
+type VpnService interface {
+	MakeProxy() (adapter.ProxyVPN, error)
+}
+
+type InboundChargeService interface {
+	ChargeInbound(*entity.Inbound, *entity.Charge) error
+}
+
+type ChargeService interface {
+	FindAvailbleCharge(string) (*entity.Charge, error)
+}
+
+type UserHealingUpService interface {
+	FindByID(string) (*entity.User, error)
+}
+
+func NewHealingUpInbound(
+	inboundRepo HealingUpInboundRepo,
+	vpnService VpnService,
+	inboundChargeSvc InboundChargeService,
+	chargeSvc ChargeService,
+	userService UserHealingUpService,
+) *HealingUpInbound {
+	return &HealingUpInbound{
+		inboundRepo:      inboundRepo,
+		vpnService:       vpnService,
+		inboundChargeSvc: inboundChargeSvc,
+		chargeSvc:        chargeSvc,
+		userService:      userService,
+	}
+}
+
+func (i *HealingUpInbound) HealingUpExpiredInbounds() {
 	inbounds, err := i.inboundRepo.RetriveActiveInboundExpired()
 	if err != nil {
 		return
@@ -23,7 +76,7 @@ func (i *Inbound) HealingUpExpiredInbounds() {
 	}
 }
 
-func (i *Inbound) HealingUpOverQuotedInbounds() {
+func (i *HealingUpInbound) HealingUpOverQuotedInbounds() {
 	inbounds, err := i.inboundRepo.RetriveActiveInboundsOverQuota()
 	if err != nil {
 		return
@@ -38,7 +91,7 @@ func (i *Inbound) HealingUpOverQuotedInbounds() {
 	}
 }
 
-func (i *Inbound) HealingUpBlockedInbounds() {
+func (i *HealingUpInbound) HealingUpBlockedInbounds() {
 	inbounds, err := i.inboundRepo.RetriveActiveInboundBlocked()
 	if err != nil {
 		return
@@ -46,7 +99,7 @@ func (i *Inbound) HealingUpBlockedInbounds() {
 	i.deactiveInbounds(inbounds)
 }
 
-func (i *Inbound) HealingUpChargedInbounds() {
+func (i *HealingUpInbound) HealingUpChargedInbounds() {
 	inbounds, err := i.inboundRepo.RetriveDeactiveInboundsCharged()
 	if err != nil {
 		return
@@ -54,7 +107,7 @@ func (i *Inbound) HealingUpChargedInbounds() {
 	i.activeInbounds(inbounds)
 }
 
-func (i *Inbound) activeInbounds(inbounds []*entity.Inbound) {
+func (i *HealingUpInbound) activeInbounds(inbounds []*entity.Inbound) {
 	proxy, err := i.vpnService.MakeProxy()
 	if err != nil {
 		return
@@ -65,7 +118,7 @@ func (i *Inbound) activeInbounds(inbounds []*entity.Inbound) {
 	}
 }
 
-func (i *Inbound) deactiveInbounds(inbounds []*entity.Inbound) {
+func (i *HealingUpInbound) deactiveInbounds(inbounds []*entity.Inbound) {
 	proxy, err := i.vpnService.MakeProxy()
 	if err != nil {
 		return
@@ -76,7 +129,7 @@ func (i *Inbound) deactiveInbounds(inbounds []*entity.Inbound) {
 	}
 }
 
-func (i *Inbound) healingUpExpiredInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) error {
+func (i *HealingUpInbound) healingUpExpiredInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) error {
 	charge, err := i.chargeSvc.FindAvailbleCharge(strconv.Itoa(inbound.ID))
 	if err != nil {
 		return i.deActiveInbound(inbound, vpnProxy)
@@ -84,7 +137,7 @@ func (i *Inbound) healingUpExpiredInbound(inbound *entity.Inbound, vpnProxy vpnP
 	return i.inboundChargeSvc.ChargeInbound(inbound, charge)
 }
 
-func (i *Inbound) deActiveInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) error {
+func (i *HealingUpInbound) deActiveInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) error {
 	user, err := i.userService.FindByID(inbound.UserID)
 	if err != nil {
 		return err
@@ -99,7 +152,7 @@ func (i *Inbound) deActiveInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IPr
 	return i.inboundRepo.DeActive(inbound.ID)
 }
 
-func (i *Inbound) activeInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) error {
+func (i *HealingUpInbound) activeInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) error {
 	user, err := i.userService.FindByID(inbound.UserID)
 	if err != nil {
 		return err

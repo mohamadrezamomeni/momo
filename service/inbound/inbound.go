@@ -3,7 +3,6 @@ package inbound
 import (
 	"fmt"
 
-	"github.com/mohamadrezamomeni/momo/adapter"
 	"github.com/mohamadrezamomeni/momo/entity"
 
 	inboundRepoDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
@@ -13,71 +12,23 @@ import (
 )
 
 type Inbound struct {
-	inboundRepo      InboundRepo
-	vpnService       VpnService
-	userService      UserService
-	hostService      HostService
-	chargeSvc        ChargeService
-	inboundChargeSvc InboundChargeService
-}
-
-type VpnService interface {
-	MakeProxy() (adapter.ProxyVPN, error)
-}
-
-type UserService interface {
-	FindByID(string) (*entity.User, error)
+	inboundRepo InboundRepo
 }
 
 type InboundRepo interface {
-	IncreaseTrafficUsage(string, uint32) error
 	Update(string, *inboundRepoDto.UpdateInboundDto) error
 	FindInboundByID(id string) (*entity.Inbound, error)
-	UpdateDomainPort(int, string, string) error
 	ChangeBlockState(string, bool) error
-	RetriveActiveInboundBlocked() ([]*entity.Inbound, error)
-	RetriveActiveInboundExpired() ([]*entity.Inbound, error)
-	RetriveActiveInboundsOverQuota() ([]*entity.Inbound, error)
-	RetriveDeactiveInboundsCharged() ([]*entity.Inbound, error)
-	Active(id int) error
 	Filter(*inboundRepoDto.FilterInbound) ([]*entity.Inbound, error)
-	DeActive(id int) error
 	Create(*inboundRepoDto.CreateInbound) (*entity.Inbound, error)
-	FindInboundIsNotAssigned() ([]*entity.Inbound, error)
-	GetListOfPortsByDomain() ([]struct {
-		Domain string
-		Ports  []string
-	}, error)
 	ExtendInbound(string, *inboundRepoDto.ExtendInboundDto) error
-}
-
-type HostService interface {
-	ResolveHostPortPair(map[string][]string, int) ([][2]string, error)
-}
-
-type ChargeService interface {
-	FindAvailbleCharge(string) (*entity.Charge, error)
-}
-
-type InboundChargeService interface {
-	ChargeInbound(*entity.Inbound, *entity.Charge) error
 }
 
 func New(
 	repo InboundRepo,
-	vpnService VpnService,
-	userService UserService,
-	hostService HostService,
-	chargeService ChargeService,
-	inboundChargeService InboundChargeService,
 ) *Inbound {
 	return &Inbound{
-		inboundRepo:      repo,
-		vpnService:       vpnService,
-		userService:      userService,
-		hostService:      hostService,
-		chargeSvc:        chargeService,
-		inboundChargeSvc: inboundChargeService,
+		inboundRepo: repo,
 	}
 }
 

@@ -8,20 +8,28 @@ import (
 )
 
 type Scheduler struct {
-	inboundSvc      InboundService
-	vpnSvc          VPNService
-	hostSvc         HostService
-	sch             *gocron.Scheduler
-	notificationSvc NotificationService
+	healingUpInboundSvc HealingUpInboundService
+	inboundTrafficSvc   InboundTrafficService
+	hostInboundSvc      HostInboundService
+	vpnSvc              VPNService
+	hostSvc             HostService
+	sch                 *gocron.Scheduler
+	notificationSvc     NotificationService
 }
 
-type InboundService interface {
+type HealingUpInboundService interface {
 	HealingUpExpiredInbounds()
 	HealingUpOverQuotedInbounds()
 	HealingUpBlockedInbounds()
 	HealingUpChargedInbounds()
-	AssignDomainToInbounds()
+}
+
+type InboundTrafficService interface {
 	UpdateTraffics()
+}
+
+type HostInboundService interface {
+	AssignDomainToInbounds()
 }
 
 type NotificationService interface {
@@ -37,17 +45,21 @@ type HostService interface {
 }
 
 func New(
-	inboundSvc InboundService,
+	healingUpInboundSvc HealingUpInboundService,
+	inboundTrafficSvc InboundTrafficService,
+	hostInboundSvc HostInboundService,
 	vpnSvc VPNService,
 	hostSvc HostService,
 	notificationSvc NotificationService,
 ) *Scheduler {
 	return &Scheduler{
-		inboundSvc:      inboundSvc,
-		vpnSvc:          vpnSvc,
-		hostSvc:         hostSvc,
-		sch:             gocron.NewScheduler(time.UTC),
-		notificationSvc: notificationSvc,
+		healingUpInboundSvc: healingUpInboundSvc,
+		inboundTrafficSvc:   inboundTrafficSvc,
+		hostInboundSvc:      hostInboundSvc,
+		vpnSvc:              vpnSvc,
+		hostSvc:             hostSvc,
+		sch:                 gocron.NewScheduler(time.UTC),
+		notificationSvc:     notificationSvc,
 	}
 }
 
@@ -55,12 +67,12 @@ func (s *Scheduler) Start(done <-chan struct{}, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	s.sch.Cron("*/1 * * * *").Do(s.notificationSvc.NotifyEvents)
-	s.sch.Cron("*/10 * * * *").Do(s.inboundSvc.HealingUpExpiredInbounds)
-	s.sch.Cron("*/10 * * * *").Do(s.inboundSvc.HealingUpOverQuotedInbounds)
-	s.sch.Cron("*/10 * * * *").Do(s.inboundSvc.HealingUpBlockedInbounds)
-	s.sch.Cron("*/10 * * * *").Do(s.inboundSvc.HealingUpChargedInbounds)
-	s.sch.Cron("*/5 * * * *").Do(s.inboundSvc.AssignDomainToInbounds)
-	s.sch.Cron("*/1 * * * *").Do(s.inboundSvc.UpdateTraffics)
+	s.sch.Cron("*/10 * * * *").Do(s.healingUpInboundSvc.HealingUpExpiredInbounds)
+	s.sch.Cron("*/10 * * * *").Do(s.healingUpInboundSvc.HealingUpOverQuotedInbounds)
+	s.sch.Cron("*/10 * * * *").Do(s.healingUpInboundSvc.HealingUpBlockedInbounds)
+	s.sch.Cron("*/10 * * * *").Do(s.healingUpInboundSvc.HealingUpChargedInbounds)
+	s.sch.Cron("*/5 * * * *").Do(s.hostInboundSvc.AssignDomainToInbounds)
+	s.sch.Cron("*/1 * * * *").Do(s.inboundTrafficSvc.UpdateTraffics)
 	s.sch.Cron("*/2 * * * *").Do(s.vpnSvc.MonitorVPNs)
 	s.sch.Cron("*/2 * * * *").Do(s.hostSvc.MonitorHosts)
 	s.sch.StartAsync()

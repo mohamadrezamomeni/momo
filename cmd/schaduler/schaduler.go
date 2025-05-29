@@ -32,7 +32,7 @@ func main() {
 
 	migration.UP()
 
-	hostSvc, vpnSvc, userSvc, inboundSvc, _, _, _, eventSvc, chargeSvc := serviceInitializer.GetServices(&cfg)
+	hostSvc, vpnSvc, userSvc, inboundSvc, _, _, _, eventSvc, chargeSvc, healingUpInbound, hostInboundSvc, inboundTrafficSvc := serviceInitializer.GetServices(&cfg)
 
 	notification := notification.New(&cfg.Notification, inboundSvc, userSvc, chargeSvc, eventSvc)
 
@@ -44,7 +44,7 @@ func main() {
 
 	go func() {
 		wg.Add(1)
-		scheduler := scheduler.New(inboundSvc, vpnSvc, hostSvc, notification)
+		scheduler := scheduler.New(healingUpInbound, inboundTrafficSvc, hostInboundSvc, vpnSvc, hostSvc, notification)
 		scheduler.Start(done, &wg)
 	}()
 

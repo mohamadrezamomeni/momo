@@ -15,26 +15,28 @@ import (
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
 
-func registerInboundSvc() (*Inbound, *inboundRepository.MockInbound, *vpnService.MockVPN) {
+func registerInboundSvc() (*Inbound, *HostInbound, *HealingUpInbound, *inboundRepository.MockInbound, *vpnService.MockVPN) {
 	inboundRepo := inboundRepository.New()
-	userSvc := userService.New()
 	hostSvc := hostService.New()
 	vpnSvc := vpnService.New()
-	chargeSvc := chargeService.New()
-	inboundChargeSvc := inboundChargeService.New()
 
-	inboundSvc := New(inboundRepo, vpnSvc, userSvc, hostSvc, chargeSvc, inboundChargeSvc)
-	return inboundSvc, inboundRepo, vpnSvc
+	inboundSvc := New(inboundRepo)
+	inboundChargeSvc := inboundChargeService.New()
+	inboundHostSvc := NewHostInbound(inboundRepo, hostSvc)
+	userSvc := userService.New()
+	chargeSvc := chargeService.New()
+	healingUpInboundSvc := NewHealingUpInbound(inboundRepo, vpnSvc, inboundChargeSvc, chargeSvc, userSvc)
+	return inboundSvc, inboundHostSvc, healingUpInboundSvc, inboundRepo, vpnSvc
 }
 
 func TestApplyDomainAndPortToInbounds(t *testing.T) {
-	inboundSvc, inboundRepo, _ := registerInboundSvc()
+	_, inboundHostSvc, _, inboundRepo, _ := registerInboundSvc()
 
 	inboundCreated1, _ := inboundRepo.Create(inbound1)
 	inboundCreated2, _ := inboundRepo.Create(inbound2)
 	inboundCreated3, _ := inboundRepo.Create(inbound3)
 
-	inboundSvc.AssignDomainToInbounds()
+	inboundHostSvc.AssignDomainToInbounds()
 
 	ret1, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated1.ID))
 	ret2, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated2.ID))
@@ -60,14 +62,14 @@ func ReadPrivateField(obj interface{}, fieldName string) interface{} {
 }
 
 func TestHealingUpInbounds(t *testing.T) {
-	inboundSvc, inboundRepo, vpnSvc := registerInboundSvc()
+	_, _, healingUpInboundSvc, inboundRepo, vpnSvc := registerInboundSvc()
 
 	proxy, _ := vpnSvc.MakeProxy()
 
 	ret1, _ := inboundRepo.Create(inbound4)
 	ret2, _ := inboundRepo.Create(inbound5)
 	ret3, _ := inboundRepo.Create(inbound6)
-	inboundSvc.activeInbound(ret1, proxy)
+	healingUpInboundSvc.activeInbound(ret1, proxy)
 
 	inboundEnableInpt := utils.ReadPrivateField(proxy, "addInboundData")
 	disableInpt := utils.ReadPrivateField(proxy, "disableInboundData")
@@ -78,7 +80,7 @@ func TestHealingUpInbounds(t *testing.T) {
 	}
 	proxy.Close()
 
-	inboundSvc.deActiveInbound(ret2, proxy)
+	healingUpInboundSvc.deActiveInbound(ret2, proxy)
 
 	inboundEnableInpt = utils.ReadPrivateField(proxy, "addInboundData")
 	disableInpt = utils.ReadPrivateField(proxy, "disableInboundData")
@@ -90,7 +92,7 @@ func TestHealingUpInbounds(t *testing.T) {
 
 	proxy.Close()
 
-	inboundSvc.deActiveInbound(ret3, proxy)
+	healingUpInboundSvc.deActiveInbound(ret3, proxy)
 
 	inboundEnableInpt = utils.ReadPrivateField(proxy, "addInboundData")
 	disableInpt = utils.ReadPrivateField(proxy, "disableInboundData")
