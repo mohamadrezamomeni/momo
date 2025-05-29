@@ -3,13 +3,11 @@ package inbound
 import (
 	"fmt"
 
-	"github.com/mohamadrezamomeni/momo/entity"
-
+	"github.com/google/uuid"
 	inboundRepoDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
 	inboundServiceDto "github.com/mohamadrezamomeni/momo/dto/service/inbound"
-
-	"github.com/google/uuid"
-
+	"github.com/mohamadrezamomeni/momo/entity"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 	templategenerator "github.com/mohamadrezamomeni/momo/templates"
 )
 
@@ -107,11 +105,16 @@ func (i *Inbound) UpdateInbound(id string, inpt *inboundServiceDto.UpdateDto) er
 }
 
 func (i *Inbound) GetClientConfig(id string) (string, error) {
+	scope := "inboundService.GetClientConfig"
+
 	inbound, err := i.inboundRepo.FindInboundByID(id)
 	if err != nil {
 		return "", err
 	}
 
+	if inbound.IsBlock || !inbound.IsAssigned {
+		return "", momoError.Scope(scope).Forbidden().ErrorWrite()
+	}
 	template, err := templategenerator.LoadClientConfig(inbound.Domain, inbound.Port, inbound.UserID)
 	if err != nil {
 		return "", err

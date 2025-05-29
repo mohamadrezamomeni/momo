@@ -4,6 +4,8 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/mohamadrezamomeni/momo/delivery/telegram/core"
 	telegramState "github.com/mohamadrezamomeni/momo/delivery/telegram/state"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
+	telegrammessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
 
@@ -33,9 +35,23 @@ func (h *Handler) GetClientConfig(update *core.Update) (*core.ResponseHandlerFun
 	if err != nil {
 		return nil, err
 	}
+	errorTitle, err := telegrammessages.GetMessage("inbound.client_config.worng_button_selected", map[string]string{})
+	if err != nil {
+		return nil, err
+	}
 
 	template, err := h.inboundSvc.GetClientConfig(inboundID)
-	if err != nil {
+
+	if momoErr, ok := momoError.GetMomoError(err); ok && momoErr.GetErrorType() == momoError.Forbidden {
+		msgConfig := tgbotapi.NewMessage(telegramID, errorTitle)
+
+		return &core.ResponseHandlerFunc{
+			MessageConfig: &msgConfig,
+			ReleaseState:  true,
+			RedirectRoot:  true,
+			MenuTab:       true,
+		}, nil
+	} else if err != nil {
 		return nil, err
 	}
 
