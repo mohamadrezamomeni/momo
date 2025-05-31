@@ -16,7 +16,7 @@ func (h *Handler) AskSelectingVPNType(update *core.Update) (*core.ResponseHandle
 		return nil, err
 	}
 
-	markup := h.getVPNTypeButtoms()
+	markup := h.getVPNTypeButtons()
 
 	id, err := utils.ConvertToInt64(idStr)
 	if err != nil {
@@ -40,7 +40,7 @@ func (h *Handler) AskSelectingVPNType(update *core.Update) (*core.ResponseHandle
 	}, nil
 }
 
-func (h *Handler) getVPNTypeButtoms() tgbotapi.InlineKeyboardMarkup {
+func (h *Handler) getVPNTypeButtons() tgbotapi.InlineKeyboardMarkup {
 	xray := tgbotapi.NewInlineKeyboardButtonData(
 		entity.VPNTypeString(entity.XRAY_VPN), entity.VPNTypeString(entity.XRAY_VPN),
 	)

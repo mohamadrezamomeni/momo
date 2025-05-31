@@ -64,27 +64,27 @@ func getClientConfigRow() ([]tgbotapi.InlineKeyboardButton, error) {
 }
 
 func getInboundRow() ([]tgbotapi.InlineKeyboardButton, error) {
-	titleListVPNs, err := telegrammessages.GetMessage("inbound.list_buttom", map[string]string{})
+	titleListVPNs, err := telegrammessages.GetMessage("inbound.list_button", map[string]string{})
 	if err != nil {
 		return nil, err
 	}
 
-	titleCreateVPN, err := telegrammessages.GetMessage("inbound.create_buttom", map[string]string{})
+	titleCreateVPN, err := telegrammessages.GetMessage("inbound.create_button", map[string]string{})
 	if err != nil {
 		return nil, err
 	}
 
-	listInboundsButtom := tgbotapi.NewInlineKeyboardButtonData(titleListVPNs, "/list_inbounds")
-	createInboundsButtom := tgbotapi.NewInlineKeyboardButtonData(titleCreateVPN, "/create_inbound")
-	return tgbotapi.NewInlineKeyboardRow(listInboundsButtom, createInboundsButtom), nil
+	listInboundsButton := tgbotapi.NewInlineKeyboardButtonData(titleListVPNs, "/list_inbounds")
+	createInboundsButton := tgbotapi.NewInlineKeyboardButtonData(titleCreateVPN, "/create_inbound")
+	return tgbotapi.NewInlineKeyboardRow(listInboundsButton, createInboundsButton), nil
 }
 
 func getChargeRow() ([]tgbotapi.InlineKeyboardButton, error) {
-	titleCreateCharge, err := telegrammessages.GetMessage("charge.extend_buttom", map[string]string{})
+	titleCreateCharge, err := telegrammessages.GetMessage("charge.extend_button", map[string]string{})
 	if err != nil {
 		return nil, err
 	}
 
-	createChargeButtom := tgbotapi.NewInlineKeyboardButtonData(titleCreateCharge, "/create_charge")
-	return tgbotapi.NewInlineKeyboardRow(createChargeButtom), nil
+	createChargeButton := tgbotapi.NewInlineKeyboardButtonData(titleCreateCharge, "/create_charge")
+	return tgbotapi.NewInlineKeyboardRow(createChargeButton), nil
 }

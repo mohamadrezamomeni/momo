@@ -48,17 +48,17 @@ func (t *Telegram) getCommands() ([]tgbotapi.BotCommand, error) {
 		return nil, err
 	}
 
-	listVPNsTitle, err := telegrammessages.GetMessage("inbound.list_buttom", map[string]string{})
+	listVPNsTitle, err := telegrammessages.GetMessage("inbound.list_button", map[string]string{})
 	if err != nil {
 		return nil, err
 	}
 
-	createVPNTitle, err := telegrammessages.GetMessage("inbound.create_buttom", map[string]string{})
+	createVPNTitle, err := telegrammessages.GetMessage("inbound.create_button", map[string]string{})
 	if err != nil {
 		return nil, err
 	}
 
-	createChargeTitle, err := telegrammessages.GetMessage("charge.extend_buttom", map[string]string{})
+	createChargeTitle, err := telegrammessages.GetMessage("charge.extend_button", map[string]string{})
 	if err != nil {
 		return nil, err
 	}

@@ -30,7 +30,7 @@ func (h *Handler) SetRouter(telegramRouter *core.Router) {
 		h.SetStateGettingClientConfig,
 	)
 
-	telegramRouter.Register("render_client_config_buttoms",
+	telegramRouter.Register("render_client_config_buttons",
 		h.RenderClientConfigButtons,
 		middleware.IdentifyUser(h.userSvc),
 	)

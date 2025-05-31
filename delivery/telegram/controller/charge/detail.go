@@ -10,7 +10,7 @@ import (
 )
 
 func (h *Handler) AskDetail(update *core.Update) (*core.ResponseHandlerFunc, error) {
-	message, err := telegrammessages.GetMessage("charge.detail_buttom", map[string]string{})
+	message, err := telegrammessages.GetMessage("charge.detail_button", map[string]string{})
 	if err != nil {
 		return nil, err
 	}

@@ -39,7 +39,7 @@ func (h *Handler) AskSelectingInbound(update *core.Update) (*core.ResponseHandle
 	var rows [][]tgbotapi.InlineKeyboardButton
 
 	for _, inbound := range inbounds {
-		button, err := h.makeExtendingInboundButtom(inbound)
+		button, err := h.makeExtendingInboundButton(inbound)
 		if err != nil {
 			return nil, err
 		}
@@ -54,7 +54,7 @@ func (h *Handler) AskSelectingInbound(update *core.Update) (*core.ResponseHandle
 	}, nil
 }
 
-func (h *Handler) makeExtendingInboundButtom(inbound *entity.Inbound) (*tgbotapi.InlineKeyboardButton, error) {
+func (h *Handler) makeExtendingInboundButton(inbound *entity.Inbound) (*tgbotapi.InlineKeyboardButton, error) {
 	itemTtitle, err := telegrammessages.GetMessage("inbound.select_vpn.item", map[string]string{
 		"VPNType": entity.VPNTypeString(inbound.VPNType),
 		"ID":      strconv.Itoa(inbound.ID),

@@ -4,7 +4,7 @@ error:
   internal_error: 😕 Oops! Something went wrong. Let the admin know so we can fix it.
   forbidden_access: 🙏 Sorry, access is pending admin approval. Please be patient!
 auth:
-  username_buttom: 📝 Please enter your username. This username may be used on the platform in the future.
+  username_button: 📝 Please enter your username. This username may be used on the platform in the future.
   approve_user: 🎉 You're already approved by admin.
   registeration:
     duplicate_register: 🎉 You're already registered! No need to do it again.
@@ -12,11 +12,11 @@ auth:
     successfully_registeration: "😊 You're welcome! Here is your information:\n  username: :username:\n⏳ Please wait while an admin approves your request! in the next 4 hour we will have sent you a message"
 root:
   menu: 😊 Where would you like to go next?
-  menu_buttom: menu
+  menu_button: menu
 
 inbound:
-  list_buttom: 👀 See My VPNs
-  create_buttom: 🚀 Create Your VPN
+  list_button: 👀 See My VPNs
+  create_button: 🚀 Create Your VPN
   client_config_button: "👀 generate your client config"
   not_found: 🌐 You haven’t created a VPN yet — it would be our honor if you set one up!
   client_config:
@@ -42,7 +42,7 @@ inbound:
 
 vpn_package:
   not_found_package: unforunetly admin haven't introduced any packages please wait admin will do that
-  package_buttom: "📶 10GB ⏳ :timeDuration: 💵 :price:"
+  package_button: "📶 10GB ⏳ :timeDuration: 💵 :price:"
   ask_selecting_package: "😊 please choose your desire package "
   one_month: "1 month"
   many_months: ":count: months"
@@ -53,8 +53,8 @@ vpn:
   select_vpn: 📝 select your desire vpn
 
 charge:
-  extend_buttom: 📶 Extend your VPN now!
-  detail_buttom: 📝 write your detail of payment
+  extend_button: 📶 Extend your VPN now!
+  detail_button: 📝 write your detail of payment
   successfully_extending: 🎉 Your VPN has been extended
 
   approve_charge_admin: "🌟 Great News! 🌟 \n Your charge #:id: has been approved by the admin ✅ \n Thank you for your patience and trust. \n We're happy to have you with us! 💙"

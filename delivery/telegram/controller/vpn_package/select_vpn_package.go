@@ -72,7 +72,7 @@ func (h *Handler) getPackageButton(pkg *entity.VPNPackage) (*tgbotapi.InlineKeyb
 		return nil, err
 	}
 
-	titlePkg, err := telegrammessages.GetMessage("vpn_package.package_buttom", map[string]string{
+	titlePkg, err := telegrammessages.GetMessage("vpn_package.package_button", map[string]string{
 		"timeDuration": titleDuration,
 		"price":        pkg.PriceTitle,
 	})

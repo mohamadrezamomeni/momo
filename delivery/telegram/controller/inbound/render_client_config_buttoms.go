@@ -34,7 +34,7 @@ func (h *Handler) RenderClientConfigButtons(update *core.Update) (*core.Response
 	var rows [][]tgbotapi.InlineKeyboardButton
 
 	for _, inbound := range inbounds {
-		button, err := h.renderClientConfigButtom(inbound)
+		button, err := h.renderClientConfigButton(inbound)
 		if err != nil {
 			return nil, err
 		}
@@ -49,7 +49,7 @@ func (h *Handler) RenderClientConfigButtons(update *core.Update) (*core.Response
 	}, nil
 }
 
-func (h *Handler) renderClientConfigButtom(inbound *entity.Inbound) (*tgbotapi.InlineKeyboardButton, error) {
+func (h *Handler) renderClientConfigButton(inbound *entity.Inbound) (*tgbotapi.InlineKeyboardButton, error) {
 	blockedTitle, err := telegrammessages.GetMessage("inbound.client_config.client_config_item_block", map[string]string{
 		"VPNType": entity.VPNTypeString(inbound.VPNType),
 		"ID":      strconv.Itoa(inbound.ID),

@@ -18,7 +18,7 @@ func (h *Handler) SetStateGettingClientConfig(next core.HandlerFunc) core.Handle
 		_, isExist := telegramState.FindState(idStr)
 		if !isExist {
 			telegramState.NewState(idStr,
-				"render_client_config_buttoms",
+				"render_client_config_buttons",
 				"generate_client_config",
 			)
 			return nil, nil

@@ -69,13 +69,13 @@ func (r *Router) enrichKeyboardMarkup(replyMarkup interface{}) interface{} {
 		return replyMarkup
 	}
 
-	menuButtomText, err := telegrammessages.GetMessage("root.menu_buttom", map[string]string{})
+	menuButtonText, err := telegrammessages.GetMessage("root.menu_button", map[string]string{})
 	if err != nil {
-		menuButtomText = "menu"
+		menuButtonText = "menu"
 	}
 
 	menu := tgbotapi.NewInlineKeyboardButtonData(
-		menuButtomText, "/menu",
+		menuButtonText, "/menu",
 	)
 	row := tgbotapi.NewInlineKeyboardRow(menu)
 	inlineKeyboardMarkup.InlineKeyboard = append(inlineKeyboardMarkup.InlineKeyboard, row)

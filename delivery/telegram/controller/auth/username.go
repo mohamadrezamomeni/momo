@@ -14,7 +14,7 @@ func (h *Handler) AskUsername(update *core.Update) (*core.ResponseHandlerFunc, e
 		return nil, err
 	}
 
-	usernameButtomText, err := telegrammessages.GetMessage("auth.username_buttom", map[string]string{})
+	usernameButtonText, err := telegrammessages.GetMessage("auth.username_button", map[string]string{})
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func (h *Handler) AskUsername(update *core.Update) (*core.ResponseHandlerFunc, e
 		return nil, err
 	}
 
-	msgConfig := tgbotapi.NewMessage(id, usernameButtomText)
+	msgConfig := tgbotapi.NewMessage(id, usernameButtonText)
 
 	return &core.ResponseHandlerFunc{
 		MessageConfig: &msgConfig,
