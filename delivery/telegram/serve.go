@@ -85,6 +85,8 @@ func (t *Telegram) Serve() {
 			Update: &update,
 		}
 
+		t.setMenu(customUpdate)
+
 		res, err := t.core.Route(customUpdate)
 		if err != nil {
 			t.sendError(customUpdate)

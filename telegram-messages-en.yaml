@@ -21,7 +21,7 @@ inbound:
   not_found: 🌐 You haven’t created a VPN yet — it would be our honor if you set one up!
   client_config:
     worng_button_selected: "the input you have selected is not active you can get a config that is active 😊"
-    title_list_inbound: "inbound you will select must be ✅ in some situation your vpn is pending ⏳(isn't assigned to any server it will have been assigned soon) or your vpn is blocked ⛔ by admin you can communicate with admin about this subject"
+    title_list_inbound: "inbound you will select must be ✅ in some situation your vpn is pending ⏳(isn't assigned to any server in the next 15 minutes it will have been assigned soon) or your vpn is blocked ⛔ by admin you can communicate with admin about this subject"
     client_config_item_block: "⛔ ID:  :ID: - :VPNType:"
     client_config_item_pending: "⏳ ID:  :ID: - :VPNType:"
     client_config_item_ok: "✅ ID:  :ID: - :VPNType:"
