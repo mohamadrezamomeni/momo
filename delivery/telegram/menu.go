@@ -3,7 +3,6 @@ package telegram
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/mohamadrezamomeni/momo/delivery/telegram/core"
-	"github.com/mohamadrezamomeni/momo/entity"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 	telegrammessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
@@ -19,29 +18,15 @@ func (t *Telegram) setMenu(update *core.Update) error {
 
 	id, err := utils.ConvertToInt64(idStr)
 
-	commands := []tgbotapi.BotCommand{}
+	commands, err := t.getCommands()
+	if err != nil {
+		return err
+	}
 
 	user, _ := t.userSvc.FindByTelegramID(idStr)
 
-	if user != nil && user.IsApproved {
-		commands = []tgbotapi.BotCommand{
-			{
-				Command:     "generate_client_config",
-				Description: "👀 generate your client config",
-			},
-			{
-				Command:     "list_inbounds",
-				Description: "👀 See My VPNs",
-			},
-			{
-				Command:     "create_inbound",
-				Description: "🚀 Create Your VPN",
-			},
-			{
-				Command:     "create_charge",
-				Description: "📶 Extend your VPN now!",
-			},
-		}
+	if user == nil {
+		commands = []tgbotapi.BotCommand{}
 	}
 
 	s := tgbotapi.NewBotCommandScopeChat(id)
@@ -57,7 +42,7 @@ func (t *Telegram) setMenu(update *core.Update) error {
 	return nil
 }
 
-func GetCommands(user *entity.User) ([]tgbotapi.BotCommand, error) {
+func (t *Telegram) getCommands() ([]tgbotapi.BotCommand, error) {
 	GenerateClientConfigTitle, err := telegrammessages.GetMessage("inbound.client_config_button", map[string]string{})
 	if err != nil {
 		return nil, err

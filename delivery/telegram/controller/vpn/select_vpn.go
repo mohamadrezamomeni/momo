@@ -37,7 +37,6 @@ func (h *Handler) AskSelectingVPNType(update *core.Update) (*core.ResponseHandle
 
 	return &core.ResponseHandlerFunc{
 		MessageConfig: &msgConfig,
-		MenuTab:       true,
 	}, nil
 }
 
