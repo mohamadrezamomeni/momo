@@ -115,7 +115,7 @@ func (i *Inbound) GetClientConfig(id string) (string, error) {
 	if inbound.IsBlock || !inbound.IsAssigned {
 		return "", momoError.Scope(scope).Forbidden().ErrorWrite()
 	}
-	template, err := templategenerator.LoadClientConfig(inbound.Domain, inbound.Port, inbound.UserID)
+	template, err := templategenerator.LoadClientConfig(inbound.VPNType, inbound.Domain, inbound.Port, inbound.UserID)
 	if err != nil {
 		return "", err
 	}

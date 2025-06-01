@@ -6,6 +6,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/mohamadrezamomeni/momo/entity"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
@@ -22,10 +23,10 @@ func getFilename(name string) (string, error) {
 	return path, nil
 }
 
-func LoadClientConfig(domain string, port string, userID string) (string, error) {
+func LoadClientConfig(vpnType entity.VPNType, domain string, port string, userID string) (string, error) {
 	scope := "template.LoadClientConfig"
 
-	path, err := getFilename("client_config")
+	path, err := getFilename(fmt.Sprintf("%s_client_config", entity.VPNTypeString(vpnType)))
 	if err != nil {
 		return "", err
 	}
