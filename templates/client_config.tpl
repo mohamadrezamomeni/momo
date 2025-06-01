@@ -30,13 +30,6 @@
                         ]
                     }
                 ]
-            },
-            "streamSettings": {
-                "network": "tcp",
-                "security": "tls",
-                "tlsSettings": {
-                    "allowInsecure": true
-                }
             }
         },
         {
