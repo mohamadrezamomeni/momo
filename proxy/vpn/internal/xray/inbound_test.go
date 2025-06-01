@@ -7,18 +7,6 @@ import (
 	"github.com/mohamadrezamomeni/momo/proxy/vpn/internal/xray/dto"
 )
 
-var (
-	protocolInbound string = "vmess"
-	portInbound     string = "1081"
-	tagInbound      string = "inbound-1081"
-
-	usernameInbound string = "mohamadian"
-	levelInbound    string = "0"
-	uuidInbound     string = "0393ed06-29bb-41c2-b3f4-6382a6729c3e"
-
-	inboundDoesntExist string = "inbound-1083"
-)
-
 func TestAddInbound(t *testing.T) {
 	_, err := xrayU.addInbound(&dto.AddInbound{
 		Port:     portInbound,
