@@ -29,8 +29,6 @@ func ConvertStringVPNTypeToEnum(key string) int {
 	switch key {
 	case "xray":
 		return XRAY_VPN
-	case "":
-		return 0
 	default:
 		return UknownVPNType
 	}
