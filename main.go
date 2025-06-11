@@ -19,6 +19,7 @@ import (
 	inboundValidator "github.com/mohamadrezamomeni/momo/validator/inbound"
 	userValidator "github.com/mohamadrezamomeni/momo/validator/user"
 	vpnValidator "github.com/mohamadrezamomeni/momo/validator/vpn"
+	vpnSourceValidator "github.com/mohamadrezamomeni/momo/validator/vpn_source"
 
 	httpserver "github.com/mohamadrezamomeni/momo/delivery/http_server"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
@@ -60,6 +61,7 @@ func main() {
 		hostValidator.New(),
 		vpnValidator.New(),
 		inboundValidator.New(userSvc, inboundSvc),
+		vpnSourceValidator.New(),
 	)
 
 	go func() {

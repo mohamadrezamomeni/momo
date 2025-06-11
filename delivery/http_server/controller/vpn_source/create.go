@@ -17,6 +17,14 @@ func (h *Handler) Create(c echo.Context) error {
 			"message": msg,
 		})
 	}
+
+	if err := h.vpnSourceValidator.ValidateUpsert(req); err != nil {
+		msg, code := httperror.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
+		})
+	}
+
 	err := h.VPNSourceSvc.Create(&VPNSourceSvc.CreateVPNSourceDto{
 		Country: req.Country,
 		English: req.English,

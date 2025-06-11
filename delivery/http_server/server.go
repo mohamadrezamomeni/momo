@@ -28,6 +28,7 @@ import (
 	inboundValidation "github.com/mohamadrezamomeni/momo/validator/inbound"
 	userValidation "github.com/mohamadrezamomeni/momo/validator/user"
 	vpnValidation "github.com/mohamadrezamomeni/momo/validator/vpn"
+	vpnSourceValidation "github.com/mohamadrezamomeni/momo/validator/vpn_source"
 )
 
 type Server struct {
@@ -57,6 +58,7 @@ func New(cfg *HTTPConfig,
 	hostValidator *hostValidation.Validator,
 	vpnValidator *vpnValidation.Validator,
 	inboundValidator *inboundValidation.Validator,
+	vpnSourceValidator *vpnSourceValidation.Validator,
 ) *Server {
 	return &Server{
 		router:           echo.New(),
@@ -68,7 +70,7 @@ func New(cfg *HTTPConfig,
 		vpnHandler:       vpnHandler.New(vpnSvc, vpnValidator, authSvc),
 		inboundHandler:   inboundHandler.New(inboundSvc, inboundValidator, authSvc),
 		chargeHandler:    chargeHandler.New(chargeSvc, authSvc),
-		vpnSourceHandler: vpnSourceHandler.New(vpnSourceSvc, authSvc),
+		vpnSourceHandler: vpnSourceHandler.New(vpnSourceSvc, vpnSourceValidator, authSvc),
 	}
 }
 
