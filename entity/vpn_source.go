@@ -1,7 +1,6 @@
 package entity
 
 type VPNSource struct {
-	ID      string
+	Country string
 	English string
-	Title   string
 }

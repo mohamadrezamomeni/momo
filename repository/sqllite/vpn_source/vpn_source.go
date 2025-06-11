@@ -17,14 +17,13 @@ func (vs *VPNSource) Create(createdVPNSource *vpnSourceRepositoryDto.CreateVPNSo
 
 	vpnSource := &entity.VPNSource{}
 	err := vs.db.Conn().QueryRow(`
-	INSERT INTO vpn_source (title, english)
+	INSERT INTO vpn_source (country, english)
 	VALUES (?, ?)
-	RETURNING id, title, english
-	`, createdVPNSource.Title,
+	RETURNING country, english
+	`, createdVPNSource.Country,
 		createdVPNSource.English,
 	).Scan(
-		&vpnSource.ID,
-		&vpnSource.Title,
+		&vpnSource.Country,
 		&vpnSource.English,
 	)
 	if err == nil {
@@ -37,49 +36,44 @@ func (vs *VPNSource) Create(createdVPNSource *vpnSourceRepositoryDto.CreateVPNSo
 	return nil, momoError.Wrap(err).Input(createdVPNSource).UnExpected().Scope(scope).DebuggingError()
 }
 
-func (vs *VPNSource) Find(id string) (*entity.VPNSource, error) {
+func (vs *VPNSource) Find(country string) (*entity.VPNSource, error) {
 	scope := "vpnSourceRepository.find"
 
 	vpnSource := &entity.VPNSource{}
 
-	s := fmt.Sprintf("SELECT * FROM vpn_source WHERE id=%s LIMIT 1", id)
+	s := fmt.Sprintf("SELECT * FROM vpn_source WHERE country='%s' LIMIT 1", country)
 	err := vs.db.Conn().QueryRow(s).Scan(
-		&vpnSource.ID,
-		&vpnSource.Title,
+		&vpnSource.Country,
 		&vpnSource.English,
 	)
 	if err == nil {
 		return vpnSource, nil
 	}
 	if err == sql.ErrNoRows {
-		return nil, momoError.Wrap(err).Scope(scope).Input(id).NotFound().DebuggingError()
+		return nil, momoError.Wrap(err).Scope(scope).Input(country).NotFound().DebuggingError()
 	}
-	return nil, momoError.Wrap(err).Scope(scope).Input(id).UnExpected().DebuggingError()
+	return nil, momoError.Wrap(err).Scope(scope).Input(country).UnExpected().DebuggingError()
 }
 
-func (vs *VPNSource) Update(id string, updateVPNSourceDto *vpnSourceRepositoryDto.UpdateVPNSourceDto) error {
+func (vs *VPNSource) Update(country string, updateVPNSourceDto *vpnSourceRepositoryDto.UpdateVPNSourceDto) error {
 	scope := "vpnsourceRepository.update"
 	subUpdates := []string{}
 	if updateVPNSourceDto.English != "" {
 		subUpdates = append(subUpdates, fmt.Sprintf("english = '%s'", updateVPNSourceDto.English))
 	}
 
-	if updateVPNSourceDto.Title != "" {
-		subUpdates = append(subUpdates, fmt.Sprintf("title = '%s'", updateVPNSourceDto.Title))
-	}
-
 	sql := fmt.Sprintf(
-		"UPDATE vpn_source SET %s WHERE id = %s",
+		"UPDATE vpn_source SET %s WHERE country = '%s'",
 		strings.Join(subUpdates, ", "),
-		id,
+		country,
 	)
 
 	result, err := vs.db.Conn().Exec(sql)
 	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
+		return momoError.Wrap(err).Scope(scope).Input(country).ErrorWrite()
 	}
 	if rows, err := result.RowsAffected(); err != nil || rows == 0 {
-		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
+		return momoError.Wrap(err).Scope(scope).Input(country).ErrorWrite()
 	}
 	return nil
 }
@@ -112,15 +106,14 @@ func (vs *VPNSource) makeFilterQuery(filterDto *vpnSourceRepositoryDto.FilterVPN
 		field := t.Field(i)
 		value := v.Field(i)
 
-		if field.Name == "IDs" && !value.IsNil() && value.Len() > 0 {
-			subQueries = append(subQueries, fmt.Sprintf("id IN (%s)", strings.Join(filterDto.IDs, ",")))
+		if field.Name == "Countries" && !value.IsNil() && value.Len() > 0 {
+			subQueries = append(subQueries, fmt.Sprintf("country IN ('%s')", strings.Join(filterDto.Countries, "','")))
 		}
 	}
 	sql := "SELECT * FROM vpn_source"
 	if len(subQueries) > 0 {
 		sql += fmt.Sprintf(" WHERE %s", strings.Join(subQueries, " AND "))
 	}
-
 	return sql
 }
 
@@ -129,8 +122,7 @@ func (vp *VPNSource) scan(rows *sql.Rows) (*entity.VPNSource, error) {
 
 	vpnSource := &entity.VPNSource{}
 	err := rows.Scan(
-		&vpnSource.ID,
-		&vpnSource.Title,
+		&vpnSource.Country,
 		&vpnSource.English,
 	)
 	if err != nil {

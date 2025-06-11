@@ -1,7 +1,6 @@
 -- +migrate Up
 CREATE TABLE vpn_source (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title VARCHAR(64) NOT NULL,
+    country VARCHAR(64) NOT NULL PRIMARY KEY,
     english  VARCHAR(128) NOT NULL
 );
 

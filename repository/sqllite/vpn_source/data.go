@@ -4,15 +4,15 @@ import vpnSourceRepositoryDto "github.com/mohamadrezamomeni/momo/dto/repository/
 
 var (
 	vpnsource1 = &vpnSourceRepositoryDto.CreateVPNSourceDto{
-		Title:   "us",
+		Country: "us",
 		English: "us",
 	}
 	vpnsource2 = &vpnSourceRepositoryDto.CreateVPNSourceDto{
-		Title:   "uk",
+		Country: "uk",
 		English: "uk",
 	}
 	vpnsource3 = &vpnSourceRepositoryDto.CreateVPNSourceDto{
-		Title:   "china",
+		Country: "china",
 		English: "china",
 	}
 )

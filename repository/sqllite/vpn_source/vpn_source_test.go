@@ -39,9 +39,8 @@ func TestCreateingVPNSource(t *testing.T) {
 		t.Fatalf("something went wrong that was %v", err)
 	}
 
-	if vpnsource.Title != vpnsource.Title ||
-		vpnsource.English != vpnsource1.English ||
-		vpnsource.ID == "" {
+	if vpnsource.Country != vpnsource.Country ||
+		vpnsource.English != vpnsource1.English {
 		t.Fatal("error to compare data")
 	}
 }
@@ -50,11 +49,11 @@ func TestFindVPNSource(t *testing.T) {
 	defer VPNSourceRepo.DeleteAll()
 	vpnsourceCreated, _ := VPNSourceRepo.Create(vpnsource1)
 
-	vpnsource, err := VPNSourceRepo.Find(vpnsourceCreated.ID)
+	vpnsource, err := VPNSourceRepo.Find(vpnsourceCreated.Country)
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
 	}
-	if vpnsource.ID != vpnsourceCreated.ID {
+	if vpnsource.Country != vpnsourceCreated.Country {
 		t.Fatal("error to compare data")
 	}
 }
@@ -63,22 +62,15 @@ func TestUpdateVPNSource(t *testing.T) {
 	defer VPNSourceRepo.DeleteAll()
 	vpnsourceCreated, _ := VPNSourceRepo.Create(vpnsource1)
 
-	newTitle := "moon"
-	err := VPNSourceRepo.Update(vpnsourceCreated.ID, &vpnsource.UpdateVPNSourceDto{
-		Title: newTitle,
-	})
-	if err != nil {
-		t.Fatalf("something went wrong that was %v", err)
-	}
-	newEnglishTranslation := "sun"
-	err = VPNSourceRepo.Update(vpnsourceCreated.ID, &vpnsource.UpdateVPNSourceDto{
+	newEnglishTranslation := "united-state"
+	err := VPNSourceRepo.Update(vpnsourceCreated.Country, &vpnsource.UpdateVPNSourceDto{
 		English: newEnglishTranslation,
 	})
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
 	}
-	vpnSource, _ := VPNSourceRepo.Find(vpnsourceCreated.ID)
-	if vpnSource.Title != newTitle || vpnSource.English != newEnglishTranslation {
+	vpnSource, _ := VPNSourceRepo.Find(vpnsourceCreated.Country)
+	if vpnSource.English != newEnglishTranslation {
 		t.Fatalf("error to compare data")
 	}
 }
@@ -89,9 +81,9 @@ func TestFilterVPNSource(t *testing.T) {
 	vpnsourceCreated3, _ := VPNSourceRepo.Create(vpnsource3)
 	vpnsourcesRefrences := map[string]struct{}{}
 
-	vpnsourcesRefrences[vpnsourceCreated1.ID] = struct{}{}
-	vpnsourcesRefrences[vpnsourceCreated2.ID] = struct{}{}
-	vpnsourcesRefrences[vpnsourceCreated3.ID] = struct{}{}
+	vpnsourcesRefrences[vpnsourceCreated1.Country] = struct{}{}
+	vpnsourcesRefrences[vpnsourceCreated2.Country] = struct{}{}
+	vpnsourcesRefrences[vpnsourceCreated3.Country] = struct{}{}
 
 	vpnsources, err := VPNSourceRepo.Filter(&vpnsource.FilterVPNSources{})
 	if err != nil {
@@ -102,13 +94,13 @@ func TestFilterVPNSource(t *testing.T) {
 	}
 
 	for _, vpnsource := range vpnsources {
-		if _, isExist := vpnsourcesRefrences[vpnsource.ID]; !isExist {
-			t.Fatalf("miss the vpnsource with id %s", vpnsource.ID)
+		if _, isExist := vpnsourcesRefrences[vpnsource.Country]; !isExist {
+			t.Fatalf("miss the vpnsource with country %s", vpnsource.Country)
 		}
 	}
 
 	vpnsources, err = VPNSourceRepo.Filter(&vpnsource.FilterVPNSources{
-		IDs: []string{vpnsourceCreated1.ID, vpnsourceCreated2.ID},
+		Countries: []string{vpnsourceCreated1.Country, vpnsourceCreated2.Country},
 	})
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
@@ -118,8 +110,8 @@ func TestFilterVPNSource(t *testing.T) {
 	}
 
 	for _, vpnsource := range vpnsources {
-		if !(vpnsource.ID == vpnsourceCreated1.ID || vpnsourceCreated2.ID == vpnsource.ID) {
-			t.Fatalf("we get unexpected vpnsource with %s id", vpnsource.ID)
+		if !(vpnsource.Country == vpnsourceCreated1.Country || vpnsourceCreated2.Country == vpnsource.Country) {
+			t.Fatalf("we get unexpected vpnsource with %s country", vpnsource.Country)
 		}
 	}
 }

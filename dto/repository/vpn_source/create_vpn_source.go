@@ -1,6 +1,6 @@
 package vpnsource
 
 type CreateVPNSourceDto struct {
-	Title   string
+	Country string
 	English string
 }
