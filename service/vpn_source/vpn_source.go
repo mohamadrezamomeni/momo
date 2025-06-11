@@ -8,6 +8,7 @@ import (
 
 type VPNSource struct {
 	VPNSourceRepository VPNSourceRepository
+	VPNManagerSvc       VPNManagerService
 }
 
 type VPNSourceRepository interface {
@@ -16,9 +17,17 @@ type VPNSourceRepository interface {
 	Find(string) (*entity.VPNSource, error)
 }
 
-func New(VPNSourceRepo VPNSourceRepository) *VPNSource {
+type VPNManagerService interface {
+	GetAvailableCountries() ([]string, error)
+}
+
+func New(
+	VPNSourceRepo VPNSourceRepository,
+	VPNManagerSvc VPNManagerService,
+) *VPNSource {
 	return &VPNSource{
 		VPNSourceRepository: VPNSourceRepo,
+		VPNManagerSvc:       VPNManagerSvc,
 	}
 }
 
@@ -37,7 +46,20 @@ func (vs *VPNSource) Find(country string) (*entity.VPNSource, error) {
 }
 
 func (vs *VPNSource) FilterVPNSources(filterVPNSourcesDto *VPNSourceServiceDto.FilterVPNSourcesDto) ([]*entity.VPNSource, error) {
+	var err error
+	var countries []string = []string{}
+	if filterVPNSourcesDto.Available {
+		countries, err = vs.VPNManagerSvc.GetAvailableCountries()
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	if filterVPNSourcesDto.Countries != nil {
+		countries = append(countries, filterVPNSourcesDto.Countries...)
+	}
+
 	return vs.VPNSourceRepository.Filter(&vpnSourceRepositoryDto.FilterVPNSourcesDto{
-		Countries: filterVPNSourcesDto.Countries,
+		Countries: countries,
 	})
 }
