@@ -58,3 +58,7 @@ charge:
   successfully_extending: 🎉 Your VPN has been extended
 
   approve_charge_admin: "🌟 Great News! 🌟 \n Your charge #:id: has been approved by the admin ✅ \n Thank you for your patience and trust. \n We're happy to have you with us! 💙"
+
+vpn_source:
+  ask_vpn_source: select your destination
+  not_found_source: unforunetly admin haven't introduced any vpns for creating

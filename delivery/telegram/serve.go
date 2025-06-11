@@ -69,7 +69,7 @@ func New(
 			vpnPackageSvc,
 			inboundValidator.New(userSvc, inboundSvc),
 		),
-		vpnSourceHandler: vpnSourceHandler.New(vpnSourceSvc),
+		vpnSourceHandler: vpnSourceHandler.New(vpnSourceSvc, userSvc),
 	}
 }
 

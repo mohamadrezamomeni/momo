@@ -22,6 +22,8 @@ func (h *Handler) SetStateCreateInbound(next core.HandlerFunc) core.HandlerFunc 
 		_, isExist := telegramState.FindState(idStr)
 		if !isExist {
 			telegramState.NewState(idStr,
+				"ask_selecting_VPNSource",
+				"answer_VPNSource",
 				"ask_selecting_VPN",
 				"answer_selecting_VPN",
 				"ask_selecting_VPNPackage",
@@ -36,7 +38,7 @@ func (h *Handler) SetStateCreateInbound(next core.HandlerFunc) core.HandlerFunc 
 }
 
 func (h *Handler) CreateInbound(update *core.Update) (*core.ResponseHandlerFunc, error) {
-	vpnType, vpnPackage, err := getCreatingInboundData(update)
+	vpnType, vpnPackage, vpnSource, err := getCreatingInboundData(update)
 	if err != nil {
 		return nil, err
 	}
@@ -47,6 +49,7 @@ func (h *Handler) CreateInbound(update *core.Update) (*core.ResponseHandlerFunc,
 		VPNType:      vpnType,
 		TrafficLimit: vpnPackage.TrafficLimit,
 		Start:        now,
+		Country:      vpnSource.Country,
 		End:          now.AddDate(0, int(vpnPackage.Months), int(vpnPackage.Days)),
 	})
 	if err != nil {
@@ -70,36 +73,46 @@ func (h *Handler) CreateInbound(update *core.Update) (*core.ResponseHandlerFunc,
 	}, nil
 }
 
-func getCreatingInboundData(update *core.Update) (entity.VPNType, *entity.VPNPackage, error) {
+func getCreatingInboundData(update *core.Update) (entity.VPNType, *entity.VPNPackage, *entity.VPNSource, error) {
 	scope := "controller.createVPN.getData"
 	idStr, err := core.GetID(update)
 	if err != nil {
-		return 0, nil, err
+		return 0, nil, nil, err
 	}
 
 	state, isExist := telegramState.FindState(idStr)
 	if !isExist {
-		return 0, nil, momoError.Scope(scope).ErrorWrite()
+		return 0, nil, nil, momoError.Scope(scope).ErrorWrite()
 	}
 
 	vpnTypeVal, isExist := state.GetData("vpn_type")
 	if !isExist {
-		return 0, nil, momoError.Scope(scope).ErrorWrite()
+		return 0, nil, nil, momoError.Scope(scope).ErrorWrite()
 	}
 
 	vpnType, ok := vpnTypeVal.(entity.VPNType)
 	if !ok {
-		return 0, nil, momoError.Scope(scope).ErrorWrite()
+		return 0, nil, nil, momoError.Scope(scope).ErrorWrite()
 	}
 
 	vpnPackageVal, isExist := state.GetData("vpn_package")
 	if !isExist {
-		return 0, nil, momoError.Scope(scope).ErrorWrite()
+		return 0, nil, nil, momoError.Scope(scope).ErrorWrite()
 	}
 
 	vpnPackage, ok := vpnPackageVal.(*entity.VPNPackage)
 	if !ok {
-		return 0, nil, momoError.Scope(scope).ErrorWrite()
+		return 0, nil, nil, momoError.Scope(scope).ErrorWrite()
 	}
-	return vpnType, vpnPackage, nil
+
+	vpnSourceVal, isExist := state.GetData("vpn_source")
+	if !isExist {
+		return 0, nil, nil, momoError.Scope(scope).ErrorWrite()
+	}
+
+	vpnSource, ok := vpnSourceVal.(*entity.VPNSource)
+	if !ok {
+		return 0, nil, nil, momoError.Scope(scope).ErrorWrite()
+	}
+	return vpnType, vpnPackage, vpnSource, nil
 }
