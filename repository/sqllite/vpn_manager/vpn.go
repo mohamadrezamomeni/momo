@@ -159,3 +159,29 @@ func (v *VPN) makeSQlFilter(inpt *vpnManagerDto.FilterVPNs) string {
 	}
 	return sql
 }
+
+func (v *VPN) GroupAvailbleVPNsByCountry() ([]string, error) {
+	scope := "vpnRepository.GroupAvailbleVPNsByCountry"
+
+	query := "SELECT country FROM vpns WHERE is_active = true GROUP BY country"
+
+	rows, err := v.db.Conn().Query(query)
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).DebuggingError()
+	}
+
+	countries := make([]string, 0)
+
+	for rows.Next() {
+		country := ""
+		err := rows.Scan(
+			&country,
+		)
+		if err != nil {
+			return nil, momoError.Wrap(err).Scope(scope).DebuggingError()
+		}
+
+		countries = append(countries, country)
+	}
+	return countries, nil
+}

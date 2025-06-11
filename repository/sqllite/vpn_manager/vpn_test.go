@@ -110,3 +110,30 @@ func TestFilterVPNs(t *testing.T) {
 		t.Errorf("4. the number of vpns must be 2 but the result was %v", len(vpns))
 	}
 }
+
+func TestGroupingByCountry(t *testing.T) {
+	defer vpnRepo.DeleteAll()
+	vpnRepo.Create(vpn1)
+	vpnRepo.Create(vpn2)
+	vpnRepo.Create(vpn3)
+	vpnRepo.Create(vpn4)
+
+	countries, err := vpnRepo.GroupAvailbleVPNsByCountry()
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	if len(countries) != 2 {
+		t.Fatalf("we expected the lengh of coutnreis be 2 but we got %d", len(countries))
+	}
+	countriesRefrence := map[string]struct{}{}
+
+	for _, country := range countries {
+		countriesRefrence[country] = struct{}{}
+	}
+	for _, country := range []string{"china", "uk"} {
+		if _, isExist := countriesRefrence[country]; !isExist {
+			t.Fatalf("we expected china be existed but the response miss that`")
+		}
+	}
+}

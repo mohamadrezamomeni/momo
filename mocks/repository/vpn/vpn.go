@@ -78,3 +78,14 @@ func (mv *MockVPN) Filter(inpt *vpnManagerDto.FilterVPNs) ([]*entity.VPN, error)
 
 	return ret, nil
 }
+
+func (mv *MockVPN) GroupAvailbleVPNsByCountry() ([]string, error) {
+	countriesRefrence := map[string]struct{}{}
+	res := make([]string, 0)
+	for _, vpn := range mv.vpns {
+		if _, isExist := countriesRefrence[vpn.Country]; !isExist {
+			res = append(res, vpn.Country)
+		}
+	}
+	return res, nil
+}

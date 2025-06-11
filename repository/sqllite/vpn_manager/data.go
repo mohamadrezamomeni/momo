@@ -25,10 +25,18 @@ var (
 	}
 
 	vpn3 = &vpnManagerDto.AddVPN{
-		Country:  "uk",
+		Country:  "china",
 		Domain:   "jordan.com",
 		ApiPort:  "62733",
 		VPNType:  entity.XRAY_VPN,
 		IsActive: true,
+	}
+
+	vpn4 = &vpnManagerDto.AddVPN{
+		Country:  "colombia",
+		Domain:   "jordan.com",
+		ApiPort:  "62733",
+		VPNType:  entity.XRAY_VPN,
+		IsActive: false,
 	}
 )
