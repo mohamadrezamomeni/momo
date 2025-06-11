@@ -33,6 +33,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestCreateingVPNSource(t *testing.T) {
+	defer VPNSourceRepo.DeleteAll()
 	vpnsource, err := VPNSourceRepo.Create(vpnsource1)
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
@@ -46,6 +47,7 @@ func TestCreateingVPNSource(t *testing.T) {
 }
 
 func TestFindVPNSource(t *testing.T) {
+	defer VPNSourceRepo.DeleteAll()
 	vpnsourceCreated, _ := VPNSourceRepo.Create(vpnsource1)
 
 	vpnsource, err := VPNSourceRepo.Find(vpnsourceCreated.ID)
@@ -58,6 +60,7 @@ func TestFindVPNSource(t *testing.T) {
 }
 
 func TestUpdateVPNSource(t *testing.T) {
+	defer VPNSourceRepo.DeleteAll()
 	vpnsourceCreated, _ := VPNSourceRepo.Create(vpnsource1)
 
 	newTitle := "moon"
@@ -77,5 +80,46 @@ func TestUpdateVPNSource(t *testing.T) {
 	vpnSource, _ := VPNSourceRepo.Find(vpnsourceCreated.ID)
 	if vpnSource.Title != newTitle || vpnSource.English != newEnglishTranslation {
 		t.Fatalf("error to compare data")
+	}
+}
+
+func TestFilterVPNSource(t *testing.T) {
+	vpnsourceCreated1, _ := VPNSourceRepo.Create(vpnsource1)
+	vpnsourceCreated2, _ := VPNSourceRepo.Create(vpnsource2)
+	vpnsourceCreated3, _ := VPNSourceRepo.Create(vpnsource3)
+	vpnsourcesRefrences := map[string]struct{}{}
+
+	vpnsourcesRefrences[vpnsourceCreated1.ID] = struct{}{}
+	vpnsourcesRefrences[vpnsourceCreated2.ID] = struct{}{}
+	vpnsourcesRefrences[vpnsourceCreated3.ID] = struct{}{}
+
+	vpnsources, err := VPNSourceRepo.Filter(&vpnsource.FilterVPNSources{})
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+	if len(vpnsources) != 3 {
+		t.Fatalf("we expected the lengh of vpnsource be 3 but we got %d", len(vpnsources))
+	}
+
+	for _, vpnsource := range vpnsources {
+		if _, isExist := vpnsourcesRefrences[vpnsource.ID]; !isExist {
+			t.Fatalf("miss the vpnsource with id %s", vpnsource.ID)
+		}
+	}
+
+	vpnsources, err = VPNSourceRepo.Filter(&vpnsource.FilterVPNSources{
+		IDs: []string{vpnsourceCreated1.ID, vpnsourceCreated2.ID},
+	})
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+	if len(vpnsources) != 2 {
+		t.Fatalf("we expected the lengh of vpnsource be 3 but we got %d", len(vpnsources))
+	}
+
+	for _, vpnsource := range vpnsources {
+		if !(vpnsource.ID == vpnsourceCreated1.ID || vpnsourceCreated2.ID == vpnsource.ID) {
+			t.Fatalf("we get unexpected vpnsource with %s id", vpnsource.ID)
+		}
 	}
 }

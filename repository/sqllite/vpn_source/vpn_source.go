@@ -3,6 +3,7 @@ package vpnsource
 import (
 	"database/sql"
 	"fmt"
+	"reflect"
 	"strings"
 
 	vpnSourceRepositoryDto "github.com/mohamadrezamomeni/momo/dto/repository/vpn_source"
@@ -83,11 +84,66 @@ func (vs *VPNSource) Update(id string, updateVPNSourceDto *vpnSourceRepositoryDt
 	return nil
 }
 
+func (vs *VPNSource) Filter(filterDto *vpnSourceRepositoryDto.FilterVPNSources) ([]*entity.VPNSource, error) {
+	scope := "vpnsourceRepository.filter"
+	query := vs.makeFilterQuery(filterDto)
+
+	rows, err := vs.db.Conn().Query(query)
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).UnExpected().DebuggingError()
+	}
+
+	vpnSources := make([]*entity.VPNSource, 0)
+	for rows.Next() {
+		vpnsource, err := vs.scan(rows)
+		if err != nil {
+			return nil, err
+		}
+		vpnSources = append(vpnSources, vpnsource)
+	}
+	return vpnSources, nil
+}
+
+func (vs *VPNSource) makeFilterQuery(filterDto *vpnSourceRepositoryDto.FilterVPNSources) string {
+	t := reflect.TypeOf(*filterDto)
+	v := reflect.ValueOf(*filterDto)
+	subQueries := []string{}
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		value := v.Field(i)
+
+		if field.Name == "IDs" && !value.IsNil() && value.Len() > 0 {
+			subQueries = append(subQueries, fmt.Sprintf("id IN (%s)", strings.Join(filterDto.IDs, ",")))
+		}
+	}
+	sql := "SELECT * FROM vpn_source"
+	if len(subQueries) > 0 {
+		sql += fmt.Sprintf(" WHERE %s", strings.Join(subQueries, " AND "))
+	}
+
+	return sql
+}
+
+func (vp *VPNSource) scan(rows *sql.Rows) (*entity.VPNSource, error) {
+	scope := "vpnPackage.repositroy.scan"
+
+	vpnSource := &entity.VPNSource{}
+	err := rows.Scan(
+		&vpnSource.ID,
+		&vpnSource.Title,
+		&vpnSource.English,
+	)
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).Input(rows).DebuggingError()
+	}
+	return vpnSource, nil
+}
+
 func (vs *VPNSource) DeleteAll() error {
 	scope := "vpnSourceRepository.DeleteAll"
 
 	sql := "DELETE FROM vpn_source"
-	res, err := i.db.Conn().Exec(sql)
+	res, err := vs.db.Conn().Exec(sql)
 	if err != nil {
 		return momoError.Wrap(err).Scope(scope).ErrorWrite()
 	}
