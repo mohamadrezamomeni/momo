@@ -1,6 +1,5 @@
 package vpnsource
 
-type CreateVPNSourceDto struct {
-	Country string
+type UpsertVPNSourceDto struct {
 	English string
 }

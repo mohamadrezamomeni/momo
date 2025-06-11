@@ -12,16 +12,18 @@ import (
 	errorRepository "github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
 
-func (vs *VPNSource) Create(createdVPNSource *vpnSourceRepositoryDto.CreateVPNSourceDto) (*entity.VPNSource, error) {
-	scope := "vpnSourceRepository.Create"
+func (vs *VPNSource) Upsert(country string, upsertdVPNSourceDto *vpnSourceRepositoryDto.UpsertVPNSourceDto) (*entity.VPNSource, error) {
+	scope := "vpnSourceRepository.Upsert"
 
 	vpnSource := &entity.VPNSource{}
 	err := vs.db.Conn().QueryRow(`
 	INSERT INTO vpn_source (country, english)
 	VALUES (?, ?)
+	ON CONFLICT(country) DO UPDATE SET
+		english = excluded.english
 	RETURNING country, english
-	`, createdVPNSource.Country,
-		createdVPNSource.English,
+	`, country,
+		upsertdVPNSourceDto.English,
 	).Scan(
 		&vpnSource.Country,
 		&vpnSource.English,
@@ -31,9 +33,9 @@ func (vs *VPNSource) Create(createdVPNSource *vpnSourceRepositoryDto.CreateVPNSo
 	}
 
 	if errorRepository.IsDuplicateError(err) {
-		return nil, momoError.Wrap(err).Input(createdVPNSource).Duplicate().Scope(scope).DebuggingError()
+		return nil, momoError.Wrap(err).Input(upsertdVPNSourceDto).Duplicate().Scope(scope).DebuggingError()
 	}
-	return nil, momoError.Wrap(err).Input(createdVPNSource).UnExpected().Scope(scope).DebuggingError()
+	return nil, momoError.Wrap(err).Input(upsertdVPNSourceDto).UnExpected().Scope(scope).DebuggingError()
 }
 
 func (vs *VPNSource) Find(country string) (*entity.VPNSource, error) {
@@ -53,29 +55,6 @@ func (vs *VPNSource) Find(country string) (*entity.VPNSource, error) {
 		return nil, momoError.Wrap(err).Scope(scope).Input(country).NotFound().DebuggingError()
 	}
 	return nil, momoError.Wrap(err).Scope(scope).Input(country).UnExpected().DebuggingError()
-}
-
-func (vs *VPNSource) Update(country string, updateVPNSourceDto *vpnSourceRepositoryDto.UpdateVPNSourceDto) error {
-	scope := "vpnsourceRepository.update"
-	subUpdates := []string{}
-	if updateVPNSourceDto.English != "" {
-		subUpdates = append(subUpdates, fmt.Sprintf("english = '%s'", updateVPNSourceDto.English))
-	}
-
-	sql := fmt.Sprintf(
-		"UPDATE vpn_source SET %s WHERE country = '%s'",
-		strings.Join(subUpdates, ", "),
-		country,
-	)
-
-	result, err := vs.db.Conn().Exec(sql)
-	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Input(country).ErrorWrite()
-	}
-	if rows, err := result.RowsAffected(); err != nil || rows == 0 {
-		return momoError.Wrap(err).Scope(scope).Input(country).ErrorWrite()
-	}
-	return nil
 }
 
 func (vs *VPNSource) Filter(filterDto *vpnSourceRepositoryDto.FilterVPNSources) ([]*entity.VPNSource, error) {

@@ -34,7 +34,7 @@ func TestMain(m *testing.M) {
 
 func TestCreateingVPNSource(t *testing.T) {
 	defer VPNSourceRepo.DeleteAll()
-	vpnsource, err := VPNSourceRepo.Create(vpnsource1)
+	vpnsource, err := VPNSourceRepo.Upsert("us", vpnsource1)
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
 	}
@@ -47,7 +47,7 @@ func TestCreateingVPNSource(t *testing.T) {
 
 func TestFindVPNSource(t *testing.T) {
 	defer VPNSourceRepo.DeleteAll()
-	vpnsourceCreated, _ := VPNSourceRepo.Create(vpnsource1)
+	vpnsourceCreated, _ := VPNSourceRepo.Upsert("us", vpnsource1)
 
 	vpnsource, err := VPNSourceRepo.Find(vpnsourceCreated.Country)
 	if err != nil {
@@ -60,10 +60,10 @@ func TestFindVPNSource(t *testing.T) {
 
 func TestUpdateVPNSource(t *testing.T) {
 	defer VPNSourceRepo.DeleteAll()
-	vpnsourceCreated, _ := VPNSourceRepo.Create(vpnsource1)
+	vpnsourceCreated, _ := VPNSourceRepo.Upsert("us", vpnsource1)
 
 	newEnglishTranslation := "united-state"
-	err := VPNSourceRepo.Update(vpnsourceCreated.Country, &vpnsource.UpdateVPNSourceDto{
+	_, err := VPNSourceRepo.Upsert(vpnsourceCreated.Country, &vpnsource.UpsertVPNSourceDto{
 		English: newEnglishTranslation,
 	})
 	if err != nil {
@@ -76,9 +76,9 @@ func TestUpdateVPNSource(t *testing.T) {
 }
 
 func TestFilterVPNSource(t *testing.T) {
-	vpnsourceCreated1, _ := VPNSourceRepo.Create(vpnsource1)
-	vpnsourceCreated2, _ := VPNSourceRepo.Create(vpnsource2)
-	vpnsourceCreated3, _ := VPNSourceRepo.Create(vpnsource3)
+	vpnsourceCreated1, _ := VPNSourceRepo.Upsert("us", vpnsource1)
+	vpnsourceCreated2, _ := VPNSourceRepo.Upsert("uk", vpnsource2)
+	vpnsourceCreated3, _ := VPNSourceRepo.Upsert("china", vpnsource3)
 	vpnsourcesRefrences := map[string]struct{}{}
 
 	vpnsourcesRefrences[vpnsourceCreated1.Country] = struct{}{}

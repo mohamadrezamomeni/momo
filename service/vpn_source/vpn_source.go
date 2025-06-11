@@ -11,7 +11,7 @@ type VPNSource struct {
 }
 
 type VPNSourceRepository interface {
-	Create(*vpnSourceRepositoryDto.CreateVPNSourceDto) (*entity.VPNSource, error)
+	Upsert(string, *vpnSourceRepositoryDto.UpsertVPNSourceDto) (*entity.VPNSource, error)
 }
 
 func New(VPNSourceRepo VPNSourceRepository) *VPNSource {
@@ -21,8 +21,7 @@ func New(VPNSourceRepo VPNSourceRepository) *VPNSource {
 }
 
 func (vs *VPNSource) Create(VPNSourceDto *VPNSourceServiceDto.CreateVPNSourceDto) error {
-	_, err := vs.VPNSourceRepository.Create(&vpnSourceRepositoryDto.CreateVPNSourceDto{
-		Country: VPNSourceDto.Country,
+	_, err := vs.VPNSourceRepository.Upsert(VPNSourceDto.Country, &vpnSourceRepositoryDto.UpsertVPNSourceDto{
 		English: VPNSourceDto.English,
 	})
 	if err != nil {
