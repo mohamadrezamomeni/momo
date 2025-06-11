@@ -7,6 +7,7 @@ type VPN struct {
 	ApiPort   string
 	VPNType   VPNType
 	UserCount int
+	Country   string
 }
 
 type VPNType = int
@@ -29,7 +30,9 @@ func ConvertStringVPNTypeToEnum(key string) int {
 	switch key {
 	case "xray":
 		return XRAY_VPN
-	default:
+	case "unkhown":
 		return UknownVPNType
+	default:
+		return 0
 	}
 }

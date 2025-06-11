@@ -45,7 +45,9 @@ func ConvertStringToChargeStatus(s string) ChargeStatus {
 		return RegejectedStatusCharge
 	case "assiggned":
 		return AssignedCharged
-	default:
+	case "unkhown":
 		return UnkhownStatusCharge
+	default:
+		return 0
 	}
 }

@@ -59,7 +59,7 @@ func main() {
 		userValidator.New(),
 		authValidator.New(),
 		hostValidator.New(),
-		vpnValidator.New(),
+		vpnValidator.New(vpnSourceSvc),
 		inboundValidator.New(userSvc, inboundSvc),
 		vpnSourceValidator.New(),
 	)

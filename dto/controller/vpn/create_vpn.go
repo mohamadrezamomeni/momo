@@ -5,4 +5,5 @@ type CreateVPN struct {
 	Port      string `json:"port"`
 	Domain    string `json:"domain"`
 	UserCount int    `json:"user_count"`
+	Country   string `json:"country"`
 }

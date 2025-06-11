@@ -27,6 +27,7 @@ func (h *Handler) Filter(c echo.Context) error {
 			"message": msg,
 		})
 	}
+
 	vpns, err := h.vpnSvc.Filter(&vpnServiceDto.FilterVPNs{
 		Domain:  req.Domain,
 		VPNType: entity.ConvertStringVPNTypeToEnum(req.VPNType),
@@ -47,6 +48,7 @@ func (h *Handler) Filter(c echo.Context) error {
 			UserCount: vpn.UserCount,
 			Domain:    vpn.Domain,
 			VPNType:   entity.VPNTypeString(vpn.VPNType),
+			Country:   vpn.Country,
 		})
 	}
 	return c.JSON(http.StatusAccepted, filterVpnsSerializer)

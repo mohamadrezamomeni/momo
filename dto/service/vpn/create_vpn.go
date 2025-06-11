@@ -7,4 +7,5 @@ type CreateVPN struct {
 	Port      string
 	Domain    string
 	UserCount int
+	Country   string
 }

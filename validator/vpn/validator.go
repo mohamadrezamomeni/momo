@@ -1,7 +1,17 @@
 package vpn
 
-type Validator struct{}
+import "github.com/mohamadrezamomeni/momo/entity"
 
-func New() *Validator {
-	return &Validator{}
+type Validator struct {
+	vpnSourceSvc VPNSourceService
+}
+
+type VPNSourceService interface {
+	Find(string) (*entity.VPNSource, error)
+}
+
+func New(vpnSourceService VPNSourceService) *Validator {
+	return &Validator{
+		vpnSourceSvc: vpnSourceService,
+	}
 }

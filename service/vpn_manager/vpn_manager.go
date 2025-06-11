@@ -36,6 +36,7 @@ func (v *VPNService) Create(createVPNDto *vpnServiceDto.CreateVPN) (*entity.VPN,
 		Domain:    createVPNDto.Domain,
 		IsActive:  false,
 		UserCount: createVPNDto.UserCount,
+		Country:   createVPNDto.Country,
 	})
 }
 

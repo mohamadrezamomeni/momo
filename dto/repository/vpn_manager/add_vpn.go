@@ -10,4 +10,5 @@ type AddVPN struct {
 	ApiPort   string
 	VPNType   entity.VPNType
 	UserCount int
+	Country   string
 }

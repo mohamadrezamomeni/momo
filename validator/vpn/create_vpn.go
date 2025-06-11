@@ -20,6 +20,11 @@ func (v *Validator) ValidateCreatingVPN(req vpnControllerDto.CreateVPN) error {
 			validation.Length(3, 0),
 		),
 		validation.Field(
+			&req.Country,
+			validation.Required,
+			validation.Length(1, 0),
+		),
+		validation.Field(
 			&req.Port,
 			validation.Required,
 			validation.Match(regexp.MustCompile(`^\d+$`)).Error("must be a numeric string"),
@@ -40,6 +45,11 @@ func (v *Validator) ValidateCreatingVPN(req vpnControllerDto.CreateVPN) error {
 	)
 	if err != nil {
 		return momoError.Wrap(err).BadRequest().Scope(scope).Input(req).ErrorWrite()
+	}
+
+	_, err = v.vpnSourceSvc.Find(req.Country)
+	if err != nil {
+		return err
 	}
 	return nil
 }

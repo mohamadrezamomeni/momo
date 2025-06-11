@@ -6,6 +6,7 @@ CREATE TABLE `vpns` (
         `api_port` varchar(8) NOT NULL,
         `vpn_type` varchar(32) NOT NULL,
         `user_count` int NOT NULL,
+        `country` varchar(128) NOT NULL,
         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

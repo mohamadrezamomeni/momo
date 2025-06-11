@@ -9,6 +9,7 @@ var (
 	vpnRepo *VPN
 
 	vpn1 = &vpnManagerDto.AddVPN{
+		Country:  "uk",
 		Domain:   "joi.com",
 		ApiPort:  "62733",
 		VPNType:  entity.XRAY_VPN,
@@ -16,6 +17,7 @@ var (
 	}
 
 	vpn2 = &vpnManagerDto.AddVPN{
+		Country:  "uk",
 		Domain:   "joi.com",
 		ApiPort:  "62733",
 		VPNType:  entity.XRAY_VPN,
@@ -23,6 +25,7 @@ var (
 	}
 
 	vpn3 = &vpnManagerDto.AddVPN{
+		Country:  "uk",
 		Domain:   "jordan.com",
 		ApiPort:  "62733",
 		VPNType:  entity.XRAY_VPN,
