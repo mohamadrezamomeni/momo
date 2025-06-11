@@ -11,6 +11,7 @@ import (
 	inboundService "github.com/mohamadrezamomeni/momo/service/inbound"
 	userService "github.com/mohamadrezamomeni/momo/service/user"
 	vpnPackageService "github.com/mohamadrezamomeni/momo/service/vpn_package"
+	vpnSourceService "github.com/mohamadrezamomeni/momo/service/vpn_source"
 
 	authHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/auth"
 	chargeHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/charge"
@@ -18,6 +19,7 @@ import (
 	rootHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/root"
 	vpnHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/vpn"
 	vpnPackageHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/vpn_package"
+	vpnSourceHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/vpn_source"
 
 	inboundValidator "github.com/mohamadrezamomeni/momo/validator/inbound"
 )
@@ -33,6 +35,7 @@ type Telegram struct {
 	vpnHandler        *vpnHandler.Handler
 	vpnPackageHandler *vpnPackageHandler.Handler
 	chargeHandler     *chargeHandler.Handler
+	vpnSourceHandler  *vpnSourceHandler.Handler
 }
 
 func New(
@@ -42,6 +45,7 @@ func New(
 	inboundSvc *inboundService.Inbound,
 	vpnPackageSvc *vpnPackageService.VPNPackage,
 	chargeSvc *chargeService.Charge,
+	vpnSourceSvc *vpnSourceService.VPNSource,
 ) *Telegram {
 	scope := "telegram.New"
 	bot, err := tgbotapi.NewBotAPI(cfg.Token)
@@ -65,6 +69,7 @@ func New(
 			vpnPackageSvc,
 			inboundValidator.New(userSvc, inboundSvc),
 		),
+		vpnSourceHandler: vpnSourceHandler.New(vpnSourceSvc),
 	}
 }
 
@@ -79,6 +84,7 @@ func (t *Telegram) Serve() {
 	t.vpnHandler.SetRouter(t.core)
 	t.vpnPackageHandler.SetRouter(t.core)
 	t.chargeHandler.SetRouter(t.core)
+	t.vpnSourceHandler.SetRouter(t.core)
 
 	for update := range updates {
 		customUpdate := &core.Update{
