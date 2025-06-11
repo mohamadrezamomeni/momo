@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	vpnsource "github.com/mohamadrezamomeni/momo/dto/repository/vpn_source"
 	"github.com/mohamadrezamomeni/momo/repository/migrate"
 	"github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
@@ -53,5 +54,28 @@ func TestFindVPNSource(t *testing.T) {
 	}
 	if vpnsource.ID != vpnsourceCreated.ID {
 		t.Fatal("error to compare data")
+	}
+}
+
+func TestUpdateVPNSource(t *testing.T) {
+	vpnsourceCreated, _ := VPNSourceRepo.Create(vpnsource1)
+
+	newTitle := "moon"
+	err := VPNSourceRepo.Update(vpnsourceCreated.ID, &vpnsource.UpdateVPNSourceDto{
+		Title: newTitle,
+	})
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+	newEnglishTranslation := "sun"
+	err = VPNSourceRepo.Update(vpnsourceCreated.ID, &vpnsource.UpdateVPNSourceDto{
+		English: newEnglishTranslation,
+	})
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+	vpnSource, _ := VPNSourceRepo.Find(vpnsourceCreated.ID)
+	if vpnSource.Title != newTitle || vpnSource.English != newEnglishTranslation {
+		t.Fatalf("error to compare data")
 	}
 }

@@ -3,6 +3,7 @@ package vpnsource
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	vpnSourceRepositoryDto "github.com/mohamadrezamomeni/momo/dto/repository/vpn_source"
 	"github.com/mohamadrezamomeni/momo/entity"
@@ -55,7 +56,34 @@ func (vs *VPNSource) Find(id string) (*entity.VPNSource, error) {
 	return nil, momoError.Wrap(err).Scope(scope).Input(id).UnExpected().DebuggingError()
 }
 
-func (i *VPNSource) DeleteAll() error {
+func (vs *VPNSource) Update(id string, updateVPNSourceDto *vpnSourceRepositoryDto.UpdateVPNSourceDto) error {
+	scope := "vpnsourceRepository.update"
+	subUpdates := []string{}
+	if updateVPNSourceDto.English != "" {
+		subUpdates = append(subUpdates, fmt.Sprintf("english = '%s'", updateVPNSourceDto.English))
+	}
+
+	if updateVPNSourceDto.Title != "" {
+		subUpdates = append(subUpdates, fmt.Sprintf("title = '%s'", updateVPNSourceDto.Title))
+	}
+
+	sql := fmt.Sprintf(
+		"UPDATE vpn_source SET %s WHERE id = %s",
+		strings.Join(subUpdates, ", "),
+		id,
+	)
+
+	result, err := vs.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
+	}
+	if rows, err := result.RowsAffected(); err != nil || rows == 0 {
+		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
+	}
+	return nil
+}
+
+func (vs *VPNSource) DeleteAll() error {
 	scope := "vpnSourceRepository.DeleteAll"
 
 	sql := "DELETE FROM vpn_source"
