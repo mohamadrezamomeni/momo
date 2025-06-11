@@ -43,3 +43,15 @@ func TestCreateingVPNSource(t *testing.T) {
 		t.Fatal("error to compare data")
 	}
 }
+
+func TestFindVPNSource(t *testing.T) {
+	vpnsourceCreated, _ := VPNSourceRepo.Create(vpnsource1)
+
+	vpnsource, err := VPNSourceRepo.Find(vpnsourceCreated.ID)
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+	if vpnsource.ID != vpnsourceCreated.ID {
+		t.Fatal("error to compare data")
+	}
+}
