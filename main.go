@@ -41,7 +41,7 @@ func main() {
 	migration := migrate.New(&cfg.DB)
 
 	migration.UP()
-	hostSvc, vpnSvc, userSvc, inboundSvc, authSvc, cryptSvc, _, _, chargeSvc, _, _, _ := serviceInitializer.GetServices(&cfg)
+	hostSvc, vpnSvc, userSvc, inboundSvc, authSvc, cryptSvc, _, _, chargeSvc, _, _, _, vpnSourceSvc := serviceInitializer.GetServices(&cfg)
 
 	initializer(userSvc, &cfg)
 
@@ -54,6 +54,7 @@ func main() {
 		vpnSvc,
 		inboundSvc,
 		chargeSvc,
+		vpnSourceSvc,
 		userValidator.New(),
 		authValidator.New(),
 		hostValidator.New(),

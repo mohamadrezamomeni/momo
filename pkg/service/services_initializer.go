@@ -12,6 +12,7 @@ import (
 	userSqlite "github.com/mohamadrezamomeni/momo/repository/sqllite/user"
 	vpnSqlite "github.com/mohamadrezamomeni/momo/repository/sqllite/vpn_manager"
 	vpnPackageSqlite "github.com/mohamadrezamomeni/momo/repository/sqllite/vpn_package"
+	vpnSourceSqlite "github.com/mohamadrezamomeni/momo/repository/sqllite/vpn_source"
 
 	config "github.com/mohamadrezamomeni/momo/pkg/config"
 	authService "github.com/mohamadrezamomeni/momo/service/auth"
@@ -24,6 +25,7 @@ import (
 	userService "github.com/mohamadrezamomeni/momo/service/user"
 	vpnService "github.com/mohamadrezamomeni/momo/service/vpn_manager"
 	vpnPackageService "github.com/mohamadrezamomeni/momo/service/vpn_package"
+	vpnSourceService "github.com/mohamadrezamomeni/momo/service/vpn_source"
 )
 
 func GetServices(cfg *config.Config) (
@@ -39,6 +41,7 @@ func GetServices(cfg *config.Config) (
 	*inboundService.HealingUpInbound,
 	*inboundService.HostInbound,
 	*inboundService.InboundTraffic,
+	*vpnSourceService.VPNSource,
 ) {
 	db := sqllite.New(&cfg.DB)
 	userRepo := userSqlite.New(db)
@@ -49,6 +52,7 @@ func GetServices(cfg *config.Config) (
 	eventRepo := eventSqlite.New(db)
 	chargeRepo := chargeSqlite.New(db)
 	inboundChargeRepo := inboundChargeSqlite.New(db)
+	vpnSourceRepo := vpnSourceSqlite.New(db)
 
 	hostSvc := hostService.New(hostRepo, adapter.AdaptedWorkerFactory)
 	vpnSvc := vpnService.New(vpnRepo, adapter.AdaptedVPNProxyFactory)
@@ -64,6 +68,8 @@ func GetServices(cfg *config.Config) (
 	healingUpInboundSvc := inboundService.NewHealingUpInbound(inboundRepo, vpnSvc, inboundChargeSvc, chargeSvc, userSvc)
 	hostInboundSvc := inboundService.NewHostInbound(inboundRepo, hostSvc)
 	inboundTrafficSvc := inboundService.NewInboundTraffic(inboundRepo, vpnSvc, userSvc)
+	vpnSourceSvc := vpnSourceService.New(vpnSourceRepo)
+
 	return hostSvc,
 		vpnSvc,
 		userSvc,
@@ -75,5 +81,6 @@ func GetServices(cfg *config.Config) (
 		chargeSvc,
 		healingUpInboundSvc,
 		hostInboundSvc,
-		inboundTrafficSvc
+		inboundTrafficSvc,
+		vpnSourceSvc
 }

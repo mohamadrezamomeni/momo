@@ -32,7 +32,7 @@ func main() {
 
 	migration.UP()
 
-	hostSvc, vpnSvc, userSvc, inboundSvc, _, _, _, eventSvc, chargeSvc, healingUpInbound, hostInboundSvc, inboundTrafficSvc := serviceInitializer.GetServices(&cfg)
+	hostSvc, vpnSvc, userSvc, inboundSvc, _, _, _, eventSvc, chargeSvc, healingUpInbound, hostInboundSvc, inboundTrafficSvc, _ := serviceInitializer.GetServices(&cfg)
 
 	notification := notification.New(&cfg.Notification, inboundSvc, userSvc, chargeSvc, eventSvc)
 
