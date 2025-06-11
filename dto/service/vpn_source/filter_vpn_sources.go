@@ -1,3 +1,5 @@
 package vpnsource
 
-type FilterVPNSourcesDto struct{}
+type FilterVPNSourcesDto struct {
+	Countries []string
+}

@@ -37,5 +37,7 @@ func (vs *VPNSource) Find(country string) (*entity.VPNSource, error) {
 }
 
 func (vs *VPNSource) FilterVPNSources(filterVPNSourcesDto *VPNSourceServiceDto.FilterVPNSourcesDto) ([]*entity.VPNSource, error) {
-	return vs.VPNSourceRepository.Filter(&vpnSourceRepositoryDto.FilterVPNSourcesDto{})
+	return vs.VPNSourceRepository.Filter(&vpnSourceRepositoryDto.FilterVPNSourcesDto{
+		Countries: filterVPNSourcesDto.Countries,
+	})
 }
