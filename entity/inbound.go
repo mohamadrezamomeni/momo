@@ -10,6 +10,7 @@ type Inbound struct {
 	ChargeCount  uint32
 	TrafficUsage uint32
 	TrafficLimit uint32
+	Country      string
 	Protocol     string
 	VPNType      VPNType
 	Domain       string

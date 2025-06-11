@@ -18,9 +18,9 @@ func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error
 
 	inbound := &entity.Inbound{}
 	err := i.db.Conn().QueryRow(`
-	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_active, start, end, is_block, is_assigned, is_notified, charge_count, traffic_usage, traffic_limit)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-	RETURNING id, protocol, is_active, domain, port, user_id, tag, is_block, start, end, is_notified, is_assigned, charge_count, traffic_usage, traffic_limit
+	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_active, start, end, is_block, is_assigned, is_notified, charge_count, traffic_usage, traffic_limit, country)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	RETURNING id, protocol, is_active, domain, port, user_id, tag, is_block, start, end, is_notified, is_assigned, charge_count, traffic_usage, traffic_limit, country
 	`, inpt.Protocol,
 		inpt.Domain, entity.VPNTypeString(inpt.VPNType),
 		inpt.Port,
@@ -35,6 +35,7 @@ func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error
 		1,
 		inpt.TrafficUsage,
 		inpt.TrafficLimit,
+		inpt.Country,
 	).Scan(
 		&inbound.ID,
 		&inbound.Protocol,
@@ -51,6 +52,7 @@ func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error
 		&inbound.ChargeCount,
 		&inbound.TrafficUsage,
 		&inbound.TrafficLimit,
+		&inbound.Country,
 	)
 
 	if err == nil {
@@ -88,6 +90,7 @@ func (i *Inbound) FindInboundByID(id string) (*entity.Inbound, error) {
 		&inbound.ChargeCount,
 		&inbound.TrafficUsage,
 		&inbound.TrafficLimit,
+		&inbound.Country,
 		&createdAt,
 		&updatedAt,
 	)
@@ -479,6 +482,7 @@ func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
 		&inbound.ChargeCount,
 		&inbound.TrafficUsage,
 		&inbound.TrafficLimit,
+		&inbound.Country,
 		&createdAt,
 		&updatedAt,
 	)

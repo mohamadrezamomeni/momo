@@ -21,4 +21,5 @@ type CreateInbound struct {
 	Start        time.Time
 	End          time.Time
 	IsBlock      bool
+	Country      string
 }

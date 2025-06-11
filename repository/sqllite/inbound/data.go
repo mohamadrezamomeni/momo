@@ -40,6 +40,7 @@ var (
 		VPNType:  entity.XRAY_VPN,
 		Start:    utils.GetDateTime("2024-04-21 14:30:00"),
 		End:      utils.GetDateTime("2024-04-22 14:30:00"),
+		Country:  "uk",
 	}
 
 	inbound2 = &inboundDto.CreateInbound{
@@ -52,6 +53,7 @@ var (
 		VPNType:  entity.XRAY_VPN,
 		Start:    utils.GetDateTime("2024-04-21 14:30:00"),
 		End:      utils.GetDateTime("2024-04-22 14:30:00"),
+		Country:  "uk",
 	}
 
 	inbound3 = &inboundDto.CreateInbound{
@@ -65,6 +67,7 @@ var (
 		VPNType:  entity.XRAY_VPN,
 		Start:    utils.GetDateTime("2024-04-21 14:30:00"),
 		End:      utils.GetDateTime("2024-04-22 14:30:00"),
+		Country:  "uk",
 	}
 
 	inbound4 = &inboundDto.CreateInbound{
@@ -80,6 +83,7 @@ var (
 		End:          time.Now().AddDate(0, 0, 15),
 		TrafficLimit: 50,
 		TrafficUsage: 34,
+		Country:      "uk",
 	}
 
 	inbound5 = &inboundDto.CreateInbound{
@@ -95,6 +99,7 @@ var (
 		TrafficUsage: 34,
 		Start:        time.Now().AddDate(0, 0, -15),
 		End:          time.Now().AddDate(0, 0, 15),
+		Country:      "uk",
 	}
 
 	inbound6 = &inboundDto.CreateInbound{
@@ -110,6 +115,7 @@ var (
 		TrafficUsage: 34,
 		Start:        time.Now().AddDate(0, 0, -15),
 		End:          time.Now().AddDate(0, 0, 15),
+		Country:      "uk",
 	}
 
 	inbound7 = &inboundDto.CreateInbound{
@@ -125,6 +131,7 @@ var (
 		TrafficUsage: 34,
 		Start:        time.Now().AddDate(0, -2, 0),
 		End:          time.Now().AddDate(0, -1, 0),
+		Country:      "uk",
 	}
 
 	inbound8 = &inboundDto.CreateInbound{
@@ -140,6 +147,7 @@ var (
 		TrafficUsage: 34,
 		Start:        time.Now().AddDate(0, -2, 0),
 		End:          time.Now().AddDate(0, -1, 0),
+		Country:      "uk",
 	}
 	inbound9 = &inboundDto.CreateInbound{
 		Tag:      fmt.Sprintf("inbound-%s", port2),
@@ -167,6 +175,7 @@ var (
 		VPNType:    entity.XRAY_VPN,
 		Start:      utils.GetDateTime("2024-04-21 14:30:00"),
 		End:        utils.GetDateTime("2024-04-22 14:30:00"),
+		Country:    "uk",
 	}
 
 	inbound11 = &inboundDto.CreateInbound{
@@ -182,6 +191,7 @@ var (
 		VPNType:    entity.XRAY_VPN,
 		Start:      utils.GetDateTime("2024-04-21 14:30:00"),
 		End:        utils.GetDateTime("2024-04-22 14:30:00"),
+		Country:    "uk",
 	}
 
 	inbound12 = &inboundDto.CreateInbound{
@@ -197,6 +207,7 @@ var (
 		VPNType:    entity.XRAY_VPN,
 		Start:      utils.GetDateTime("2024-04-21 14:30:00"),
 		End:        utils.GetDateTime("2024-04-22 14:30:00"),
+		Country:    "uk",
 	}
 
 	inbound13 = &inboundDto.CreateInbound{
@@ -212,6 +223,7 @@ var (
 		VPNType:    entity.XRAY_VPN,
 		Start:      utils.GetDateTime("2024-04-21 14:30:00"),
 		End:        utils.GetDateTime("2024-04-22 14:30:00"),
+		Country:    "uk",
 	}
 
 	inbound14 = &inboundDto.CreateInbound{
@@ -227,6 +239,7 @@ var (
 		VPNType:    entity.XRAY_VPN,
 		Start:      utils.GetDateTime("2024-04-21 14:30:00"),
 		End:        utils.GetDateTime("2024-04-22 14:30:00"),
+		Country:    "uk",
 	}
 
 	inbound15 = &inboundDto.CreateInbound{
@@ -240,6 +253,7 @@ var (
 		IsBlock:  false,
 		Start:    time.Now().AddDate(0, -2, 0),
 		End:      time.Now().AddDate(0, -1, 0),
+		Country:  "uk",
 	}
 
 	inbound16 = &inboundDto.CreateInbound{
@@ -255,6 +269,7 @@ var (
 		End:          time.Now().AddDate(0, -1, 0),
 		TrafficLimit: 50,
 		TrafficUsage: 50,
+		Country:      "uk",
 	}
 	inbound17 = &inboundDto.CreateInbound{
 		Tag:        fmt.Sprintf("inbound-%s", port2),
@@ -269,6 +284,7 @@ var (
 		VPNType:    entity.XRAY_VPN,
 		Start:      utils.GetDateTime("2024-04-21 14:30:00"),
 		End:        utils.GetDateTime("2024-04-22 14:30:00"),
+		Country:    "uk",
 	}
 
 	inbound18 = &inboundDto.CreateInbound{
@@ -282,6 +298,7 @@ var (
 		IsBlock:      false,
 		Start:        time.Now().AddDate(0, -2, 0),
 		End:          time.Now().AddDate(0, 1, 0),
+		Country:      "uk",
 		TrafficLimit: 50,
 		TrafficUsage: 0,
 	}
@@ -298,6 +315,7 @@ var (
 		Start:        time.Now().AddDate(0, -2, 0),
 		End:          time.Now().AddDate(0, 1, 0),
 		TrafficLimit: 50,
+		Country:      "uk",
 		TrafficUsage: 51,
 	}
 
@@ -314,6 +332,7 @@ var (
 		End:          time.Now().AddDate(0, -1, 0),
 		TrafficLimit: 50,
 		TrafficUsage: 2,
+		Country:      "uk",
 	}
 
 	inbound21 = &inboundDto.CreateInbound{
@@ -329,6 +348,7 @@ var (
 		End:          time.Now().AddDate(0, -1, 0),
 		TrafficLimit: 50,
 		TrafficUsage: 2,
+		Country:      "uk",
 	}
 
 	inbound22 = &inboundDto.CreateInbound{
@@ -344,5 +364,6 @@ var (
 		End:          time.Now().AddDate(0, 1, 0),
 		TrafficLimit: 50,
 		TrafficUsage: 2,
+		Country:      "uk",
 	}
 )

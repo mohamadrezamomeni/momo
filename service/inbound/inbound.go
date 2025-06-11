@@ -44,6 +44,7 @@ func (i *Inbound) Create(inpt *inboundServiceDto.CreateInbound) (*entity.Inbound
 		End:          inpt.End,
 		VPNType:      inpt.VPNType,
 		TrafficLimit: inpt.TrafficLimit,
+		Country:      inpt.Country,
 	})
 	if err != nil {
 		return nil, err
