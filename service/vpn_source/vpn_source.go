@@ -12,6 +12,7 @@ type VPNSource struct {
 
 type VPNSourceRepository interface {
 	Upsert(string, *vpnSourceRepositoryDto.UpsertVPNSourceDto) (*entity.VPNSource, error)
+	Filter(*vpnSourceRepositoryDto.FilterVPNSourcesDto) ([]*entity.VPNSource, error)
 }
 
 func New(VPNSourceRepo VPNSourceRepository) *VPNSource {
@@ -28,4 +29,8 @@ func (vs *VPNSource) Create(VPNSourceDto *VPNSourceServiceDto.CreateVPNSourceDto
 		return err
 	}
 	return err
+}
+
+func (vs *VPNSource) FilterVPNSources(filterVPNSourcesDto *VPNSourceServiceDto.FilterVPNSourcesDto) ([]*entity.VPNSource, error) {
+	return vs.VPNSourceRepository.Filter(&vpnSourceRepositoryDto.FilterVPNSourcesDto{})
 }

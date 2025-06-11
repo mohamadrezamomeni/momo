@@ -85,7 +85,7 @@ func TestFilterVPNSource(t *testing.T) {
 	vpnsourcesRefrences[vpnsourceCreated2.Country] = struct{}{}
 	vpnsourcesRefrences[vpnsourceCreated3.Country] = struct{}{}
 
-	vpnsources, err := VPNSourceRepo.Filter(&vpnsource.FilterVPNSources{})
+	vpnsources, err := VPNSourceRepo.Filter(&vpnsource.FilterVPNSourcesDto{})
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
 	}
@@ -99,7 +99,7 @@ func TestFilterVPNSource(t *testing.T) {
 		}
 	}
 
-	vpnsources, err = VPNSourceRepo.Filter(&vpnsource.FilterVPNSources{
+	vpnsources, err = VPNSourceRepo.Filter(&vpnsource.FilterVPNSourcesDto{
 		Countries: []string{vpnsourceCreated1.Country, vpnsourceCreated2.Country},
 	})
 	if err != nil {

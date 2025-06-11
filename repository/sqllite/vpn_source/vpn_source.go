@@ -57,7 +57,7 @@ func (vs *VPNSource) Find(country string) (*entity.VPNSource, error) {
 	return nil, momoError.Wrap(err).Scope(scope).Input(country).UnExpected().DebuggingError()
 }
 
-func (vs *VPNSource) Filter(filterDto *vpnSourceRepositoryDto.FilterVPNSources) ([]*entity.VPNSource, error) {
+func (vs *VPNSource) Filter(filterDto *vpnSourceRepositoryDto.FilterVPNSourcesDto) ([]*entity.VPNSource, error) {
 	scope := "vpnsourceRepository.filter"
 	query := vs.makeFilterQuery(filterDto)
 
@@ -77,7 +77,7 @@ func (vs *VPNSource) Filter(filterDto *vpnSourceRepositoryDto.FilterVPNSources) 
 	return vpnSources, nil
 }
 
-func (vs *VPNSource) makeFilterQuery(filterDto *vpnSourceRepositoryDto.FilterVPNSources) string {
+func (vs *VPNSource) makeFilterQuery(filterDto *vpnSourceRepositoryDto.FilterVPNSourcesDto) string {
 	t := reflect.TypeOf(*filterDto)
 	v := reflect.ValueOf(*filterDto)
 	subQueries := []string{}
