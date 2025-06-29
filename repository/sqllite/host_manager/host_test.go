@@ -117,6 +117,18 @@ func TestFilterHosts(t *testing.T) {
 	if len(hosts) != 3 {
 		t.Errorf("we expected 3 items but we got %v", len(hosts))
 	}
+
+	hosts, err = hostRepo.Filter(&hostmanagerDto.FilterHosts{
+		Statuses: []entity.HostStatus{entity.High, entity.Medium, entity.Low},
+		Domains:  []string{hostExample2.Domain},
+	})
+	if err != nil {
+		t.Errorf("something wrong has happend that was %v", err)
+	}
+
+	if len(hosts) != 1 {
+		t.Errorf("we expected 1 items but we got %v", len(hosts))
+	}
 }
 
 func TestUpdateHost(t *testing.T) {

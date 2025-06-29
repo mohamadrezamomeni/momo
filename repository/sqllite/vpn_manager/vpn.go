@@ -2,7 +2,6 @@ package vpnmanager
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 
 	vpnManagerDto "github.com/mohamadrezamomeni/momo/dto/repository/vpn_manager"
@@ -137,21 +136,24 @@ func (v *VPN) Filter(inpt *vpnManagerDto.FilterVPNs) ([]*entity.VPN, error) {
 
 func (v *VPN) makeSQlFilter(inpt *vpnManagerDto.FilterVPNs) string {
 	sql := "SELECT * FROM vpns"
-	val := reflect.ValueOf(*inpt)
-	t := reflect.TypeOf(*inpt)
 	subQueries := make([]string, 0)
 
-	for i := 0; i < t.NumField(); i++ {
-		v := val.Field(i)
-		field := t.Field(i)
-		if v.Kind() == reflect.Pointer && !v.IsNil() && v.Elem().Kind() == reflect.Bool && field.Name == "IsActive" {
-			subQueries = append(subQueries, fmt.Sprintf("is_active = %v", v.Elem().Bool()))
-		} else if v.Kind() == reflect.String && v.String() != "" && field.Name == "Domain" {
-			subQueries = append(subQueries, fmt.Sprintf("domain LIKE  '%%%s%%'", v.String()))
-		} else if field.Name == "VPNType" && v.Int() != 0 {
-			subQueries = append(subQueries, fmt.Sprintf("vpn_type = '%s'", entity.VPNTypeString(int(v.Int()))))
-		}
+	if inpt.IsActive != nil {
+		subQueries = append(subQueries, fmt.Sprintf("is_active = %v", *inpt.IsActive))
 	}
+
+	if inpt.Domain != "" {
+		subQueries = append(subQueries, fmt.Sprintf("domain LIKE  '%%%s%%'", inpt.Domain))
+	}
+
+	if inpt.VPNType != 0 {
+		subQueries = append(subQueries, fmt.Sprintf("vpn_type = '%s'", entity.VPNTypeString(inpt.VPNType)))
+	}
+
+	if inpt.Coountries != nil && len(inpt.Coountries) > 0 {
+		subQueries = append(subQueries, fmt.Sprintf("country IN ('%s')", strings.Join(inpt.Coountries, "', '")))
+	}
+
 	joinSQL := strings.Join(subQueries, " AND ")
 
 	if len(joinSQL) > 0 {
@@ -184,4 +186,45 @@ func (v *VPN) GroupAvailbleVPNsByCountry() ([]string, error) {
 		countries = append(countries, country)
 	}
 	return countries, nil
+}
+
+func (v *VPN) GroupDomainsByVPNSource(dto *vpnManagerDto.GroupVPNsByVPNSourceDto) (map[string][]string, error) {
+	scope := "vpnRepository.GroupDomainsByVPNSource"
+
+	ret := map[string][]string{}
+	sql := "SELECT country, GROUP_CONCAT(DISTINCT domain) AS domains FROM vpns %s GROUP BY country"
+
+	subQueries := []string{}
+
+	if dto.IsActive != nil {
+		subQueries = append(subQueries, fmt.Sprintf("is_active = %v", *dto.IsActive))
+	}
+
+	if dto.VPNSources != nil && len(dto.VPNSources) > 0 {
+		subQueries = append(subQueries, fmt.Sprintf("country IN ('%s')", strings.Join(dto.VPNSources, "', '")))
+	}
+	query := sql
+	if len(subQueries) > 0 {
+		query = fmt.Sprintf(query, " WHERE "+strings.Join(subQueries, " AND "))
+	} else {
+		query = fmt.Sprintf(query, "")
+	}
+	rows, err := v.db.Conn().Query(query)
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).Input(dto).ErrorWrite()
+	}
+
+	for rows.Next() {
+		var country string
+		var domains string
+		err := rows.Scan(
+			&country,
+			&domains,
+		)
+		if err != nil {
+			return nil, momoError.Wrap(err).Scope(scope).Input(dto).ErrorWrite()
+		}
+		ret[country] = append(ret[country], strings.Split(domains, ",")...)
+	}
+	return ret, nil
 }

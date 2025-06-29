@@ -25,11 +25,13 @@ var (
 		Start:        now.AddDate(0, -1, 0),
 		End:          now,
 		IsBlock:      false,
+		Country:      "china",
 		TrafficLimit: 50000,
 	}
 	inbound2 = &inboundRepositoryDto.CreateInbound{
 		Protocol:     "vmess",
 		Tag:          "example-tag",
+		Country:      "china",
 		Port:         "",
 		UserID:       uuid.New().String(),
 		Domain:       "",
@@ -46,6 +48,7 @@ var (
 		Protocol:     "vmess",
 		Tag:          "example-tag",
 		Port:         "",
+		Country:      "us",
 		UserID:       uuid.New().String(),
 		Domain:       "instagram.com",
 		VPNType:      entity.XRAY_VPN,

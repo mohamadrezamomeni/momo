@@ -3,6 +3,7 @@ package host
 import (
 	"strconv"
 
+	hostService "github.com/mohamadrezamomeni/momo/dto/service/host"
 	"github.com/mohamadrezamomeni/momo/entity"
 )
 
@@ -12,13 +13,27 @@ func New() *MockHost {
 	return &MockHost{}
 }
 
-func (h *MockHost) ResolveHostPortPair(hostPortUsed map[string][]string, requiredPorts int) ([][2]string, error) {
-	hostPairs := make([][2]string, 0)
-	for i := 0; i < requiredPorts; i++ {
-		hostPairs = append(hostPairs, [2]string{"google.com", strconv.Itoa(1000 + i)})
+func (h *MockHost) ResolveHostPortPair(
+	hostPortUsed map[string][]string,
+	hostPortsRequired map[string]uint32,
+) (map[string][]*hostService.HostAddress, error) {
+	hostPairs := make([]*hostService.HostAddress, 0)
+	for domain, countPortsRequired := range hostPortsRequired {
+		for i := 0; i < int(countPortsRequired); i++ {
+			hostPairs = append(hostPairs, &hostService.HostAddress{
+				Domain: domain,
+				Port:   strconv.Itoa(1000 + i),
+			},
+			)
+		}
 	}
 
-	return hostPairs, nil
+	ret := map[string][]*hostService.HostAddress{}
+	for _, hostPair := range hostPairs {
+		ret[hostPair.Domain] = append(ret[hostPair.Domain], hostPair)
+	}
+
+	return ret, nil
 }
 
 func (h *MockHost) FindRightHosts(status entity.HostStatus) ([]*entity.Host, error) {

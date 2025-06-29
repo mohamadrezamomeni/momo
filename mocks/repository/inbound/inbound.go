@@ -32,6 +32,7 @@ func (i *MockInbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, e
 		IsActive:   inpt.IsActive,
 		Domain:     inpt.Domain,
 		Port:       inpt.Port,
+		Country:    inpt.Country,
 		IsAssigned: inpt.IsAssigned,
 		IsNotified: inpt.IsNotified,
 		IsBlock:    inpt.IsBlock,

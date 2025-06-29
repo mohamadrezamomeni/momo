@@ -39,4 +39,12 @@ var (
 		VPNType:  entity.XRAY_VPN,
 		IsActive: false,
 	}
+
+	vpn5 = &vpnManagerDto.AddVPN{
+		Country:  "china",
+		Domain:   "joi.com",
+		ApiPort:  "62733",
+		VPNType:  entity.XRAY_VPN,
+		IsActive: true,
+	}
 )

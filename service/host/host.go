@@ -45,6 +45,7 @@ func (h *Host) Filter(filterDto *hostServiceDto.FilterHosts) ([]*entity.Host, er
 	return h.hostRepo.Filter(
 		&hostRepoDto.FilterHosts{
 			Statuses: filterDto.Status,
+			Domains:  filterDto.Domains,
 		},
 	)
 }

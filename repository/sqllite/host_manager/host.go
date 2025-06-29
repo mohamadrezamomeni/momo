@@ -146,6 +146,10 @@ func (h *Host) makeQuery(inpt *hostmanagerDto.FilterHosts) string {
 		)
 	}
 
+	if inpt.Domains != nil && len(inpt.Domains) > 0 {
+		subQueries = append(subQueries, fmt.Sprintf("domain IN ('%s')", strings.Join(inpt.Domains, "', '")))
+	}
+
 	if len(subQueries) > 0 {
 		sql = sql + " WHERE " + strings.Join(subQueries, " AND ")
 	}

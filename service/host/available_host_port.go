@@ -5,16 +5,22 @@ import (
 	"sync"
 	"time"
 
+	hostServiceDto "github.com/mohamadrezamomeni/momo/dto/service/host"
 	"github.com/mohamadrezamomeni/momo/entity"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 )
 
 func (h *Host) ResolveHostPortPair(
 	domainPortUsed map[string][]string,
-	requiredHosts int,
-) ([][2]string, error) {
+	requiredHostPorts map[string]uint32,
+) (map[string][]*hostServiceDto.HostAddress, error) {
 	scope := "host.service.resolveHostPortPair"
-	hosts, err := h.FindRightHosts(entity.High)
+
+	domains := h.extractRequiredHostPorts(requiredHostPorts)
+	hosts, err := h.Filter(&hostServiceDto.FilterHosts{
+		Status:  []entity.HostStatus{entity.High},
+		Domains: domains,
+	})
 	if err != nil {
 		return nil, momoError.Wrap(err).Scope(scope).ErrorWrite()
 	}
@@ -37,7 +43,7 @@ func (h *Host) ResolveHostPortPair(
 
 		go h.resolvePorts(
 			host,
-			requiredHosts,
+			requiredHostPorts[host.Domain],
 			domainPortUsed[host.Domain],
 			&wg,
 			ch,
@@ -49,7 +55,7 @@ func (h *Host) ResolveHostPortPair(
 		close(ch)
 	}()
 
-	hostPortPairs := [][2]string{}
+	hostPortPairs := []*hostServiceDto.HostAddress{}
 
 	for item := range ch {
 		hostPortPairs = append(hostPortPairs, h.makeHostPairWiPort(item.Domain, item.Ports)...)
@@ -60,7 +66,7 @@ func (h *Host) ResolveHostPortPair(
 
 func (h *Host) resolvePorts(
 	host *entity.Host,
-	requiredPorts int,
+	requiredPorts uint32,
 	portsUsed []string,
 	wg *sync.WaitGroup,
 	ch chan<- struct {
@@ -89,19 +95,32 @@ func (h *Host) resolvePorts(
 	}
 }
 
-func (i *Host) makeHostPairWiPort(host string, ports []string) [][2]string {
-	hostPortPairs := [][2]string{}
+func (h *Host) makeHostPairWiPort(host string, ports []string) []*hostServiceDto.HostAddress {
+	hostPortPairs := []*hostServiceDto.HostAddress{}
 	for _, port := range ports {
-		hostPortPairs = append(hostPortPairs, [2]string{host, port})
+		hostPortPairs = append(hostPortPairs, &hostServiceDto.HostAddress{Domain: host, Port: port})
 	}
 	return hostPortPairs
 }
 
-func (i *Host) shuffleHostPortPairs(hostPortPairs [][2]string) [][2]string {
+func (h *Host) shuffleHostPortPairs(hostPortPairs []*hostServiceDto.HostAddress) map[string][]*hostServiceDto.HostAddress {
 	rand := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	rand.Shuffle(len(hostPortPairs), func(i, j int) {
 		hostPortPairs[i], hostPortPairs[j] = hostPortPairs[j], hostPortPairs[i]
 	})
-	return hostPortPairs
+
+	ret := map[string][]*hostServiceDto.HostAddress{}
+	for _, hostPair := range hostPortPairs {
+		ret[hostPair.Domain] = append(ret[hostPair.Domain], hostPair)
+	}
+	return ret
+}
+
+func (i *Host) extractRequiredHostPorts(requiredHostPorts map[string]uint32) []string {
+	domains := []string{}
+	for domain := range requiredHostPorts {
+		domains = append(domains, domain)
+	}
+	return domains
 }

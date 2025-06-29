@@ -6,6 +6,7 @@ import (
 	"testing"
 	"unsafe"
 
+	"github.com/mohamadrezamomeni/momo/dto/service/vpn"
 	inboundRepository "github.com/mohamadrezamomeni/momo/mocks/repository/inbound"
 	chargeService "github.com/mohamadrezamomeni/momo/mocks/service/charge"
 	hostService "github.com/mohamadrezamomeni/momo/mocks/service/host"
@@ -22,7 +23,7 @@ func registerInboundSvc() (*Inbound, *HostInbound, *HealingUpInbound, *inboundRe
 
 	inboundSvc := New(inboundRepo)
 	inboundChargeSvc := inboundChargeService.New()
-	inboundHostSvc := NewHostInbound(inboundRepo, hostSvc)
+	inboundHostSvc := NewHostInbound(inboundRepo, hostSvc, vpnSvc)
 	userSvc := userService.New()
 	chargeSvc := chargeService.New()
 	healingUpInboundSvc := NewHealingUpInbound(inboundRepo, vpnSvc, inboundChargeSvc, chargeSvc, userSvc)
@@ -30,8 +31,29 @@ func registerInboundSvc() (*Inbound, *HostInbound, *HealingUpInbound, *inboundRe
 }
 
 func TestApplyDomainAndPortToInbounds(t *testing.T) {
-	_, inboundHostSvc, _, inboundRepo, _ := registerInboundSvc()
+	_, inboundHostSvc, _, inboundRepo, vpnSvc := registerInboundSvc()
 
+	vpnSvc.Create(&vpn.CreateVPN{
+		VpnType:   inbound1.VPNType,
+		Country:   inbound1.Country,
+		Domain:    "instagram.com",
+		UserCount: 2,
+		Port:      "203",
+	})
+	vpnSvc.Create(&vpn.CreateVPN{
+		VpnType:   inbound2.VPNType,
+		Country:   inbound2.Country,
+		Domain:    "instagram.com",
+		UserCount: 2,
+		Port:      "203",
+	})
+	vpnSvc.Create(&vpn.CreateVPN{
+		VpnType:   inbound3.VPNType,
+		Country:   inbound3.Country,
+		Domain:    "instagram.com",
+		UserCount: 2,
+		Port:      "203",
+	})
 	inboundCreated1, _ := inboundRepo.Create(inbound1)
 	inboundCreated2, _ := inboundRepo.Create(inbound2)
 	inboundCreated3, _ := inboundRepo.Create(inbound3)

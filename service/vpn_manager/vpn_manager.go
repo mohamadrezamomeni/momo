@@ -14,6 +14,7 @@ type VPNRepo interface {
 	DeactiveVPN(int) error
 	Create(*vpnManagerRepositoryDto.AddVPN) (*entity.VPN, error)
 	GroupAvailbleVPNsByCountry() ([]string, error)
+	GroupDomainsByVPNSource(*vpnManagerRepositoryDto.GroupVPNsByVPNSourceDto) (map[string][]string, error)
 }
 
 type AdaptedVPNProxy func(adapterConfigs []*adapter.AdapterVPnProxyigFactoryConfig) adapter.ProxyVPN
@@ -110,4 +111,12 @@ func (v *VPNService) GetAvailableCountries() ([]string, error) {
 		return nil, err
 	}
 	return countries, err
+}
+
+func (v *VPNService) GetAvailableVPNSourceDomains(vpnsSources []string) (map[string][]string, error) {
+	active := true
+	return v.vpnRepo.GroupDomainsByVPNSource(&vpnManagerRepositoryDto.GroupVPNsByVPNSourceDto{
+		VPNSources: vpnsSources,
+		IsActive:   &active,
+	})
 }

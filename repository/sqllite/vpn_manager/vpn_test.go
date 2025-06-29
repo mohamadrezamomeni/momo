@@ -109,6 +109,17 @@ func TestFilterVPNs(t *testing.T) {
 	if len(vpns) != 2 {
 		t.Errorf("4. the number of vpns must be 2 but the result was %v", len(vpns))
 	}
+
+	vpns, err = vpnRepo.Filter(&vpnManagerDto.FilterVPNs{
+		Coountries: []string{"uk"},
+	})
+	if err != nil {
+		t.Errorf("5. something wrong has happend that was %v", err)
+	}
+
+	if len(vpns) != 2 {
+		t.Errorf("5. the number of vpns must be 2 but the result was %v", len(vpns))
+	}
 }
 
 func TestGroupingByCountry(t *testing.T) {
@@ -134,6 +145,71 @@ func TestGroupingByCountry(t *testing.T) {
 	for _, country := range []string{"china", "uk"} {
 		if _, isExist := countriesRefrence[country]; !isExist {
 			t.Fatalf("we expected china be existed but the response miss that`")
+		}
+	}
+}
+
+func TestGroupDomainsByVPNSource(t *testing.T) {
+	defer vpnRepo.DeleteAll()
+	vpnRepo.Create(vpn1)
+	vpnRepo.Create(vpn2)
+	vpnRepo.Create(vpn3)
+	vpnRepo.Create(vpn4)
+	vpnRepo.Create(vpn5)
+
+	VPNSourceDomains, err := vpnRepo.GroupDomainsByVPNSource(&vpnManagerDto.GroupVPNsByVPNSourceDto{})
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	validResponse := map[string][]string{
+		"china":    {"jordan.com", "joi.com"},
+		"uk":       {"joi.com"},
+		"colombia": {"jordan.com"},
+	}
+	if len(VPNSourceDomains) != len(validResponse) {
+		t.Fatalf("we expected the lengh of result's keys be %d but we got %d", len(validResponse), len(VPNSourceDomains))
+	}
+
+	ValidateResponseGroupDomainByVPNSource(t, validResponse, VPNSourceDomains)
+
+	active := true
+	VPNSourceDomains, err = vpnRepo.GroupDomainsByVPNSource(&vpnManagerDto.GroupVPNsByVPNSourceDto{
+		IsActive:   &active,
+		VPNSources: []string{"uk"},
+	})
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	validResponse = map[string][]string{
+		"uk": {"joi.com"},
+	}
+	if len(VPNSourceDomains) != len(validResponse) {
+		t.Fatalf("we expected the lengh of result's keys be %d but we got %d", len(validResponse), len(VPNSourceDomains))
+	}
+
+	ValidateResponseGroupDomainByVPNSource(t, validResponse, VPNSourceDomains)
+}
+
+func ValidateResponseGroupDomainByVPNSource(
+	t *testing.T,
+	validResponse map[string][]string,
+	VPNSourceDomains map[string][]string,
+) {
+	for country, domains := range validResponse {
+		if _, isExist := VPNSourceDomains[country]; !isExist {
+			t.Fatalf("the country %s was missed", country)
+		}
+
+		domainsRefrence := map[string]struct{}{}
+		for _, domain := range VPNSourceDomains[country] {
+			domainsRefrence[domain] = struct{}{}
+		}
+		for _, domain := range domains {
+			if _, isExist := domainsRefrence[domain]; !isExist {
+				t.Fatalf("the domain %s was missed", domain)
+			}
 		}
 	}
 }

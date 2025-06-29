@@ -89,3 +89,30 @@ func (mv *MockVPN) GroupAvailbleVPNsByCountry() ([]string, error) {
 	}
 	return res, nil
 }
+
+func (mv *MockVPN) GroupDomainsByVPNSource(dto *vpnManagerDto.GroupVPNsByVPNSourceDto) (map[string][]string, error) {
+	ret := map[string][]string{}
+	vpns := []*entity.VPN{}
+	VPNSourcesRefrence := map[string]struct{}{}
+	for _, vpnSource := range dto.VPNSources {
+		VPNSourcesRefrence[vpnSource] = struct{}{}
+	}
+	for _, vpn := range mv.vpns {
+		if dto.IsActive != nil && *dto.IsActive == vpn.IsActive {
+			vpns = append(vpns, vpn)
+		}
+		if len(dto.VPNSources) > 0 {
+			if _, isExist := VPNSourcesRefrence[vpn.Country]; isExist {
+				vpns = append(vpns, vpn)
+			}
+		} else {
+			vpns = append(vpns, vpn)
+		}
+	}
+
+	for _, vpn := range vpns {
+		ret[vpn.Country] = append(ret[vpn.Country], vpn.Domain)
+	}
+
+	return ret, nil
+}

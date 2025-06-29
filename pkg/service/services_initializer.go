@@ -66,7 +66,7 @@ func GetServices(cfg *config.Config) (
 	chargeSvc := chargeService.New(eventSvc, chargeRepo)
 	inboundSvc := inboundService.New(inboundRepo)
 	healingUpInboundSvc := inboundService.NewHealingUpInbound(inboundRepo, vpnSvc, inboundChargeSvc, chargeSvc, userSvc)
-	hostInboundSvc := inboundService.NewHostInbound(inboundRepo, hostSvc)
+	hostInboundSvc := inboundService.NewHostInbound(inboundRepo, hostSvc, vpnSvc)
 	inboundTrafficSvc := inboundService.NewInboundTraffic(inboundRepo, vpnSvc, userSvc)
 	vpnSourceSvc := vpnSourceService.New(vpnSourceRepo, vpnSvc)
 
