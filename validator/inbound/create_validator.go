@@ -45,7 +45,7 @@ func (v *Validator) ValidateCreatingInbound(req inboundControllerDto.CreateInbou
 				if !ok {
 					return momoError.Scope(scope).Input(req).ErrorWrite()
 				}
-				if entity.UknownVPNType == entity.ConvertStringVPNTypeToEnum(v) {
+				if entity.UknownVPNType == entity.ConvertStringVPNTypeToEnum(v) || 0 == entity.ConvertStringVPNTypeToEnum(v) {
 					return momoError.Scope(scope).Input(req).BadRequest().ErrorWrite()
 				}
 				return nil
