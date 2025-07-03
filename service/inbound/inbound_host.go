@@ -1,7 +1,6 @@
 package inbound
 
 import (
-	hostServiceDto "github.com/mohamadrezamomeni/momo/dto/service/host"
 	"github.com/mohamadrezamomeni/momo/entity"
 )
 
@@ -26,9 +25,14 @@ type InboundHostRepo interface {
 
 type HostService interface {
 	ResolveHostPortPair(map[string][]string, map[string]uint32) (
-		map[string][]*hostServiceDto.HostAddress,
+		map[string][]string,
 		error,
 	)
+}
+
+type Address struct {
+	Domain string
+	Port   string
 }
 
 func NewHostInbound(
@@ -53,6 +57,7 @@ func (i *HostInbound) AssignDomainToInbounds() {
 		return
 	}
 	vpnSources := i.getVPNSourcesFromInbounds(inbounds)
+
 	VPNSourceDomains, err := i.vpnManagerSvc.GetAvailableVPNSourceDomains(vpnSources)
 	if err != nil {
 		return
@@ -66,7 +71,7 @@ func (i *HostInbound) AssignDomainToInbounds() {
 		return
 	}
 
-	VPNSourceInboundDestinations := i.getVPNSourceInboundDestination(
+	VPNSourceAddresses := i.getVPNSourceInboundDestination(
 		VPNSourceDomains,
 		hostPortPairsMap,
 	)
@@ -74,8 +79,8 @@ func (i *HostInbound) AssignDomainToInbounds() {
 	for _, inbound := range inbounds {
 		count := seen[inbound.Country]
 
-		if len(VPNSourceInboundDestinations[inbound.Country]) > int(count) {
-			inboundDestination := VPNSourceInboundDestinations[inbound.Country][count]
+		if len(VPNSourceAddresses[inbound.Country]) > int(count) {
+			inboundDestination := VPNSourceAddresses[inbound.Country][count]
 			i.inboundRepo.UpdateDomainPort(inbound.ID,
 				inboundDestination.Domain,
 				inboundDestination.Port,
@@ -155,13 +160,30 @@ func (i *HostInbound) countInboundsByVPNSource(inbounds []*entity.Inbound) map[s
 
 func (i *HostInbound) getVPNSourceInboundDestination(
 	VPNSourceDomains map[string][]string,
-	hostInboundDestination map[string][]*hostServiceDto.HostAddress,
-) map[string][]*hostServiceDto.HostAddress {
-	VPNSourceInboundDestination := map[string][]*hostServiceDto.HostAddress{}
-	for VPNSource, domains := range VPNSourceDomains {
-		for _, domain := range domains {
-			VPNSourceInboundDestination[VPNSource] = append(VPNSourceInboundDestination[VPNSource], hostInboundDestination[domain]...)
-		}
+	hostPorts map[string][]string,
+) map[string][]*Address {
+	VPNSourceInboundDestination := map[string][]*Address{}
+	for country, domains := range VPNSourceDomains {
+		VPNSourceInboundDestination[country] = i.getAddressesByCountry(domains, hostPorts)
 	}
 	return VPNSourceInboundDestination
+}
+
+func (i *HostInbound) getAddressesByCountry(domains []string, hostPorts map[string][]string) []*Address {
+	addresses := []*Address{}
+	for _, domain := range domains {
+		addresses = append(
+			addresses,
+			i.makeAddresses(domain, hostPorts[domain])...,
+		)
+	}
+	return addresses
+}
+
+func (i *HostInbound) makeAddresses(domain string, ports []string) []*Address {
+	ret := []*Address{}
+	for _, port := range ports {
+		ret = append(ret, &Address{Domain: domain, Port: port})
+	}
+	return ret
 }

@@ -10,10 +10,15 @@ import (
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 )
 
+type Address struct {
+	Domain string
+	Port   string
+}
+
 func (h *Host) ResolveHostPortPair(
 	domainPortUsed map[string][]string,
 	requiredHostPorts map[string]uint32,
-) (map[string][]*hostServiceDto.HostAddress, error) {
+) (map[string][]string, error) {
 	scope := "host.service.resolveHostPortPair"
 
 	domains := h.extractRequiredHostPorts(requiredHostPorts)
@@ -55,7 +60,7 @@ func (h *Host) ResolveHostPortPair(
 		close(ch)
 	}()
 
-	hostPortPairs := []*hostServiceDto.HostAddress{}
+	hostPortPairs := []*Address{}
 
 	for item := range ch {
 		hostPortPairs = append(hostPortPairs, h.makeHostPairWiPort(item.Domain, item.Ports)...)
@@ -95,24 +100,27 @@ func (h *Host) resolvePorts(
 	}
 }
 
-func (h *Host) makeHostPairWiPort(host string, ports []string) []*hostServiceDto.HostAddress {
-	hostPortPairs := []*hostServiceDto.HostAddress{}
+func (h *Host) makeHostPairWiPort(host string, ports []string) []*Address {
+	hostPortPairs := []*Address{}
 	for _, port := range ports {
-		hostPortPairs = append(hostPortPairs, &hostServiceDto.HostAddress{Domain: host, Port: port})
+		hostPortPairs = append(hostPortPairs, &Address{
+			Domain: host,
+			Port:   port,
+		})
 	}
 	return hostPortPairs
 }
 
-func (h *Host) shuffleHostPortPairs(hostPortPairs []*hostServiceDto.HostAddress) map[string][]*hostServiceDto.HostAddress {
+func (h *Host) shuffleHostPortPairs(hostPortPairs []*Address) map[string][]string {
 	rand := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	rand.Shuffle(len(hostPortPairs), func(i, j int) {
 		hostPortPairs[i], hostPortPairs[j] = hostPortPairs[j], hostPortPairs[i]
 	})
 
-	ret := map[string][]*hostServiceDto.HostAddress{}
+	ret := map[string][]string{}
 	for _, hostPair := range hostPortPairs {
-		ret[hostPair.Domain] = append(ret[hostPair.Domain], hostPair)
+		ret[hostPair.Domain] = append(ret[hostPair.Domain], hostPair.Port)
 	}
 	return ret
 }

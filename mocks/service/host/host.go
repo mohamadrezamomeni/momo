@@ -3,7 +3,6 @@ package host
 import (
 	"strconv"
 
-	hostService "github.com/mohamadrezamomeni/momo/dto/service/host"
 	"github.com/mohamadrezamomeni/momo/entity"
 )
 
@@ -13,14 +12,19 @@ func New() *MockHost {
 	return &MockHost{}
 }
 
+type Address struct {
+	Domain string
+	Port   string
+}
+
 func (h *MockHost) ResolveHostPortPair(
 	hostPortUsed map[string][]string,
 	hostPortsRequired map[string]uint32,
-) (map[string][]*hostService.HostAddress, error) {
-	hostPairs := make([]*hostService.HostAddress, 0)
+) (map[string][]string, error) {
+	hostPairs := make([]*Address, 0)
 	for domain, countPortsRequired := range hostPortsRequired {
 		for i := 0; i < int(countPortsRequired); i++ {
-			hostPairs = append(hostPairs, &hostService.HostAddress{
+			hostPairs = append(hostPairs, &Address{
 				Domain: domain,
 				Port:   strconv.Itoa(1000 + i),
 			},
@@ -28,9 +32,9 @@ func (h *MockHost) ResolveHostPortPair(
 		}
 	}
 
-	ret := map[string][]*hostService.HostAddress{}
+	ret := map[string][]string{}
 	for _, hostPair := range hostPairs {
-		ret[hostPair.Domain] = append(ret[hostPair.Domain], hostPair)
+		ret[hostPair.Domain] = append(ret[hostPair.Domain], hostPair.Port)
 	}
 
 	return ret, nil
