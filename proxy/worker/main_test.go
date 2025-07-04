@@ -8,7 +8,7 @@ import (
 var pw *ProxyWorker
 
 func TestMain(m *testing.M) {
-	pw, _ = New(&Config{Address: "localhost", Port: "666"})
+	pw, _ = New(&Config{Address: "localhost", Port: "50051"})
 
 	code := m.Run()
 	pw.Close()

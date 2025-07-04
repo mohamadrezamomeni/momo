@@ -1,8 +1,6 @@
 package vpn
 
 import (
-	"fmt"
-
 	"github.com/mohamadrezamomeni/momo/adapter"
 	vpnServiceDto "github.com/mohamadrezamomeni/momo/dto/service/vpn"
 	"github.com/mohamadrezamomeni/momo/entity"
@@ -42,7 +40,6 @@ func (mv *MockVPN) GetAvailableVPNSourceDomains(vpnSources []string) (map[string
 	ret := map[string][]string{}
 	for _, vpnSource := range vpnSources {
 		for _, v := range mv.vpns {
-			fmt.Println(vpnSource, v.Country)
 			if v.Country == vpnSource {
 				ret[vpnSource] = append(ret[vpnSource], v.Domain)
 			}
