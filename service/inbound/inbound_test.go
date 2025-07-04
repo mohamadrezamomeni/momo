@@ -33,6 +33,8 @@ func registerInboundSvc() (*Inbound, *HostInbound, *HealingUpInbound, *inboundRe
 func TestApplyDomainAndPortToInbounds(t *testing.T) {
 	_, inboundHostSvc, _, inboundRepo, vpnSvc := registerInboundSvc()
 
+	defer vpnSvc.DeleteAll()
+
 	vpnSvc.Create(&vpn.CreateVPN{
 		VpnType:   inbound1.VPNType,
 		Country:   inbound1.Country,
@@ -40,32 +42,35 @@ func TestApplyDomainAndPortToInbounds(t *testing.T) {
 		UserCount: 2,
 		Port:      "203",
 	})
-	vpnSvc.Create(&vpn.CreateVPN{
-		VpnType:   inbound2.VPNType,
-		Country:   inbound2.Country,
-		Domain:    "instagram.com",
-		UserCount: 2,
-		Port:      "203",
-	})
+
 	vpnSvc.Create(&vpn.CreateVPN{
 		VpnType:   inbound3.VPNType,
 		Country:   inbound3.Country,
-		Domain:    "instagram.com",
+		Domain:    "facebook.com",
 		UserCount: 2,
 		Port:      "203",
 	})
 	inboundCreated1, _ := inboundRepo.Create(inbound1)
 	inboundCreated2, _ := inboundRepo.Create(inbound2)
 	inboundCreated3, _ := inboundRepo.Create(inbound3)
+	inboundCreated4, _ := inboundRepo.Create(inbound7)
 
 	inboundHostSvc.AssignDomainToInbounds()
 
 	ret1, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated1.ID))
 	ret2, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated2.ID))
 	ret3, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated3.ID))
+	ret4, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated4.ID))
 
-	if ret1.IsAssigned != true || ret2.IsAssigned != true {
+	if ret1.IsAssigned != true ||
+		ret2.IsAssigned != true ||
+		ret1.Domain != "instagram.com" ||
+		ret2.Domain != "instagram.com" {
 		t.Fatal("inbounds aren't updated currectly")
+	}
+
+	if ret4.IsAssigned != false {
+		t.Fatal("the inbound whose country isn't exist is updated")
 	}
 
 	if ret3.Domain != "instagram.com" {
