@@ -64,9 +64,9 @@ func (v *VPNService) MonitorVPNs() {
 			VPNType: vpn.VPNType,
 		})
 		if err != nil {
-			v.vpnRepo.ActiveVPN(vpn.ID)
-		} else {
 			v.vpnRepo.DeactiveVPN(vpn.ID)
+		} else {
+			v.vpnRepo.ActiveVPN(vpn.ID)
 		}
 	}
 }

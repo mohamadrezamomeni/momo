@@ -33,15 +33,15 @@ func TestMonitorVPNs(t *testing.T) {
 	vpnFound2 := vpnRepo.FindByID(vpnCreated2.ID)
 	vpnFound3 := vpnRepo.FindByID(vpnCreated3.ID)
 
-	if vpnFound3.IsActive != true {
-		t.Error("vpn3 must be active")
+	if vpnFound3.IsActive != false {
+		t.Error("vpn3 must be deactive")
 	}
 
-	if vpnFound2.IsActive != false {
-		t.Error("vpn2 must be deactive")
+	if vpnFound2.IsActive != true {
+		t.Error("vpn2 must be active")
 	}
 
-	if vpnFound1.IsActive != true {
-		t.Error("vpn1 must be active")
+	if vpnFound1.IsActive != false {
+		t.Error("vpn1 must be deactive")
 	}
 }
