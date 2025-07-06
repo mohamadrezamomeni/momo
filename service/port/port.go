@@ -59,11 +59,9 @@ func (p *Port) isPortAvailable(port string) bool {
 	if p.isPortReserverd(port) {
 		return false
 	}
-
 	if p.isPortBusy(port) {
 		return false
 	}
-
 	return true
 }
 
@@ -79,7 +77,6 @@ func (p *Port) isPortBusy(port string) bool {
 
 func (p *Port) isPortReserverd(port string) bool {
 	oldestTime := p.findOldestRecordbyPort(port)
-
 	if oldestTime.IsZero() {
 		return false
 	}
@@ -96,15 +93,16 @@ func (p *Port) isPortReserverd(port string) bool {
 
 func (p *Port) findOldestRecordbyPort(port string) time.Time {
 	path := p.getPath()
-	input, _ := os.ReadFile(path)
-	_, time := p.findPortInBytes(input, port)
+	_, time := p.findPortInBytes(path, port)
 	return time
 }
 
-func (p *Port) findPortInBytes(data []byte, port string) (int, time.Time) {
+func (p *Port) findPortInBytes(path string, port string) (int, time.Time) {
 	indexRow := -1
 	var oldestTime time.Time
-	for i, row := range strings.Split(string(data), "\n") {
+	lines := p.getAllLines(path)
+
+	for i, row := range lines {
 		fields := strings.Fields(row)
 		t, portExist := fields[0], fields[1]
 		if portExist == port {
@@ -114,30 +112,39 @@ func (p *Port) findPortInBytes(data []byte, port string) (int, time.Time) {
 			break
 		}
 	}
-
 	return indexRow, oldestTime
 }
 
 func (p *Port) store(port string) {
 	path := p.getPath()
-	input, _ := os.ReadFile(path)
-	idx, _ := p.findPortInBytes(input, port)
+	idx, _ := p.findPortInBytes(path, port)
+	lines := p.getAllLines(path)
 
-	lines := strings.Split(string(input), "\n")
-	line := fmt.Sprintf("%d %s\n", time.Now().Unix(), port)
+	line := fmt.Sprintf("%d %s", time.Now().Unix(), port)
 
 	if idx != -1 {
 		lines[idx] = line
 	} else {
 		lines = append(lines, line)
 	}
-
 	output := strings.Join(lines, "\n")
 	os.WriteFile(path, []byte(output), 0o644)
+}
+
+func (p *Port) getAllLines(path string) []string {
+	input, _ := os.ReadFile(path)
+	lines := make([]string, 0)
+	parts := strings.Split(string(input), "\n")
+	for _, part := range parts {
+		if part != "" {
+			lines = append(lines, part)
+		}
+	}
+	return lines
 }
 
 func (p *Port) getPath() string {
 	root, _ := utils.GetRootOfProject()
 
-	return filepath.Join(root, "port.text")
+	return filepath.Join(root, "ports")
 }
