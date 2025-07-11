@@ -36,15 +36,9 @@ func (h *Host) ResolveHostPortPair(
 	})
 
 	var wg sync.WaitGroup
-	seen := map[string]struct{}{}
 
 	for _, host := range hosts {
 		wg.Add(1)
-		if _, ok := seen[host.Domain]; ok {
-			continue
-		}
-
-		seen[host.Domain] = struct{}{}
 
 		go h.resolvePorts(
 			host,
