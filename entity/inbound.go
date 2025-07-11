@@ -20,6 +20,7 @@ type Inbound struct {
 	UserID       string
 	Tag          string
 	IsBlock      bool
+	IsPortOpen   bool
 	Start        time.Time
 	End          time.Time
 }
