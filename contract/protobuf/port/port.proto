@@ -14,7 +14,16 @@ message PortAssignRequest {
     uint32 requestNumberOfPort = 2;
 }
 
+message OpenPortsRequest {
+    repeated string ports = 1;
+}
+
+message OpenPortsResponse {
+    repeated string ports = 1;
+}
+
 
 service Port {
     rpc GetAvailablePorts(PortAssignRequest) returns (PortAssignResponse);
+    rpc OpenPorts(OpenPortsRequest) returns (OpenPortsResponse);
 }

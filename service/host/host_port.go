@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	hostRepoDto "github.com/mohamadrezamomeni/momo/dto/repository/host_manager"
 	hostServiceDto "github.com/mohamadrezamomeni/momo/dto/service/host"
 	"github.com/mohamadrezamomeni/momo/entity"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
@@ -125,4 +126,54 @@ func (i *Host) extractRequiredHostPorts(requiredHostPorts map[string]uint32) []s
 		domains = append(domains, domain)
 	}
 	return domains
+}
+
+func (h *Host) OpenPorts(domainPorts map[string][]string) ([]*hostServiceDto.HostPortsFailed, error) {
+	domains := make([]string, 0)
+	for domain := range domainPorts {
+		domains = append(domains, domain)
+	}
+
+	hosts, err := h.hostRepo.Filter(&hostRepoDto.FilterHosts{
+		Domains: domains,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	ch := make(chan *hostServiceDto.HostPortsFailed, 0)
+	for _, host := range hosts {
+		go h.openPortHosts(host, domainPorts[host.Domain], ch)
+	}
+
+	hostPortsFailures := make([]*hostServiceDto.HostPortsFailed, 0)
+	for i := 0; i < len(hosts); i++ {
+		hostPortsFailed := <-ch
+		hostPortsFailures = append(hostPortsFailures, hostPortsFailed)
+	}
+	return hostPortsFailures, nil
+}
+
+func (h *Host) openPortHosts(host *entity.Host, portsMustBeOpen []string, ch chan<- *hostServiceDto.HostPortsFailed) {
+	w, err := h.workerFactorNew(host.Domain, host.Port)
+	if err != nil {
+		ch <- &hostServiceDto.HostPortsFailed{
+			Domain: host.Domain,
+			Ports:  portsMustBeOpen,
+		}
+		return
+	}
+
+	portsFailed, err := w.OpenPorts(portsMustBeOpen)
+	if err != nil {
+		ch <- &hostServiceDto.HostPortsFailed{
+			Domain: host.Domain,
+			Ports:  portsMustBeOpen,
+		}
+	} else {
+		ch <- &hostServiceDto.HostPortsFailed{
+			Domain: host.Domain,
+			Ports:  portsFailed,
+		}
+	}
 }

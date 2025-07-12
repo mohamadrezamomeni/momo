@@ -442,3 +442,35 @@ func TestRetriveFinishedInbounds(t *testing.T) {
 		t.Fatalf("we expected the inbound that is returned contain %s", strconv.Itoa(inboundCreated2.ID))
 	}
 }
+
+func TestGetInboundsMustBeOpenPort(t *testing.T) {
+	inboundCreated1, _ := inboundRepo.Create(inbound23)
+	inboundCreated2, _ := inboundRepo.Create(inbound24)
+	inboundRepo.Create(inbound25)
+	defer inboundRepo.DeleteAll()
+	inbounds, err := inboundRepo.GetInboundsPortMustBeOpen()
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+	if len(inbounds) != 2 {
+		t.Fatalf("we expected the lengh of inbounds be %d but we got %d", 2, len(inbounds))
+	}
+
+	if !((inbounds[0].ID == inboundCreated1.ID || inbounds[0].ID == inboundCreated2.ID) &&
+		(inbounds[1].ID == inboundCreated1.ID || inbounds[1].ID == inboundCreated2.ID)) {
+		t.Fatal("error to compare data")
+	}
+}
+
+func TestActiveIsPortOpen(t *testing.T) {
+	inboundCreated1, _ := inboundRepo.Create(inbound23)
+	err := inboundRepo.SetPortOpen(strconv.Itoa(inboundCreated1.ID))
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	inbound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated1.ID))
+	if !inbound.IsPortOpen {
+		t.Fatal("we expected the inbound's is_port_open be true")
+	}
+}

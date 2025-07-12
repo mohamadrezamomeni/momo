@@ -131,3 +131,26 @@ func TestHealingUpInbounds(t *testing.T) {
 
 	proxy.Close()
 }
+
+func TestOpenInboundsPortMustBeOpen(t *testing.T) {
+	_, hostInboundSvc, _, inboundRepo, _ := registerInboundSvc()
+	inboundCreated1, _ := inboundRepo.Create(inbound8)
+	inboundCreated2, _ := inboundRepo.Create(inbound9)
+	inboundCreated3, _ := inboundRepo.Create(inbound10)
+	hostInboundSvc.OpenInboundsPortMustBeOpen()
+
+	inbound1, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated1.ID))
+	inbound2, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated2.ID))
+	inbound3, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated3.ID))
+	if inbound1.IsPortOpen != false {
+		t.Fatalf("error to compare data we expected inbound1 be false")
+	}
+
+	if inbound2.IsPortOpen != true {
+		t.Fatalf("error to compare data we expected inbound1 be true")
+	}
+
+	if inbound3.IsPortOpen != true {
+		t.Fatalf("error to compare data we expected inbound1 be true")
+	}
+}

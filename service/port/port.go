@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -147,4 +148,24 @@ func (p *Port) getPath() string {
 	root, _ := utils.GetRootOfProject()
 
 	return filepath.Join(root, "ports")
+}
+
+func (p *Port) OpenPorts(ports []string) []string {
+	openPortsFailed := make([]string, 0)
+	for _, port := range ports {
+		err := p.OpenPort(port)
+		if err != nil {
+			openPortsFailed = append(openPortsFailed, port)
+		}
+	}
+	return openPortsFailed
+}
+
+func (p *Port) OpenPort(port string) error {
+	cmd := exec.Command("iptables", "-A", "INPUT", "-p", "tcp", "--dport", port, "-j", "ACCEPT")
+	_, err := cmd.CombinedOutput()
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -27,3 +27,16 @@ func (pw *ProxyWorker) GetAvailablePorts(requestNumberOfPorts uint32, portsUsed 
 	}
 	return res.Ports, nil
 }
+
+func (pw *ProxyWorker) OpenPorts(ports []string) ([]string, error) {
+	scope := "workerProxy.OpenPort"
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	res, err := pw.portClient.OpenPorts(ctx, &pb.OpenPortsRequest{
+		Ports: ports,
+	})
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).Input(ports).ErrorWrite()
+	}
+	return res.Ports, nil
+}

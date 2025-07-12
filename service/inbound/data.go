@@ -123,4 +123,58 @@ var (
 		IsBlock:      false,
 		TrafficLimit: 50000,
 	}
+
+	inbound8 = &inboundRepositoryDto.CreateInbound{
+		Protocol:     "vmess",
+		Tag:          "example-tag",
+		Country:      "uk",
+		Port:         "3333",
+		UserID:       uuid.New().String(),
+		Domain:       "facebook.com",
+		VPNType:      entity.XRAY_VPN,
+		IsAssigned:   true,
+		IsNotified:   true,
+		IsActive:     false,
+		Start:        now.AddDate(0, -1, 0),
+		End:          now,
+		IsBlock:      false,
+		TrafficLimit: 50000,
+		IsPortOpen:   false,
+	}
+
+	inbound9 = &inboundRepositoryDto.CreateInbound{
+		Protocol:     "vmess",
+		Tag:          "example-tag",
+		Country:      "uk",
+		Port:         "2222",
+		UserID:       uuid.New().String(),
+		Domain:       "instagram.com",
+		VPNType:      entity.XRAY_VPN,
+		IsAssigned:   true,
+		IsNotified:   false,
+		IsActive:     true,
+		IsPortOpen:   false,
+		Start:        now.AddDate(0, -1, 0),
+		End:          now,
+		IsBlock:      false,
+		TrafficLimit: 50000,
+	}
+
+	inbound10 = &inboundRepositoryDto.CreateInbound{
+		IsPortOpen:   false,
+		Protocol:     "vmess",
+		Tag:          "example-tag",
+		Country:      "uk",
+		Port:         "2222",
+		UserID:       uuid.New().String(),
+		Domain:       "instagram.com",
+		VPNType:      entity.XRAY_VPN,
+		IsAssigned:   true,
+		IsNotified:   false,
+		IsActive:     true,
+		Start:        now.AddDate(0, -1, 0),
+		End:          now,
+		IsBlock:      false,
+		TrafficLimit: 50000,
+	}
 )

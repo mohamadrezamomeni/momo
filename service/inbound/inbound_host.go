@@ -1,6 +1,9 @@
 package inbound
 
 import (
+	"strconv"
+
+	hostServiceDto "github.com/mohamadrezamomeni/momo/dto/service/host"
 	"github.com/mohamadrezamomeni/momo/entity"
 )
 
@@ -21,6 +24,8 @@ type InboundHostRepo interface {
 		Ports  []string
 	}, error)
 	UpdateDomainPort(int, string, string) error
+	GetInboundsPortMustBeOpen() ([]*entity.Inbound, error)
+	SetPortOpen(string) error
 }
 
 type HostService interface {
@@ -28,6 +33,7 @@ type HostService interface {
 		map[string][]string,
 		error,
 	)
+	OpenPorts(domainPorts map[string][]string) ([]*hostServiceDto.HostPortsFailed, error)
 }
 
 type Address struct {
@@ -186,4 +192,49 @@ func (i *HostInbound) makeAddresses(domain string, ports []string) []*Address {
 		ret = append(ret, &Address{Domain: domain, Port: port})
 	}
 	return ret
+}
+
+func (i *HostInbound) OpenInboundsPortMustBeOpen() {
+	inbounds, err := i.inboundRepo.GetInboundsPortMustBeOpen()
+	if err != nil {
+		return
+	}
+	domainPortsMap := i.getDomainPorts(inbounds)
+
+	hostPortsFailures, err := i.hostService.OpenPorts(domainPortsMap)
+	if err != nil {
+		return
+	}
+
+	hostPortsFailedMap := i.getHostPortsMap(hostPortsFailures)
+
+	for _, inbound := range inbounds {
+		if _, isFailed := hostPortsFailedMap[inbound.Domain][inbound.Port]; !isFailed {
+			i.inboundRepo.SetPortOpen(strconv.Itoa(inbound.ID))
+		}
+	}
+}
+
+func (i *HostInbound) getDomainPorts(inbounds []*entity.Inbound) map[string][]string {
+	domainPorts := make(map[string][]string)
+	for _, inbound := range inbounds {
+		domainPorts[inbound.Domain] = append(domainPorts[inbound.Domain], inbound.Port)
+	}
+	return domainPorts
+}
+
+func (i *HostInbound) getHostPortsMap(hostPortsFailures []*hostServiceDto.HostPortsFailed) map[string]map[string]struct{} {
+	hostPortsMap := make(map[string]map[string]struct{})
+	for _, hostPortFailed := range hostPortsFailures {
+		hostPortsMap[hostPortFailed.Domain] = i.getPortFailedMap(hostPortFailed)
+	}
+	return hostPortsMap
+}
+
+func (i *HostInbound) getPortFailedMap(hostPortsFailed *hostServiceDto.HostPortsFailed) map[string]struct{} {
+	portMap := make(map[string]struct{})
+	for _, port := range hostPortsFailed.Ports {
+		portMap[port] = struct{}{}
+	}
+	return portMap
 }

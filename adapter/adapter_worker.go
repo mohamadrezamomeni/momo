@@ -9,6 +9,7 @@ type WorkerProxy interface {
 	Close()
 	GetAvailablePorts(uint32, []string) ([]string, error)
 	GetMetric() (uint32, entity.HostStatus, error)
+	OpenPorts([]string) ([]string, error)
 }
 
 func AdaptedWorkerFactory(address string, port string) (WorkerProxy, error) {

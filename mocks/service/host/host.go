@@ -3,6 +3,7 @@ package host
 import (
 	"strconv"
 
+	hostServiceDto "github.com/mohamadrezamomeni/momo/dto/service/host"
 	"github.com/mohamadrezamomeni/momo/entity"
 )
 
@@ -57,4 +58,17 @@ func (h *MockHost) FindRightHosts(status entity.HostStatus) ([]*entity.Host, err
 			Domain: "twitter.com",
 		},
 	}, nil
+}
+
+func (h *MockHost) OpenPorts(inpt map[string][]string) ([]*hostServiceDto.HostPortsFailed, error) {
+	ret := make([]*hostServiceDto.HostPortsFailed, 0)
+	for domain, ports := range inpt {
+		if domain == "facebook.com" && ports[0] == "3333" {
+			ret = append(ret, &hostServiceDto.HostPortsFailed{
+				Domain: domain,
+				Ports:  ports,
+			})
+		}
+	}
+	return ret, nil
 }

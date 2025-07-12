@@ -462,6 +462,25 @@ func (i *Inbound) getInboundsFromRows(rows *sql.Rows) ([]*entity.Inbound, error)
 	return inbounds, nil
 }
 
+func (i *Inbound) GetInboundsPortMustBeOpen() ([]*entity.Inbound, error) {
+	scope := "inboundRepository.GetInboundsMustBeOpenPort"
+
+	query := "SELECT * FROM inbounds WHERE is_port_open = false AND is_assigned = true AND is_active = true"
+	rows, err := i.db.Conn().Query(query)
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
+	}
+	inbounds := make([]*entity.Inbound, 0)
+	for rows.Next() {
+		inbound, err := i.scan(rows)
+		if err != nil {
+			return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
+		}
+		inbounds = append(inbounds, inbound)
+	}
+	return inbounds, nil
+}
+
 func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
 	scope := "inboundRepository.scan"
 
@@ -495,4 +514,21 @@ func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
 	}
 	inbound.VPNType = entity.ConvertStringVPNTypeToEnum(vpnType)
 	return inbound, nil
+}
+
+func (i *Inbound) SetPortOpen(id string) error {
+	scope := "inboundRepository.ActiveIsPortOpen"
+
+	sql := fmt.Sprintf(
+		"UPDATE inbounds SET is_port_open = true WHERE id = %s",
+		id,
+	)
+	result, err := i.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
+	}
+	if rows, err := result.RowsAffected(); err != nil || rows == 0 {
+		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
+	}
+	return nil
 }
