@@ -139,7 +139,7 @@ func (h *Host) Filter(inpt *hostmanagerDto.FilterHosts) ([]*entity.Host, error) 
 func (h *Host) makeQuery(inpt *hostmanagerDto.FilterHosts) string {
 	subQueries := []string{}
 	sql := "SELECT * FROM hosts"
-	if len(inpt.Statuses) > 0 {
+	if inpt.Statuses != nil && len(inpt.Statuses) > 0 {
 		subQueries = append(
 			subQueries,
 			fmt.Sprintf("status IN (%s)", strings.Join(h.makeQueryByListOfSatus(inpt.Statuses), ", ")),
