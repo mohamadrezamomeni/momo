@@ -1,8 +1,6 @@
 package sqllite
 
-import (
-	"github.com/mattn/go-sqlite3"
-)
+import "github.com/mattn/go-sqlite3"
 
 func IsDuplicateError(err error) bool {
 	if err, ok := err.(sqlite3.Error); ok {
