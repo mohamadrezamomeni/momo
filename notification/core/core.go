@@ -21,20 +21,24 @@ func New(
 	}
 }
 
-func (c *Core) Notify(path string, data string) {
+func (c *Core) Notify(path string, data string) error {
 	handler := c.router[path]
 	res, err := handler(NewContext(data))
 	if err != nil {
-		return
+		return err
 	}
 	for _, msg := range res.Messages {
-		msgConfig, _ := c.makeMessageConfig(msg.ID, msg.Message)
+		msgConfig, err := c.makeMessageConfig(msg.ID, msg.Message)
+		if err != nil {
+		}
+
 		c.bot.Send(msgConfig)
 
 		if msg.MenuTab {
 			c.SendMenuTab(msg.ID, msg.User)
 		}
 	}
+	return nil
 }
 
 func (c *Core) SendMenuTab(telegramID string, user *entity.User) {

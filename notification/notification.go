@@ -82,6 +82,8 @@ func (n *Notification) NotifyEvents() {
 
 func (n *Notification) notify(event *entity.Event, wg *sync.WaitGroup) {
 	defer wg.Done()
-	n.core.Notify(event.Name, event.Data)
-	n.eventSvc.MarkNotificationProcessed(event.ID)
+	err := n.core.Notify(event.Name, event.Data)
+	if err != nil {
+		n.eventSvc.MarkNotificationProcessed(event.ID)
+	}
 }
