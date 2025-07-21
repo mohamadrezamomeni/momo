@@ -1,6 +1,7 @@
 package user
 
 type UserSerialize struct {
+	ID           string `json:"id"`
 	Username     string `json:"username"`
 	Lastname     string `json:"lastname"`
 	FirstName    string `json:"firstname"`

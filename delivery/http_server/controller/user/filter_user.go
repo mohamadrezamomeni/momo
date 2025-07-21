@@ -21,6 +21,7 @@ func (u *Handler) filterUsers(c echo.Context) error {
 	}
 	for _, user := range users {
 		filterSerializer.Users = append(filterSerializer.Users, &userSerializer.UserSerialize{
+			ID:           user.ID,
 			Username:     user.Username,
 			IsAdmin:      user.IsAdmin,
 			FirstName:    user.FirstName,
