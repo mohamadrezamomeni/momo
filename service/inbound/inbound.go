@@ -30,8 +30,13 @@ func New(
 }
 
 func (i *Inbound) Create(inpt *inboundServiceDto.CreateInbound) (*entity.Inbound, error) {
+	var protocol string
+	if inpt.VPNType == entity.XRAY_VPN {
+		protocol = "vmess"
+	}
 	inboundCreated, err := i.inboundRepo.Create(&inboundRepoDto.CreateInbound{
 		Tag:          inpt.Country,
+		Protocol:     protocol,
 		Port:         "",
 		Domain:       "",
 		IsActive:     false,
