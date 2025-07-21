@@ -19,6 +19,7 @@ import (
 	inboundValidator "github.com/mohamadrezamomeni/momo/validator/inbound"
 	userValidator "github.com/mohamadrezamomeni/momo/validator/user"
 	vpnValidator "github.com/mohamadrezamomeni/momo/validator/vpn"
+	vpnPackageValidator "github.com/mohamadrezamomeni/momo/validator/vpn_package"
 	vpnSourceValidator "github.com/mohamadrezamomeni/momo/validator/vpn_source"
 
 	httpserver "github.com/mohamadrezamomeni/momo/delivery/http_server"
@@ -42,7 +43,7 @@ func main() {
 	migration := migrate.New(&cfg.DB)
 
 	migration.UP()
-	hostSvc, vpnSvc, userSvc, inboundSvc, authSvc, cryptSvc, _, _, chargeSvc, _, _, _, vpnSourceSvc := serviceInitializer.GetServices(&cfg)
+	hostSvc, vpnSvc, userSvc, inboundSvc, authSvc, cryptSvc, vpnPackageSvc, _, chargeSvc, _, _, _, vpnSourceSvc := serviceInitializer.GetServices(&cfg)
 
 	initializer(userSvc, &cfg)
 
@@ -55,6 +56,7 @@ func main() {
 		vpnSvc,
 		inboundSvc,
 		chargeSvc,
+		vpnPackageSvc,
 		vpnSourceSvc,
 		userValidator.New(),
 		authValidator.New(),
@@ -62,6 +64,7 @@ func main() {
 		vpnValidator.New(vpnSourceSvc),
 		inboundValidator.New(userSvc, inboundSvc),
 		vpnSourceValidator.New(),
+		vpnPackageValidator.New(),
 	)
 
 	go func() {
