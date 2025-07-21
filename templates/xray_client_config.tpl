@@ -31,11 +31,6 @@
                     }
                 ]
             }
-        },
-        {
-            "protocol": "blackhole",
-            "settings": {},
-            "tag": "blocked"
         }
     ],
     "routing": {
