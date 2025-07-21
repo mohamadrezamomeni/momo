@@ -75,7 +75,7 @@ func (s *Server) GetAvailablePorts(ctx context.Context, req *port.PortAssignRequ
 	}, nil
 }
 
-func (s *Server) OpenPort(ctx context.Context, req *port.OpenPortsRequest) (*port.OpenPortsResponse, error) {
+func (s *Server) OpenPorts(ctx context.Context, req *port.OpenPortsRequest) (*port.OpenPortsResponse, error) {
 	ports := s.portSvc.OpenPorts(req.Ports)
 
 	return &port.OpenPortsResponse{
