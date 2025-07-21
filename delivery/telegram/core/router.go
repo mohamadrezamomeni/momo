@@ -55,7 +55,7 @@ func (r *Router) Route(update *Update) (*ResponseHandlerFunc, error) {
 	if res == nil {
 		res, _ = r.RootHandler(update)
 	}
-	if res.MenuTab {
+	if res != nil && res.MenuTab {
 		res.MessageConfig.ReplyMarkup = r.enrichKeyboardMarkup(res.MessageConfig.ReplyMarkup)
 	}
 
