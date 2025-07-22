@@ -281,10 +281,24 @@ func (i *Inbound) RetriveActiveInboundExpired() ([]*entity.Inbound, error) {
 func (i *Inbound) RetriveFinishedInbounds() ([]*entity.Inbound, error) {
 	scope := "inboundRepository.RetriveDeactivedInbounds"
 
-	query := "SELECT * FROM inbounds WHERE (is_active = false AND is_block = false) AND (traffic_limit < traffic_usage   OR  $2 >= end)"
+	query := "SELECT * FROM inbounds WHERE (is_active = false AND is_block = false) AND (traffic_limit < traffic_usage   OR  $1 >= end)"
 
 	now := time.Now()
-	rows, err := i.db.Conn().Query(query, now, now)
+	rows, err := i.db.Conn().Query(query, now)
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).UnExpected().DebuggingError()
+	}
+
+	return i.getInboundsFromRows(rows)
+}
+
+func (i *Inbound) RetriveActiveInbounds() ([]*entity.Inbound, error) {
+	scope := "inboundRepository.RetriveDeactivedInbounds"
+
+	query := "SELECT * FROM inbounds WHERE is_active = true AND is_block = false AND traffic_limit > traffic_usage   AND  $1 < end"
+
+	now := time.Now()
+	rows, err := i.db.Conn().Query(query, now)
 	if err != nil {
 		return nil, momoError.Wrap(err).Scope(scope).UnExpected().DebuggingError()
 	}

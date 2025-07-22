@@ -463,6 +463,7 @@ func TestGetInboundsMustBeOpenPort(t *testing.T) {
 }
 
 func TestActiveIsPortOpen(t *testing.T) {
+	defer inboundRepo.DeleteAll()
 	inboundCreated1, _ := inboundRepo.Create(inbound23)
 	err := inboundRepo.SetPortOpen(strconv.Itoa(inboundCreated1.ID))
 	if err != nil {
@@ -472,5 +473,30 @@ func TestActiveIsPortOpen(t *testing.T) {
 	inbound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated1.ID))
 	if !inbound.IsPortOpen {
 		t.Fatal("we expected the inbound's is_port_open be true")
+	}
+}
+
+func TestActiveInbounds(t *testing.T) {
+	defer inboundRepo.DeleteAll()
+	inboundCreated1, _ := inboundRepo.Create(inbound23)
+	inboundCreated2, _ := inboundRepo.Create(inbound24)
+	inboundRepo.Create(inbound25)
+
+	inbounds, err := inboundRepo.RetriveActiveInbounds()
+	if err != nil {
+		t.Fatalf("something went worng that was %v", err)
+	}
+	if len(inbounds) != 2 {
+		t.Fatalf("we expeted the lentgh of inbounds be %d but we got %d", 2, len(inbounds))
+	}
+	inboundIDMap := make(map[int]struct{})
+	inboundIDMap[inboundCreated1.ID] = struct{}{}
+	inboundIDMap[inboundCreated2.ID] = struct{}{}
+	if _, isExist := inboundIDMap[inboundCreated1.ID]; !isExist {
+		t.Fatalf("error to compare data inbound1 is missed")
+	}
+
+	if _, isExist := inboundIDMap[inboundCreated2.ID]; !isExist {
+		t.Fatalf("error to compare data inbound2 is missed")
 	}
 }
