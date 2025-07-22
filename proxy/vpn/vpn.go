@@ -30,6 +30,7 @@ type IProxyVPN interface {
 	AddInbound(*proxyVpnDto.Inbound) error
 	DisableInbound(*proxyVpnDto.Inbound) error
 	GetTraffic(*proxyVpnDto.Inbound) (*vpnSerializer.Traffic, error)
+	IsInboundActive(*proxyVpnDto.Inbound) (bool, error)
 	Close()
 	Test(*proxyVpnDto.Monitor) error
 }
@@ -81,6 +82,15 @@ func (p *ProxyVPN) retriveVPN(address string, VPNType entity.VPNType) VPN {
 		}
 	}
 	return nil
+}
+
+func (p *ProxyVPN) IsInboundActive(inpt *proxyVpnDto.Inbound) (bool, error) {
+	scope := "vpnProxy.IsInboundActive"
+	v := p.retriveVPN(inpt.Address, inpt.VPNType)
+	if v == nil {
+		return false, momoError.Scope(scope).Input(inpt).DebuggingError()
+	}
+	return v.IsExisted(inpt)
 }
 
 func (p *ProxyVPN) AddInbound(inpt *proxyVpnDto.Inbound) error {

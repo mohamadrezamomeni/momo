@@ -22,6 +22,7 @@ type HealingUpInboundService interface {
 	HealingUpOverQuotedInbounds()
 	HealingUpBlockedInbounds()
 	HealingUpChargedInbounds()
+	CheckInboundsActivation()
 }
 
 type InboundTrafficService interface {
@@ -68,6 +69,7 @@ func (s *Scheduler) Start(done <-chan struct{}, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	s.sch.Cron("*/1 * * * *").Do(s.notificationSvc.NotifyEvents)
+	s.sch.Cron("*/5 * * * *").Do(s.healingUpInboundSvc.CheckInboundsActivation)
 	s.sch.Cron("*/10 * * * *").Do(s.healingUpInboundSvc.HealingUpExpiredInbounds)
 	s.sch.Cron("*/10 * * * *").Do(s.healingUpInboundSvc.HealingUpOverQuotedInbounds)
 	s.sch.Cron("*/10 * * * *").Do(s.healingUpInboundSvc.HealingUpBlockedInbounds)

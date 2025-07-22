@@ -21,6 +21,7 @@ type HealingUpInboundRepo interface {
 	RetriveActiveInboundExpired() ([]*entity.Inbound, error)
 	RetriveActiveInboundsOverQuota() ([]*entity.Inbound, error)
 	RetriveDeactiveInboundsCharged() ([]*entity.Inbound, error)
+	RetriveActiveInbounds() ([]*entity.Inbound, error)
 	Active(id int) error
 	DeActive(id int) error
 }
@@ -58,6 +59,21 @@ func NewHealingUpInbound(
 		inboundChargeSvc: inboundChargeSvc,
 		chargeSvc:        chargeSvc,
 		userService:      userService,
+	}
+}
+
+func (i *HealingUpInbound) CheckInboundsActivation() {
+	inbounds, err := i.inboundRepo.RetriveActiveInbounds()
+	if err != nil {
+		return
+	}
+	proxy, err := i.vpnService.MakeProxy()
+	if err != nil {
+		return
+	}
+	defer proxy.Close()
+	for _, inbound := range inbounds {
+		i.checkInboundActivation(inbound, proxy)
 	}
 }
 
@@ -169,4 +185,34 @@ func (i *HealingUpInbound) activeInbound(inbound *entity.Inbound, vpnProxy vpnPr
 	}
 
 	return i.inboundRepo.Active(inbound.ID)
+}
+
+func (i *HealingUpInbound) checkInboundActivation(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) {
+	isActive, err := i.isInboundActive(inbound, vpnProxy)
+	if err != nil {
+		return
+	}
+	if isActive {
+		return
+	}
+
+	err = i.inboundRepo.DeActive(inbound.ID)
+	if err != nil {
+		return
+	}
+}
+
+func (i *HealingUpInbound) isInboundActive(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) (bool, error) {
+	user, err := i.userService.FindByID(inbound.UserID)
+	if err != nil {
+		return false, err
+	}
+
+	vpnProxyInput := adapter.GenerateVPNProxyInput(inbound, user)
+	isActive, err := vpnProxy.IsInboundActive(vpnProxyInput)
+	if err != nil {
+		return false, err
+	}
+
+	return isActive, nil
 }

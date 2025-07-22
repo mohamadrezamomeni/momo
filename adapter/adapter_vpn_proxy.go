@@ -11,6 +11,7 @@ type ProxyVPN interface {
 	AddInbound(*proxyVpnDto.Inbound) error
 	DisableInbound(*proxyVpnDto.Inbound) error
 	GetTraffic(*proxyVpnDto.Inbound) (*vpnSerializer.Traffic, error)
+	IsInboundActive(*proxyVpnDto.Inbound) (bool, error)
 	Close()
 	Test(*proxyVpnDto.Monitor) error
 }

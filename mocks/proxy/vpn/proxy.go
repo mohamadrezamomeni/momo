@@ -56,3 +56,7 @@ func (mp *MockProxy) Close() {
 
 	mp.getTrafficInboundData = nil
 }
+
+func (mp *MockProxy) IsInboundActive(inpt *proxyVpnDto.Inbound) (bool, error) {
+	return true, nil
+}

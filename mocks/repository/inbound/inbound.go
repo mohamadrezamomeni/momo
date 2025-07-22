@@ -231,3 +231,14 @@ func (i *MockInbound) SetPortOpen(id string) error {
 	}
 	return nil
 }
+
+func (i *MockInbound) RetriveActiveInbounds() ([]*entity.Inbound, error) {
+	inbounds := make([]*entity.Inbound, 0)
+	now := time.Now()
+	for _, inbound := range i.inbounds {
+		if inbound.IsActive && inbound.End.After(now) && !inbound.IsBlock {
+			inbounds = append(inbounds, inbound)
+		}
+	}
+	return inbounds, nil
+}
