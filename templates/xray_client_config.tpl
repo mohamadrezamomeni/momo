@@ -16,7 +16,7 @@
     ],
     "outbounds": [
         {
-            "protocol": "vless",
+            "protocol": "vmess",
             "settings": {
                 "vnext": [
                     {
