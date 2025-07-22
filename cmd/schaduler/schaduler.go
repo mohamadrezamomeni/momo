@@ -44,7 +44,7 @@ func main() {
 
 	go func() {
 		wg.Add(1)
-		scheduler := scheduler.New(healingUpInbound, inboundTrafficSvc, hostInboundSvc, vpnSvc, hostSvc, notification)
+		scheduler := scheduler.New(healingUpInbound, inboundTrafficSvc, hostInboundSvc, vpnSvc, hostSvc)
 		scheduler.Start(done, &wg)
 	}()
 

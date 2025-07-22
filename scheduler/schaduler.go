@@ -14,7 +14,6 @@ type Scheduler struct {
 	vpnSvc              VPNService
 	hostSvc             HostService
 	sch                 *gocron.Scheduler
-	notificationSvc     NotificationService
 }
 
 type HealingUpInboundService interface {
@@ -34,10 +33,6 @@ type HostInboundService interface {
 	OpenInboundsPortMustBeOpen()
 }
 
-type NotificationService interface {
-	NotifyEvents()
-}
-
 type VPNService interface {
 	MonitorVPNs()
 }
@@ -52,7 +47,6 @@ func New(
 	hostInboundSvc HostInboundService,
 	vpnSvc VPNService,
 	hostSvc HostService,
-	notificationSvc NotificationService,
 ) *Scheduler {
 	return &Scheduler{
 		healingUpInboundSvc: healingUpInboundSvc,
@@ -61,14 +55,12 @@ func New(
 		vpnSvc:              vpnSvc,
 		hostSvc:             hostSvc,
 		sch:                 gocron.NewScheduler(time.UTC),
-		notificationSvc:     notificationSvc,
 	}
 }
 
 func (s *Scheduler) Start(done <-chan struct{}, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	s.sch.Cron("*/1 * * * *").Do(s.notificationSvc.NotifyEvents)
 	s.sch.Cron("*/5 * * * *").Do(s.healingUpInboundSvc.CheckInboundsActivation)
 	s.sch.Cron("*/10 * * * *").Do(s.healingUpInboundSvc.HealingUpExpiredInbounds)
 	s.sch.Cron("*/10 * * * *").Do(s.healingUpInboundSvc.HealingUpOverQuotedInbounds)
