@@ -1,6 +1,9 @@
 package inbound
 
 import (
+	"fmt"
+
+	"github.com/google/uuid"
 	inboundRepoDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
 	inboundServiceDto "github.com/mohamadrezamomeni/momo/dto/service/inbound"
 	"github.com/mohamadrezamomeni/momo/entity"
@@ -35,7 +38,7 @@ func (i *Inbound) Create(inpt *inboundServiceDto.CreateInbound) (*entity.Inbound
 		protocol = "vmess"
 	}
 	inboundCreated, err := i.inboundRepo.Create(&inboundRepoDto.CreateInbound{
-		Tag:          inpt.Country,
+		Tag:          fmt.Sprintf("%s-%s-%s", inpt.Country, inpt.UserID, uuid.New().String()),
 		Protocol:     protocol,
 		Port:         "",
 		Domain:       "",
