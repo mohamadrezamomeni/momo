@@ -14,7 +14,6 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
-	notification "github.com/mohamadrezamomeni/momo/notification"
 	serviceInitializer "github.com/mohamadrezamomeni/momo/pkg/service"
 )
 
@@ -32,11 +31,7 @@ func main() {
 
 	migration.UP()
 
-	hostSvc, vpnSvc, userSvc, inboundSvc, _, _, _, eventSvc, chargeSvc, healingUpInbound, hostInboundSvc, inboundTrafficSvc, _ := serviceInitializer.GetServices(&cfg)
-
-	notification := notification.New(&cfg.Notification, inboundSvc, userSvc, chargeSvc, eventSvc)
-
-	notification.ServeRoutes()
+	hostSvc, vpnSvc, _, _, _, _, _, _, _, healingUpInbound, hostInboundSvc, inboundTrafficSvc, _ := serviceInitializer.GetServices(&cfg)
 
 	done := make(chan struct{})
 
