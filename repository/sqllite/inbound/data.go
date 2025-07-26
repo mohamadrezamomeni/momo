@@ -411,7 +411,6 @@ var (
 		IsActive:     false,
 		IsBlock:      false,
 		IsAssigned:   true,
-		IsPortOpen:   true,
 		Start:        time.Now().AddDate(0, -2, 0),
 		End:          time.Now().AddDate(0, 1, 0),
 		TrafficLimit: 50,

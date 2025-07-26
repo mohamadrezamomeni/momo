@@ -20,7 +20,6 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	Port_GetAvailablePorts_FullMethodName = "/port.Port/GetAvailablePorts"
-	Port_OpenPorts_FullMethodName         = "/port.Port/OpenPorts"
 )
 
 // PortClient is the client API for Port service.
@@ -28,7 +27,6 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PortClient interface {
 	GetAvailablePorts(ctx context.Context, in *PortAssignRequest, opts ...grpc.CallOption) (*PortAssignResponse, error)
-	OpenPorts(ctx context.Context, in *OpenPortsRequest, opts ...grpc.CallOption) (*OpenPortsResponse, error)
 }
 
 type portClient struct {
@@ -49,22 +47,11 @@ func (c *portClient) GetAvailablePorts(ctx context.Context, in *PortAssignReques
 	return out, nil
 }
 
-func (c *portClient) OpenPorts(ctx context.Context, in *OpenPortsRequest, opts ...grpc.CallOption) (*OpenPortsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(OpenPortsResponse)
-	err := c.cc.Invoke(ctx, Port_OpenPorts_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // PortServer is the server API for Port service.
 // All implementations must embed UnimplementedPortServer
 // for forward compatibility.
 type PortServer interface {
 	GetAvailablePorts(context.Context, *PortAssignRequest) (*PortAssignResponse, error)
-	OpenPorts(context.Context, *OpenPortsRequest) (*OpenPortsResponse, error)
 	mustEmbedUnimplementedPortServer()
 }
 
@@ -77,9 +64,6 @@ type UnimplementedPortServer struct{}
 
 func (UnimplementedPortServer) GetAvailablePorts(context.Context, *PortAssignRequest) (*PortAssignResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAvailablePorts not implemented")
-}
-func (UnimplementedPortServer) OpenPorts(context.Context, *OpenPortsRequest) (*OpenPortsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method OpenPorts not implemented")
 }
 func (UnimplementedPortServer) mustEmbedUnimplementedPortServer() {}
 func (UnimplementedPortServer) testEmbeddedByValue()              {}
@@ -120,24 +104,6 @@ func _Port_GetAvailablePorts_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Port_OpenPorts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(OpenPortsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PortServer).OpenPorts(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Port_OpenPorts_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PortServer).OpenPorts(ctx, req.(*OpenPortsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Port_ServiceDesc is the grpc.ServiceDesc for Port service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -148,10 +114,6 @@ var Port_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAvailablePorts",
 			Handler:    _Port_GetAvailablePorts_Handler,
-		},
-		{
-			MethodName: "OpenPorts",
-			Handler:    _Port_OpenPorts_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -213,25 +213,6 @@ func (i *MockInbound) IncreaseTrafficUsage(_ string, _ uint32) error {
 	return nil
 }
 
-func (i *MockInbound) GetInboundsPortMustBeOpen() ([]*entity.Inbound, error) {
-	inbounds := make([]*entity.Inbound, 0)
-	for _, inbound := range i.inbounds {
-		if inbound.IsAssigned && inbound.IsActive && !inbound.IsPortOpen {
-			inbounds = append(inbounds, inbound)
-		}
-	}
-	return inbounds, nil
-}
-
-func (i *MockInbound) SetPortOpen(id string) error {
-	for _, inbound := range i.inbounds {
-		if strconv.Itoa(inbound.ID) == id {
-			inbound.IsPortOpen = true
-		}
-	}
-	return nil
-}
-
 func (i *MockInbound) RetriveActiveInbounds() ([]*entity.Inbound, error) {
 	inbounds := make([]*entity.Inbound, 0)
 	now := time.Now()

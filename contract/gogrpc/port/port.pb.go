@@ -117,94 +117,6 @@ func (x *PortAssignRequest) GetRequestNumberOfPort() uint32 {
 	return 0
 }
 
-type OpenPortsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Ports         []string               `protobuf:"bytes,1,rep,name=ports,proto3" json:"ports,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *OpenPortsRequest) Reset() {
-	*x = OpenPortsRequest{}
-	mi := &file_contract_protobuf_port_port_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *OpenPortsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*OpenPortsRequest) ProtoMessage() {}
-
-func (x *OpenPortsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_contract_protobuf_port_port_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use OpenPortsRequest.ProtoReflect.Descriptor instead.
-func (*OpenPortsRequest) Descriptor() ([]byte, []int) {
-	return file_contract_protobuf_port_port_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *OpenPortsRequest) GetPorts() []string {
-	if x != nil {
-		return x.Ports
-	}
-	return nil
-}
-
-type OpenPortsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Ports         []string               `protobuf:"bytes,1,rep,name=ports,proto3" json:"ports,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *OpenPortsResponse) Reset() {
-	*x = OpenPortsResponse{}
-	mi := &file_contract_protobuf_port_port_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *OpenPortsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*OpenPortsResponse) ProtoMessage() {}
-
-func (x *OpenPortsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_contract_protobuf_port_port_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use OpenPortsResponse.ProtoReflect.Descriptor instead.
-func (*OpenPortsResponse) Descriptor() ([]byte, []int) {
-	return file_contract_protobuf_port_port_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *OpenPortsResponse) GetPorts() []string {
-	if x != nil {
-		return x.Ports
-	}
-	return nil
-}
-
 var File_contract_protobuf_port_port_proto protoreflect.FileDescriptor
 
 const file_contract_protobuf_port_port_proto_rawDesc = "" +
@@ -214,14 +126,9 @@ const file_contract_protobuf_port_port_proto_rawDesc = "" +
 	"\x05ports\x18\x01 \x03(\tR\x05ports\"c\n" +
 	"\x11PortAssignRequest\x12\x1c\n" +
 	"\tportsUsed\x18\x01 \x03(\tR\tportsUsed\x120\n" +
-	"\x13requestNumberOfPort\x18\x02 \x01(\rR\x13requestNumberOfPort\"(\n" +
-	"\x10OpenPortsRequest\x12\x14\n" +
-	"\x05ports\x18\x01 \x03(\tR\x05ports\")\n" +
-	"\x11OpenPortsResponse\x12\x14\n" +
-	"\x05ports\x18\x01 \x03(\tR\x05ports2\x8c\x01\n" +
+	"\x13requestNumberOfPort\x18\x02 \x01(\rR\x13requestNumberOfPort2N\n" +
 	"\x04Port\x12F\n" +
-	"\x11GetAvailablePorts\x12\x17.port.PortAssignRequest\x1a\x18.port.PortAssignResponse\x12<\n" +
-	"\tOpenPorts\x12\x16.port.OpenPortsRequest\x1a\x17.port.OpenPortsResponseB\x16Z\x14contract/gogrpc/portb\x06proto3"
+	"\x11GetAvailablePorts\x12\x17.port.PortAssignRequest\x1a\x18.port.PortAssignResponseB\x16Z\x14contract/gogrpc/portb\x06proto3"
 
 var (
 	file_contract_protobuf_port_port_proto_rawDescOnce sync.Once
@@ -235,20 +142,16 @@ func file_contract_protobuf_port_port_proto_rawDescGZIP() []byte {
 	return file_contract_protobuf_port_port_proto_rawDescData
 }
 
-var file_contract_protobuf_port_port_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_contract_protobuf_port_port_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_contract_protobuf_port_port_proto_goTypes = []any{
 	(*PortAssignResponse)(nil), // 0: port.PortAssignResponse
 	(*PortAssignRequest)(nil),  // 1: port.PortAssignRequest
-	(*OpenPortsRequest)(nil),   // 2: port.OpenPortsRequest
-	(*OpenPortsResponse)(nil),  // 3: port.OpenPortsResponse
 }
 var file_contract_protobuf_port_port_proto_depIdxs = []int32{
 	1, // 0: port.Port.GetAvailablePorts:input_type -> port.PortAssignRequest
-	2, // 1: port.Port.OpenPorts:input_type -> port.OpenPortsRequest
-	0, // 2: port.Port.GetAvailablePorts:output_type -> port.PortAssignResponse
-	3, // 3: port.Port.OpenPorts:output_type -> port.OpenPortsResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	0, // 1: port.Port.GetAvailablePorts:output_type -> port.PortAssignResponse
+	1, // [1:2] is the sub-list for method output_type
+	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -265,7 +168,7 @@ func file_contract_protobuf_port_port_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_contract_protobuf_port_port_proto_rawDesc), len(file_contract_protobuf_port_port_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

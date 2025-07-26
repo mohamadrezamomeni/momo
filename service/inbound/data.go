@@ -139,7 +139,6 @@ var (
 		End:          now,
 		IsBlock:      false,
 		TrafficLimit: 50000,
-		IsPortOpen:   false,
 	}
 
 	inbound9 = &inboundRepositoryDto.CreateInbound{
@@ -153,7 +152,6 @@ var (
 		IsAssigned:   true,
 		IsNotified:   false,
 		IsActive:     true,
-		IsPortOpen:   false,
 		Start:        now.AddDate(0, -1, 0),
 		End:          now,
 		IsBlock:      false,
@@ -161,7 +159,6 @@ var (
 	}
 
 	inbound10 = &inboundRepositoryDto.CreateInbound{
-		IsPortOpen:   false,
 		Protocol:     "vmess",
 		Tag:          "example-tag",
 		Country:      "uk",

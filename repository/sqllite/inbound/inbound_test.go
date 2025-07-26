@@ -462,20 +462,6 @@ func TestGetInboundsMustBeOpenPort(t *testing.T) {
 	}
 }
 
-func TestActiveIsPortOpen(t *testing.T) {
-	defer inboundRepo.DeleteAll()
-	inboundCreated1, _ := inboundRepo.Create(inbound23)
-	err := inboundRepo.SetPortOpen(strconv.Itoa(inboundCreated1.ID))
-	if err != nil {
-		t.Fatalf("something went wrong that was %v", err)
-	}
-
-	inbound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated1.ID))
-	if !inbound.IsPortOpen {
-		t.Fatal("we expected the inbound's is_port_open be true")
-	}
-}
-
 func TestActiveInbounds(t *testing.T) {
 	defer inboundRepo.DeleteAll()
 	inboundCreated1, _ := inboundRepo.Create(inbound23)

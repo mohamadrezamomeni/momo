@@ -19,7 +19,7 @@ func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error
 	inbound := &entity.Inbound{}
 	err := i.db.Conn().QueryRow(`
 	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_active, start, end, is_block, is_assigned, is_notified, charge_count, traffic_usage, traffic_limit, country, is_port_open)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	RETURNING id, protocol, is_active, domain, port, user_id, tag, is_block, start, end, is_notified, is_assigned, charge_count, traffic_usage, traffic_limit, country, is_port_open
 	`, inpt.Protocol,
 		inpt.Domain, entity.VPNTypeString(inpt.VPNType),
@@ -36,7 +36,6 @@ func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error
 		inpt.TrafficUsage,
 		inpt.TrafficLimit,
 		inpt.Country,
-		inpt.IsPortOpen,
 	).Scan(
 		&inbound.ID,
 		&inbound.Protocol,
@@ -54,7 +53,6 @@ func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error
 		&inbound.TrafficUsage,
 		&inbound.TrafficLimit,
 		&inbound.Country,
-		&inbound.IsPortOpen,
 	)
 
 	if err == nil {
@@ -93,7 +91,6 @@ func (i *Inbound) FindInboundByID(id string) (*entity.Inbound, error) {
 		&inbound.TrafficUsage,
 		&inbound.TrafficLimit,
 		&inbound.Country,
-		&inbound.IsPortOpen,
 		&createdAt,
 		&updatedAt,
 	)
@@ -519,7 +516,6 @@ func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
 		&inbound.TrafficUsage,
 		&inbound.TrafficLimit,
 		&inbound.Country,
-		&inbound.IsPortOpen,
 		&createdAt,
 		&updatedAt,
 	)
@@ -528,21 +524,4 @@ func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
 	}
 	inbound.VPNType = entity.ConvertStringVPNTypeToEnum(vpnType)
 	return inbound, nil
-}
-
-func (i *Inbound) SetPortOpen(id string) error {
-	scope := "inboundRepository.ActiveIsPortOpen"
-
-	sql := fmt.Sprintf(
-		"UPDATE inbounds SET is_port_open = true WHERE id = %s",
-		id,
-	)
-	result, err := i.db.Conn().Exec(sql)
-	if err != nil {
-		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
-	}
-	if rows, err := result.RowsAffected(); err != nil || rows == 0 {
-		return momoError.Wrap(err).Scope(scope).Input(id).ErrorWrite()
-	}
-	return nil
 }

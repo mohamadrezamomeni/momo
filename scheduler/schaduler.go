@@ -30,7 +30,6 @@ type InboundTrafficService interface {
 
 type HostInboundService interface {
 	AssignDomainToInbounds()
-	OpenInboundsPortMustBeOpen()
 }
 
 type VPNService interface {
@@ -67,7 +66,6 @@ func (s *Scheduler) Start(done <-chan struct{}, wg *sync.WaitGroup) {
 	s.sch.Cron("*/10 * * * *").Do(s.healingUpInboundSvc.HealingUpBlockedInbounds)
 	s.sch.Cron("*/10 * * * *").Do(s.healingUpInboundSvc.HealingUpChargedInbounds)
 	s.sch.Cron("*/5 * * * *").Do(s.hostInboundSvc.AssignDomainToInbounds)
-	s.sch.Cron("*/6 * * * *").Do(s.hostInboundSvc.OpenInboundsPortMustBeOpen)
 	s.sch.Cron("*/1 * * * *").Do(s.inboundTrafficSvc.UpdateTraffics)
 	s.sch.Cron("*/2 * * * *").Do(s.vpnSvc.MonitorVPNs)
 	s.sch.Cron("*/2 * * * *").Do(s.hostSvc.MonitorHosts)

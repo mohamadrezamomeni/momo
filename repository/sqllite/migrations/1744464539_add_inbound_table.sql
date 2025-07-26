@@ -17,7 +17,6 @@ CREATE TABLE `inbounds` (
         `traffic_usage` INTEGER DEFAULT 0,
         `traffic_limit` INTEGER NOT NULL,
         `country` VARCHAR(128) NOT NULL,
-        `is_port_open` BOOLEAN DEFAULT false,
         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
