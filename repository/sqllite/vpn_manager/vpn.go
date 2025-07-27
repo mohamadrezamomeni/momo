@@ -192,7 +192,7 @@ func (v *VPN) GroupDomainsByVPNSource(dto *vpnManagerDto.GroupVPNsByVPNSourceDto
 	scope := "vpnRepository.GroupDomainsByVPNSource"
 
 	ret := map[string][]string{}
-	sql := "SELECT country, GROUP_CONCAT(DISTINCT domain) AS domains FROM vpns %s GROUP BY country"
+	query := "SELECT country, GROUP_CONCAT(DISTINCT domain) AS domains FROM vpns %s GROUP BY country"
 
 	subQueries := []string{}
 
@@ -203,7 +203,6 @@ func (v *VPN) GroupDomainsByVPNSource(dto *vpnManagerDto.GroupVPNsByVPNSourceDto
 	if dto.VPNSources != nil && len(dto.VPNSources) > 0 {
 		subQueries = append(subQueries, fmt.Sprintf("country IN ('%s')", strings.Join(dto.VPNSources, "', '")))
 	}
-	query := sql
 	if len(subQueries) > 0 {
 		query = fmt.Sprintf(query, " WHERE "+strings.Join(subQueries, " AND "))
 	} else {
