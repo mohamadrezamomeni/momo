@@ -18,9 +18,9 @@ func (i *Inbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error
 
 	inbound := &entity.Inbound{}
 	err := i.db.Conn().QueryRow(`
-	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_active, start, end, is_block, is_assigned, is_notified, charge_count, traffic_usage, traffic_limit, country, is_port_open)
+	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_active, start, end, is_block, is_assigned, is_notified, charge_count, traffic_usage, traffic_limit, country)
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-	RETURNING id, protocol, is_active, domain, port, user_id, tag, is_block, start, end, is_notified, is_assigned, charge_count, traffic_usage, traffic_limit, country, is_port_open
+	RETURNING id, protocol, is_active, domain, port, user_id, tag, is_block, start, end, is_notified, is_assigned, charge_count, traffic_usage, traffic_limit, country
 	`, inpt.Protocol,
 		inpt.Domain, entity.VPNTypeString(inpt.VPNType),
 		inpt.Port,
@@ -149,7 +149,7 @@ func (i *Inbound) GetListOfPortsByDomain() ([]struct {
 ) {
 	scope := "inboundRepository.GetListOfPortsByDomain"
 
-	sql := "SELECT domain, GROUP_CONCAT(port) AS ports FROM inbounds GROUP BY domain"
+	sql := "SELECT domain, GROUP_CONCAT(port) AS ports FROM inbounds WHERE is_assigned = true GROUP BY domain"
 	rows, err := i.db.Conn().Query(sql)
 	if err != nil {
 		return nil, momoError.Wrap(err).Scope(scope).UnExpected().DebuggingError()
@@ -470,25 +470,6 @@ func (i *Inbound) getInboundsFromRows(rows *sql.Rows) ([]*entity.Inbound, error)
 		inbounds = append(inbounds, inbound)
 	}
 
-	return inbounds, nil
-}
-
-func (i *Inbound) GetInboundsPortMustBeOpen() ([]*entity.Inbound, error) {
-	scope := "inboundRepository.GetInboundsMustBeOpenPort"
-
-	query := "SELECT * FROM inbounds WHERE is_port_open = false AND is_assigned = true AND is_active = true"
-	rows, err := i.db.Conn().Query(query)
-	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
-	}
-	inbounds := make([]*entity.Inbound, 0)
-	for rows.Next() {
-		inbound, err := i.scan(rows)
-		if err != nil {
-			return nil, momoError.Wrap(err).Scope(scope).UnExpected().ErrorWrite()
-		}
-		inbounds = append(inbounds, inbound)
-	}
 	return inbounds, nil
 }
 

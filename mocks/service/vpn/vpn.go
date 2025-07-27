@@ -27,6 +27,8 @@ func (mv *MockVPN) Create(createVPNDto *vpnServiceDto.CreateVPN) (*entity.VPN, e
 		Country:   createVPNDto.Country,
 		UserCount: 20,
 		IsActive:  true,
+		StartPort: createVPNDto.StartPort,
+		EndPort:   createVPNDto.EndPort,
 	}
 	mv.vpns = append(mv.vpns, vpn)
 	return vpn, nil
@@ -36,13 +38,23 @@ func (mv *MockVPN) MakeProxy() (adapter.ProxyVPN, error) {
 	return &mockProxyVPN.MockProxy{}, nil
 }
 
-func (mv *MockVPN) GetAvailableVPNSourceDomains(vpnSources []string) (map[string][]string, error) {
-	ret := map[string][]string{}
+func (mv *MockVPN) GetAvailableVPNSourceDomains(vpnSources []string, vpnTypes []entity.VPNType) ([]*entity.VPN, error) {
+	ret := []*entity.VPN{}
+
+	vpnSourcesMap := make(map[string]struct{})
 	for _, vpnSource := range vpnSources {
-		for _, v := range mv.vpns {
-			if v.Country == vpnSource {
-				ret[vpnSource] = append(ret[vpnSource], v.Domain)
-			}
+		vpnSourcesMap[vpnSource] = struct{}{}
+	}
+	vpnTypeMap := make(map[entity.VPNType]struct{})
+	for _, vpnType := range vpnTypes {
+		vpnTypeMap[vpnType] = struct{}{}
+	}
+
+	for _, vpn := range mv.vpns {
+		_, isExistSource := vpnSourcesMap[vpn.Country]
+		_, isExistVPNType := vpnTypeMap[vpn.VPNType]
+		if isExistSource && isExistVPNType {
+			ret = append(ret, vpn)
 		}
 	}
 	return ret, nil

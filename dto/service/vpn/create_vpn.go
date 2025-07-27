@@ -8,4 +8,6 @@ type CreateVPN struct {
 	Domain    string
 	UserCount int
 	Country   string
+	StartPort int
+	EndPort   int
 }

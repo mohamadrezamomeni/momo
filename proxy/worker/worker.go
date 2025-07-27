@@ -4,14 +4,12 @@ import (
 	"fmt"
 
 	metric "github.com/mohamadrezamomeni/momo/contract/gogrpc/metric"
-	port "github.com/mohamadrezamomeni/momo/contract/gogrpc/port"
 
 	"google.golang.org/grpc"
 )
 
 type ProxyWorker struct {
 	conn         *grpc.ClientConn
-	portClient   port.PortClient
 	metricClient metric.MetricClient
 	address      string
 }
@@ -24,7 +22,6 @@ func New(cfg *Config) (*ProxyWorker, error) {
 	}
 
 	return &ProxyWorker{
-		portClient:   port.NewPortClient(conn),
 		metricClient: metric.NewMetricClient(conn),
 		conn:         conn,
 		address:      address,

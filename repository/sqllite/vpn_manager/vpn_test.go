@@ -88,7 +88,7 @@ func TestFilterVPNs(t *testing.T) {
 	}
 
 	vpns, err = vpnRepo.Filter(&vpnManagerDto.FilterVPNs{
-		VPNType: entity.XRAY_VPN,
+		VPNTypes: []entity.VPNType{entity.XRAY_VPN},
 	})
 	if err != nil {
 		t.Errorf("3. something wrong has happend that was %v", err)
@@ -99,8 +99,8 @@ func TestFilterVPNs(t *testing.T) {
 	}
 
 	vpns, err = vpnRepo.Filter(&vpnManagerDto.FilterVPNs{
-		VPNType: entity.XRAY_VPN,
-		Domain:  "joi.com",
+		VPNTypes: []entity.VPNType{entity.XRAY_VPN},
+		Domain:   "joi.com",
 	})
 	if err != nil {
 		t.Errorf("4. something wrong has happend that was %v", err)
@@ -147,49 +147,6 @@ func TestGroupingByCountry(t *testing.T) {
 			t.Fatalf("we expected china be existed but the response miss that`")
 		}
 	}
-}
-
-func TestGroupDomainsByVPNSource(t *testing.T) {
-	defer vpnRepo.DeleteAll()
-	vpnRepo.Create(vpn1)
-	vpnRepo.Create(vpn2)
-	vpnRepo.Create(vpn3)
-	vpnRepo.Create(vpn4)
-	vpnRepo.Create(vpn5)
-
-	VPNSourceDomains, err := vpnRepo.GroupDomainsByVPNSource(&vpnManagerDto.GroupVPNsByVPNSourceDto{})
-	if err != nil {
-		t.Fatalf("something went wrong that was %v", err)
-	}
-
-	validResponse := map[string][]string{
-		"china":    {"jordan.com", "joi.com"},
-		"uk":       {"joi.com"},
-		"colombia": {"jordan.com"},
-	}
-	if len(VPNSourceDomains) != len(validResponse) {
-		t.Fatalf("we expected the lengh of result's keys be %d but we got %d", len(validResponse), len(VPNSourceDomains))
-	}
-
-	ValidateResponseGroupDomainByVPNSource(t, validResponse, VPNSourceDomains)
-
-	active := true
-	VPNSourceDomains, err = vpnRepo.GroupDomainsByVPNSource(&vpnManagerDto.GroupVPNsByVPNSourceDto{
-		IsActive:   &active,
-		VPNSources: []string{"uk"},
-	})
-	if err != nil {
-		t.Fatalf("something went wrong that was %v", err)
-	}
-
-	validResponse = map[string][]string{
-		"uk": {"joi.com"},
-	}
-	if len(VPNSourceDomains) != len(validResponse) {
-		t.Fatalf("we expected the lengh of result's keys be %d but we got %d", len(validResponse), len(VPNSourceDomains))
-	}
-
-	ValidateResponseGroupDomainByVPNSource(t, validResponse, VPNSourceDomains)
 }
 
 func ValidateResponseGroupDomainByVPNSource(

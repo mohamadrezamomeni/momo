@@ -1,18 +1,24 @@
 package inbound
 
 import (
-	hostServiceDto "github.com/mohamadrezamomeni/momo/dto/service/host"
+	"strconv"
+
 	"github.com/mohamadrezamomeni/momo/entity"
 )
 
 type HostInbound struct {
 	inboundRepo   InboundHostRepo
-	hostService   HostService
 	vpnManagerSvc VPNManagerService
 }
 
+type AvailbleVPNAddress struct {
+	VPNType entity.VPNType
+	Domain  string
+	Port    string
+}
+
 type VPNManagerService interface {
-	GetAvailableVPNSourceDomains(vpnsSources []string) (map[string][]string, error)
+	GetAvailableVPNSourceDomains(vpnsSources []string, vpnTypes []entity.VPNType) ([]*entity.VPN, error)
 }
 
 type InboundHostRepo interface {
@@ -24,13 +30,6 @@ type InboundHostRepo interface {
 	UpdateDomainPort(int, string, string) error
 }
 
-type HostService interface {
-	ResolveHostPortPair(map[string][]string, map[string]uint32) (
-		map[string][]string,
-		error,
-	)
-}
-
 type Address struct {
 	Domain string
 	Port   string
@@ -38,55 +37,51 @@ type Address struct {
 
 func NewHostInbound(
 	inboundRepo InboundHostRepo,
-	hostService HostService,
 	VPNManagerSvc VPNManagerService,
 ) *HostInbound {
 	return &HostInbound{
 		inboundRepo:   inboundRepo,
-		hostService:   hostService,
 		vpnManagerSvc: VPNManagerSvc,
 	}
 }
 
-func (i *HostInbound) AssignDomainToInbounds() {
-	inbounds, err := i.inboundRepo.FindInboundIsNotAssigned()
-	if err != nil {
-		return
-	}
-	portUserSummery, err := i.summeryDomainPorts()
-	if err != nil {
-		return
-	}
-	vpnSources := i.getVPNSourcesFromInbounds(inbounds)
-
-	VPNSourceDomains, err := i.vpnManagerSvc.GetAvailableVPNSourceDomains(vpnSources)
+func (hi *HostInbound) AssignDomainToInbounds() {
+	inbounds, err := hi.inboundRepo.FindInboundIsNotAssigned()
 	if err != nil {
 		return
 	}
 
-	hostPortPairsMap, err := i.hostService.ResolveHostPortPair(
-		portUserSummery,
-		i.countRequiredPortEachHost(inbounds, VPNSourceDomains),
-	)
+	portUserSummery, err := hi.summeryDomainPorts()
 	if err != nil {
 		return
 	}
+	vpnTypes := hi.getVPNTypes(inbounds)
+	vpnSources := hi.getVPNSourcesFromInbounds(inbounds)
 
-	VPNSourceAddresses := i.getVPNSourceInboundDestination(
-		VPNSourceDomains,
-		hostPortPairsMap,
-	)
-	seen := map[string]uint32{}
+	vpns, err := hi.vpnManagerSvc.GetAvailableVPNSourceDomains(vpnSources, vpnTypes)
+	if err != nil {
+		return
+	}
+	availbleVPNsAddresses := hi.getAvailbleAddressesByVPNPortCountry(vpns, portUserSummery)
+
+	hi.setAddresses(inbounds, availbleVPNsAddresses)
+}
+
+func (hi *HostInbound) setAddresses(inbounds []*entity.Inbound, availbleVPNsAddresses map[int]map[string][]*AvailbleVPNAddress) {
+	indexes := make(map[entity.VPNType]map[string]int)
 	for _, inbound := range inbounds {
-		count := seen[inbound.Country]
-
-		if len(VPNSourceAddresses[inbound.Country]) > int(count) {
-			inboundDestination := VPNSourceAddresses[inbound.Country][count]
-			i.inboundRepo.UpdateDomainPort(inbound.ID,
-				inboundDestination.Domain,
-				inboundDestination.Port,
-			)
-			seen[inbound.Country] += 1
+		availableVPNPorts := availbleVPNsAddresses[inbound.VPNType][inbound.Country]
+		if _, isExistVPNType := indexes[inbound.VPNType]; !isExistVPNType {
+			indexes[inbound.VPNType] = make(map[string]int)
+		}
+		if _, isExistCountry := indexes[inbound.VPNType][inbound.Country]; !isExistCountry {
+			indexes[inbound.VPNType][inbound.Country] = 0
+		}
+		i := indexes[inbound.VPNType][inbound.Country]
+		if len(availableVPNPorts) > i {
+			address := availbleVPNsAddresses[inbound.VPNType][inbound.Country][i]
+			indexes[inbound.VPNType][inbound.Country] = i + 1
+			hi.inboundRepo.UpdateDomainPort(inbound.ID, address.Domain, address.Port)
 		}
 	}
 }
@@ -115,100 +110,57 @@ func (i *HostInbound) getVPNSourcesFromInbounds(inbounds []*entity.Inbound) []st
 	return vpnSources
 }
 
-func (i *HostInbound) countRequiredPortEachHost(inbounds []*entity.Inbound, VPNSourceDomains map[string][]string) map[string]uint32 {
-	ret := map[string]uint32{}
-	vpnSourceRequiredPortsCount := i.countInboundsByVPNSource(inbounds)
-
-	for vpnSource, domains := range VPNSourceDomains {
-		domainPortsCount := i.countDominPortsRequired(
-			domains,
-			vpnSourceRequiredPortsCount[vpnSource],
-		)
-		ret = i.mergeTwoDomainPortsCount(ret, domainPortsCount)
-	}
-	return ret
-}
-
-func (i *HostInbound) countDominPortsRequired(domains []string, requiredPortsCount uint32) map[string]uint32 {
-	ret := map[string]uint32{}
-	for _, domain := range domains {
-		ret[domain] += requiredPortsCount
-	}
-
-	return ret
-}
-
-func (i *HostInbound) mergeTwoDomainPortsCount(a, b map[string]uint32) map[string]uint32 {
-	ret := map[string]uint32{}
-	for domain, count := range a {
-		ret[domain] += count
-	}
-
-	for domain, count := range b {
-		ret[domain] += count
-	}
-
-	return ret
-}
-
-func (i *HostInbound) countInboundsByVPNSource(inbounds []*entity.Inbound) map[string]uint32 {
-	ret := map[string]uint32{}
+func (i *HostInbound) getVPNTypes(inbounds []*entity.Inbound) []entity.VPNType {
+	res := make([]entity.VPNType, 0)
+	seen := make(map[entity.VPNType]struct{})
 	for _, inbound := range inbounds {
-		ret[inbound.Country] += 1
+		if _, isExist := seen[inbound.VPNType]; !isExist {
+			res = append(res, inbound.VPNType)
+			seen[inbound.VPNType] = struct{}{}
+		}
 	}
-	return ret
+	return res
 }
 
-func (i *HostInbound) getVPNSourceInboundDestination(
-	VPNSourceDomains map[string][]string,
-	hostPorts map[string][]string,
-) map[string][]*Address {
-	VPNSourceInboundDestination := map[string][]*Address{}
-	for country, domains := range VPNSourceDomains {
-		VPNSourceInboundDestination[country] = i.getAddressesByCountry(domains, hostPorts)
-	}
-	return VPNSourceInboundDestination
-}
+func (i *HostInbound) getAvailbleAddressesByVPNPortCountry(vpns []*entity.VPN, domainPortSummery map[string][]string) map[entity.VPNType]map[string][]*AvailbleVPNAddress {
+	res := make(map[entity.VPNType]map[string][]*AvailbleVPNAddress)
+	for _, vpn := range vpns {
+		if _, isExistCountry := res[vpn.VPNType][vpn.Country]; !isExistCountry {
+			res[vpn.VPNType] = make(map[string][]*AvailbleVPNAddress, 0)
+			res[vpn.VPNType][vpn.Country] = make([]*AvailbleVPNAddress, 0)
+		}
 
-func (i *HostInbound) getAddressesByCountry(domains []string, hostPorts map[string][]string) []*Address {
-	addresses := []*Address{}
-	for _, domain := range domains {
-		addresses = append(
-			addresses,
-			i.makeAddresses(domain, hostPorts[domain])...,
+		res[vpn.VPNType][vpn.Country] = append(
+			res[vpn.VPNType][vpn.Country],
+			i.getAvailblePortsByVPN(vpn, domainPortSummery)...,
 		)
 	}
-	return addresses
+	return res
 }
 
-func (i *HostInbound) makeAddresses(domain string, ports []string) []*Address {
-	ret := []*Address{}
-	for _, port := range ports {
-		ret = append(ret, &Address{Domain: domain, Port: port})
+func (i *HostInbound) getAvailblePortsByVPN(vpn *entity.VPN, domainPortSummery map[string][]string) []*AvailbleVPNAddress {
+	domain := vpn.Domain
+	portsUsed := domainPortSummery[domain]
+	portUsedMap := i.getPortUsedMap(portsUsed)
+	res := make([]*AvailbleVPNAddress, 0)
+
+	for p := vpn.StartPort; p < vpn.EndPort+1; p++ {
+		pStr := strconv.Itoa(p)
+		if _, isExist := portUsedMap[pStr]; !isExist {
+			res = append(res, &AvailbleVPNAddress{
+				Domain:  domain,
+				VPNType: vpn.VPNType,
+				Port:    strconv.Itoa(p),
+			})
+		}
 	}
-	return ret
+	return res
 }
 
-func (i *HostInbound) getDomainPorts(inbounds []*entity.Inbound) map[string][]string {
-	domainPorts := make(map[string][]string)
-	for _, inbound := range inbounds {
-		domainPorts[inbound.Domain] = append(domainPorts[inbound.Domain], inbound.Port)
+func (i *HostInbound) getPortUsedMap(portsUsed []string) map[string]struct{} {
+	portUsedMap := make(map[string]struct{})
+	for _, p := range portsUsed {
+		portUsedMap[p] = struct{}{}
 	}
-	return domainPorts
-}
-
-func (i *HostInbound) getHostPortsMap(hostPortsFailures []*hostServiceDto.HostPortsFailed) map[string]map[string]struct{} {
-	hostPortsMap := make(map[string]map[string]struct{})
-	for _, hostPortFailed := range hostPortsFailures {
-		hostPortsMap[hostPortFailed.Domain] = i.getPortFailedMap(hostPortFailed)
-	}
-	return hostPortsMap
-}
-
-func (i *HostInbound) getPortFailedMap(hostPortsFailed *hostServiceDto.HostPortsFailed) map[string]struct{} {
-	portMap := make(map[string]struct{})
-	for _, port := range hostPortsFailed.Ports {
-		portMap[port] = struct{}{}
-	}
-	return portMap
+	return portUsedMap
 }

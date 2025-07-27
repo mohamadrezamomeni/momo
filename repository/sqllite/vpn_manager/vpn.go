@@ -22,10 +22,18 @@ func (v *VPN) Create(inpt *vpnManagerDto.AddVPN) (*entity.VPN, error) {
 		Country:   inpt.Country,
 	}
 	err := v.db.Conn().QueryRow(`
-	INSERT INTO vpns (domain, is_active, api_port, vpn_type, user_count, country)
-	VALUES (?, ?, ?, ?, ?, ?)
+	INSERT INTO vpns (domain, is_active, api_port, vpn_type, user_count, country, start_port, end_port)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 	RETURNING id
-	`, inpt.Domain, inpt.IsActive, inpt.ApiPort, entity.VPNTypeString(vpn.VPNType), inpt.UserCount, inpt.Country).Scan(
+	`, inpt.Domain,
+		inpt.IsActive,
+		inpt.ApiPort,
+		entity.VPNTypeString(vpn.VPNType),
+		inpt.UserCount,
+		inpt.Country,
+		inpt.StartPort,
+		inpt.EndPort,
+	).Scan(
 		&vpn.ID,
 	)
 	if err == nil {
@@ -116,6 +124,8 @@ func (v *VPN) Filter(inpt *vpnManagerDto.FilterVPNs) ([]*entity.VPN, error) {
 			&vpnType,
 			&vpn.UserCount,
 			&vpn.Country,
+			&vpn.StartPort,
+			&vpn.EndPort,
 			&createdAt,
 			&updatedAt,
 		)
@@ -146,8 +156,8 @@ func (v *VPN) makeSQlFilter(inpt *vpnManagerDto.FilterVPNs) string {
 		subQueries = append(subQueries, fmt.Sprintf("domain LIKE  '%%%s%%'", inpt.Domain))
 	}
 
-	if inpt.VPNType != 0 {
-		subQueries = append(subQueries, fmt.Sprintf("vpn_type = '%s'", entity.VPNTypeString(inpt.VPNType)))
+	if inpt.VPNTypes != nil && len(inpt.VPNTypes) > 0 {
+		subQueries = append(subQueries, fmt.Sprintf("vpn_type IN ('%s')", strings.Join(v.convertVPNTypesToVPNstrings(inpt.VPNTypes), ",")))
 	}
 
 	if inpt.Coountries != nil && len(inpt.Coountries) > 0 {
@@ -188,42 +198,10 @@ func (v *VPN) GroupAvailbleVPNsByCountry() ([]string, error) {
 	return countries, nil
 }
 
-func (v *VPN) GroupDomainsByVPNSource(dto *vpnManagerDto.GroupVPNsByVPNSourceDto) (map[string][]string, error) {
-	scope := "vpnRepository.GroupDomainsByVPNSource"
-
-	ret := map[string][]string{}
-	query := "SELECT country, GROUP_CONCAT(DISTINCT domain) AS domains FROM vpns %s GROUP BY country"
-
-	subQueries := []string{}
-
-	if dto.IsActive != nil {
-		subQueries = append(subQueries, fmt.Sprintf("is_active = %v", *dto.IsActive))
+func (v *VPN) convertVPNTypesToVPNstrings(vpnTypes []entity.VPNType) []string {
+	res := make([]string, 0)
+	for _, vpnType := range vpnTypes {
+		res = append(res, entity.VPNTypeString(vpnType))
 	}
-
-	if dto.VPNSources != nil && len(dto.VPNSources) > 0 {
-		subQueries = append(subQueries, fmt.Sprintf("country IN ('%s')", strings.Join(dto.VPNSources, "', '")))
-	}
-	if len(subQueries) > 0 {
-		query = fmt.Sprintf(query, " WHERE "+strings.Join(subQueries, " AND "))
-	} else {
-		query = fmt.Sprintf(query, "")
-	}
-	rows, err := v.db.Conn().Query(query)
-	if err != nil {
-		return nil, momoError.Wrap(err).Scope(scope).Input(dto).ErrorWrite()
-	}
-
-	for rows.Next() {
-		var country string
-		var domains string
-		err := rows.Scan(
-			&country,
-			&domains,
-		)
-		if err != nil {
-			return nil, momoError.Wrap(err).Scope(scope).Input(dto).ErrorWrite()
-		}
-		ret[country] = append(ret[country], strings.Split(domains, ",")...)
-	}
-	return ret, nil
+	return res
 }

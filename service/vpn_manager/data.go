@@ -12,6 +12,8 @@ var (
 		ApiPort:   "2002",
 		UserCount: 20,
 		IsActive:  true,
+		StartPort: 2000,
+		EndPort:   3000,
 	}
 
 	vpn2 = &vpnManagerDto.AddVPN{
@@ -20,6 +22,8 @@ var (
 		ApiPort:   "2002",
 		UserCount: 20,
 		IsActive:  true,
+		StartPort: 2000,
+		EndPort:   3000,
 	}
 
 	vpn3 = &vpnManagerDto.AddVPN{
@@ -28,5 +32,7 @@ var (
 		ApiPort:   "2002",
 		UserCount: 20,
 		IsActive:  false,
+		StartPort: 2000,
+		EndPort:   3000,
 	}
 )

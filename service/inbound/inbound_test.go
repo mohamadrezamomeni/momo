@@ -9,7 +9,6 @@ import (
 	"github.com/mohamadrezamomeni/momo/dto/service/vpn"
 	inboundRepository "github.com/mohamadrezamomeni/momo/mocks/repository/inbound"
 	chargeService "github.com/mohamadrezamomeni/momo/mocks/service/charge"
-	hostService "github.com/mohamadrezamomeni/momo/mocks/service/host"
 	inboundChargeService "github.com/mohamadrezamomeni/momo/mocks/service/inbound_charge"
 	userService "github.com/mohamadrezamomeni/momo/mocks/service/user"
 	vpnService "github.com/mohamadrezamomeni/momo/mocks/service/vpn"
@@ -18,12 +17,11 @@ import (
 
 func registerInboundSvc() (*Inbound, *HostInbound, *HealingUpInbound, *inboundRepository.MockInbound, *vpnService.MockVPN) {
 	inboundRepo := inboundRepository.New()
-	hostSvc := hostService.New()
 	vpnSvc := vpnService.New()
 
 	inboundSvc := New(inboundRepo)
 	inboundChargeSvc := inboundChargeService.New()
-	inboundHostSvc := NewHostInbound(inboundRepo, hostSvc, vpnSvc)
+	inboundHostSvc := NewHostInbound(inboundRepo, vpnSvc)
 	userSvc := userService.New()
 	chargeSvc := chargeService.New()
 	healingUpInboundSvc := NewHealingUpInbound(inboundRepo, vpnSvc, inboundChargeSvc, chargeSvc, userSvc)
@@ -41,6 +39,8 @@ func TestApplyDomainAndPortToInbounds(t *testing.T) {
 		Domain:    "instagram.com",
 		UserCount: 2,
 		Port:      "203",
+		StartPort: 2000,
+		EndPort:   3000,
 	})
 
 	vpnSvc.Create(&vpn.CreateVPN{
@@ -49,6 +49,8 @@ func TestApplyDomainAndPortToInbounds(t *testing.T) {
 		Domain:    "facebook.com",
 		UserCount: 2,
 		Port:      "203",
+		StartPort: 2000,
+		EndPort:   3000,
 	})
 	inboundCreated1, _ := inboundRepo.Create(inbound1)
 	inboundCreated2, _ := inboundRepo.Create(inbound2)

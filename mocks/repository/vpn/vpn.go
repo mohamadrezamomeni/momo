@@ -63,15 +63,21 @@ func (mv *MockVPN) DeactiveVPN(id int) error {
 
 func (mv *MockVPN) Filter(inpt *vpnManagerDto.FilterVPNs) ([]*entity.VPN, error) {
 	ret := []*entity.VPN{}
-	if inpt.Domain == "" && inpt.IsActive == nil && inpt.VPNType == 0 {
-		return mv.vpns, nil
+	VPNTypeMap := make(map[entity.VPNType]struct{})
+	countryMap := make(map[string]struct{})
+	for _, vpnType := range inpt.VPNTypes {
+		VPNTypeMap[vpnType] = struct{}{}
+	}
+	for _, country := range inpt.Coountries {
+		countryMap[country] = struct{}{}
 	}
 	for _, vpn := range mv.vpns {
-		if inpt.Domain != "" && vpn.Domain == inpt.Domain {
-			ret = append(ret, vpn)
-		} else if inpt.IsActive != nil && vpn.IsActive == *inpt.IsActive {
-			ret = append(ret, vpn)
-		} else if inpt.VPNType != 0 && inpt.VPNType == vpn.VPNType {
+		_, isExistVPNType := VPNTypeMap[vpn.VPNType]
+		_, isExistCountry := countryMap[vpn.Country]
+		if (inpt.Domain == "" || vpn.Domain == inpt.Domain) &&
+			(inpt.IsActive == nil || vpn.IsActive == *inpt.IsActive) &&
+			(inpt.VPNTypes == nil || isExistVPNType) &&
+			(inpt.Coountries == nil || isExistCountry) {
 			ret = append(ret, vpn)
 		}
 	}
@@ -88,31 +94,4 @@ func (mv *MockVPN) GroupAvailbleVPNsByCountry() ([]string, error) {
 		}
 	}
 	return res, nil
-}
-
-func (mv *MockVPN) GroupDomainsByVPNSource(dto *vpnManagerDto.GroupVPNsByVPNSourceDto) (map[string][]string, error) {
-	ret := map[string][]string{}
-	vpns := []*entity.VPN{}
-	VPNSourcesRefrence := map[string]struct{}{}
-	for _, vpnSource := range dto.VPNSources {
-		VPNSourcesRefrence[vpnSource] = struct{}{}
-	}
-	for _, vpn := range mv.vpns {
-		if dto.IsActive != nil && *dto.IsActive == vpn.IsActive {
-			vpns = append(vpns, vpn)
-		}
-		if len(dto.VPNSources) > 0 {
-			if _, isExist := VPNSourcesRefrence[vpn.Country]; isExist {
-				vpns = append(vpns, vpn)
-			}
-		} else {
-			vpns = append(vpns, vpn)
-		}
-	}
-
-	for _, vpn := range vpns {
-		ret[vpn.Country] = append(ret[vpn.Country], vpn.Domain)
-	}
-
-	return ret, nil
 }

@@ -29,6 +29,8 @@ func TestCreateVPN(t *testing.T) {
 		Domain:    "mohamadreza.com",
 		Country:   "uk",
 		UserCount: 2,
+		StartPort: 1000,
+		EndPort:   2000,
 	})
 	if err != nil {
 		t.Errorf("someting went wrong that was %v", err)
@@ -39,6 +41,8 @@ func TestCreateVPN(t *testing.T) {
 		Domain:    "mohamadreza.com",
 		Country:   "uk",
 		UserCount: 2,
+		StartPort: 1000,
+		EndPort:   2000,
 	})
 
 	if err == nil {
@@ -50,6 +54,22 @@ func TestCreateVPN(t *testing.T) {
 		Port:      "322",
 		Domain:    "mohamadreza.com",
 		UserCount: 2,
+		StartPort: 1000,
+		EndPort:   2000,
+	})
+
+	if err == nil {
+		t.Error("we expected we would get error but we got nothing")
+	}
+
+	err = validator.ValidateCreatingVPN(vpnControllerDto.CreateVPN{
+		VpnType:   "xray",
+		Port:      "322",
+		Domain:    "mohamadreza.com",
+		UserCount: 2,
+		Country:   "china",
+		StartPort: 1000,
+		EndPort:   2000,
 	})
 
 	if err == nil {
@@ -63,9 +83,8 @@ func TestCreateVPN(t *testing.T) {
 		UserCount: 2,
 		Country:   "china",
 	})
-
 	if err == nil {
-		t.Error("we expected we would get error but we got nothing")
+		t.Error("we expect the error beacuse endport is 0")
 	}
 }
 

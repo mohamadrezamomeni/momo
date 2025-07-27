@@ -443,25 +443,6 @@ func TestRetriveFinishedInbounds(t *testing.T) {
 	}
 }
 
-func TestGetInboundsMustBeOpenPort(t *testing.T) {
-	inboundCreated1, _ := inboundRepo.Create(inbound23)
-	inboundCreated2, _ := inboundRepo.Create(inbound24)
-	inboundRepo.Create(inbound25)
-	defer inboundRepo.DeleteAll()
-	inbounds, err := inboundRepo.GetInboundsPortMustBeOpen()
-	if err != nil {
-		t.Fatalf("something went wrong that was %v", err)
-	}
-	if len(inbounds) != 2 {
-		t.Fatalf("we expected the lengh of inbounds be %d but we got %d", 2, len(inbounds))
-	}
-
-	if !((inbounds[0].ID == inboundCreated1.ID || inbounds[0].ID == inboundCreated2.ID) &&
-		(inbounds[1].ID == inboundCreated1.ID || inbounds[1].ID == inboundCreated2.ID)) {
-		t.Fatal("error to compare data")
-	}
-}
-
 func TestActiveInbounds(t *testing.T) {
 	defer inboundRepo.DeleteAll()
 	inboundCreated1, _ := inboundRepo.Create(inbound23)

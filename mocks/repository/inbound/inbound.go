@@ -75,10 +75,8 @@ func (i *MockInbound) GetListOfPortsByDomain() ([]struct {
 ) {
 	hashmap := map[string][]string{}
 	for _, inbound := range i.inbounds {
-		if val, ok := hashmap[inbound.Domain]; ok {
-			hashmap[inbound.Domain] = append(val, inbound.Port)
-		} else {
-			hashmap[inbound.Domain] = []string{inbound.Port}
+		if inbound.IsAssigned {
+			hashmap[inbound.Domain] = append(hashmap[inbound.Domain], inbound.Port)
 		}
 	}
 	ret := make([]struct {

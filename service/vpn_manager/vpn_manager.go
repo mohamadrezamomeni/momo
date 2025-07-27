@@ -14,7 +14,6 @@ type VPNRepo interface {
 	DeactiveVPN(int) error
 	Create(*vpnManagerRepositoryDto.AddVPN) (*entity.VPN, error)
 	GroupAvailbleVPNsByCountry() ([]string, error)
-	GroupDomainsByVPNSource(*vpnManagerRepositoryDto.GroupVPNsByVPNSourceDto) (map[string][]string, error)
 }
 
 type AdaptedVPNProxy func(adapterConfigs []*adapter.AdapterVPnProxyigFactoryConfig) adapter.ProxyVPN
@@ -73,8 +72,8 @@ func (v *VPNService) MonitorVPNs() {
 
 func (v *VPNService) Filter(vpnFilterDto *vpnServiceDto.FilterVPNs) ([]*entity.VPN, error) {
 	return v.vpnRepo.Filter(&vpnManagerRepositoryDto.FilterVPNs{
-		Domain:  vpnFilterDto.Domain,
-		VPNType: vpnFilterDto.VPNType,
+		Domain:   vpnFilterDto.Domain,
+		VPNTypes: []entity.VPNType{vpnFilterDto.VPNType},
 	})
 }
 
@@ -113,10 +112,9 @@ func (v *VPNService) GetAvailableCountries() ([]string, error) {
 	return countries, err
 }
 
-func (v *VPNService) GetAvailableVPNSourceDomains(vpnsSources []string) (map[string][]string, error) {
-	active := true
-	return v.vpnRepo.GroupDomainsByVPNSource(&vpnManagerRepositoryDto.GroupVPNsByVPNSourceDto{
-		VPNSources: vpnsSources,
-		IsActive:   &active,
+func (v *VPNService) GetAvailableVPNSourceDomains(coutntries []string, vpnTypes []entity.VPNType) ([]*entity.VPN, error) {
+	return v.vpnRepo.Filter(&vpnManagerRepositoryDto.FilterVPNs{
+		VPNTypes:   vpnTypes,
+		Coountries: coutntries,
 	})
 }

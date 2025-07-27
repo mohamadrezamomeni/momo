@@ -11,4 +11,6 @@ type AddVPN struct {
 	VPNType   entity.VPNType
 	UserCount int
 	Country   string
+	StartPort int
+	EndPort   int
 }

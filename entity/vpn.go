@@ -8,6 +8,8 @@ type VPN struct {
 	VPNType   VPNType
 	UserCount int
 	Country   string
+	StartPort int
+	EndPort   int
 }
 
 type VPNType = int

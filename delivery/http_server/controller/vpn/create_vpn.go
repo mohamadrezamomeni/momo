@@ -33,6 +33,8 @@ func (h *Handler) CreateVPN(c echo.Context) error {
 		Domain:    req.Domain,
 		Port:      req.Port,
 		Country:   req.Country,
+		StartPort: req.StartPort,
+		EndPort:   req.EndPort,
 	})
 	if err != nil {
 		msg, code := momoErrorHttp.Error(err)

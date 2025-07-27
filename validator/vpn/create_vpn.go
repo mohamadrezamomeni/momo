@@ -29,6 +29,15 @@ func (v *Validator) ValidateCreatingVPN(req vpnControllerDto.CreateVPN) error {
 			validation.Required,
 			validation.Match(regexp.MustCompile(`^\d+$`)).Error("must be a numeric string"),
 		),
+		validation.Field(&req.EndPort, validation.Min(2000)),
+		validation.Field(
+			&req.StartPort, validation.By(func(value interface{}) error {
+				startPort, _ := value.(int)
+				if startPort > req.EndPort {
+					return momoError.Scope(scope).Input(req).Errorf("end_port must be greather than start_port")
+				}
+				return nil
+			})),
 		validation.Field(
 			&req.VpnType,
 			validation.Required,
