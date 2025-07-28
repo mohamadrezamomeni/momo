@@ -13,7 +13,6 @@ CREATE TABLE `inbounds` (
         `end` TIMESTAMP NOT NULL,
         `is_notified` boolean default false,
         `is_assigned` boolean default false,
-        `charge_count` INTEGER DEFAULT 0,
         `traffic_usage` INTEGER DEFAULT 0,
         `traffic_limit` INTEGER NOT NULL,
         `country` VARCHAR(128) NOT NULL,

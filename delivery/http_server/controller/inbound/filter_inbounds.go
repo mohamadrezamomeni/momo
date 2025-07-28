@@ -57,7 +57,6 @@ func (h *Handler) Filter(c echo.Context) error {
 			Tag:          inbound.Tag,
 			TrafficUsage: inbound.TrafficUsage,
 			TrafficLimit: inbound.TrafficLimit,
-			ChargeCount:  inbound.ChargeCount,
 		})
 	}
 	return c.JSON(http.StatusOK, res)

@@ -13,7 +13,6 @@ type InboundSerializer struct {
 	IsAssigned   bool      `json:"is_assigned"`
 	Start        time.Time `json:"start_time"`
 	End          time.Time `json:"end_time"`
-	ChargeCount  uint32    `json:"charhe_count"`
 	TrafficUsage uint32    `json:"traffic_usage"`
 	TrafficLimit uint32    `json:"traffic_limit"`
 }
