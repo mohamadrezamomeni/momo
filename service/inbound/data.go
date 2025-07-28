@@ -174,4 +174,36 @@ var (
 		IsBlock:      false,
 		TrafficLimit: 50000,
 	}
+	inbound11 = &inboundRepositoryDto.CreateInbound{
+		Protocol:     "vmess",
+		Tag:          "example-tag",
+		Country:      "brazil",
+		Port:         "",
+		UserID:       uuid.New().String(),
+		Domain:       "",
+		VPNType:      entity.XRAY_VPN,
+		IsAssigned:   false,
+		IsNotified:   false,
+		IsActive:     false,
+		Start:        now.AddDate(0, -1, 0),
+		End:          now,
+		IsBlock:      false,
+		TrafficLimit: 50000,
+	}
+	inbound12 = &inboundRepositoryDto.CreateInbound{
+		Protocol:     "vmess",
+		Tag:          "example-tag",
+		Country:      "brazil",
+		Port:         "",
+		UserID:       uuid.New().String(),
+		Domain:       "",
+		VPNType:      entity.XRAY_VPN,
+		IsAssigned:   false,
+		IsNotified:   false,
+		IsActive:     false,
+		Start:        now.AddDate(0, -1, 0),
+		End:          now,
+		IsBlock:      false,
+		TrafficLimit: 50000,
+	}
 )

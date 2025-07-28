@@ -32,6 +32,7 @@ func TestApplyDomainAndPortToInbounds(t *testing.T) {
 	_, inboundHostSvc, _, inboundRepo, vpnSvc := registerInboundSvc()
 
 	defer vpnSvc.DeleteAll()
+	defer inboundRepo.DeleteAll()
 
 	vpnSvc.Create(&vpn.CreateVPN{
 		VpnType:   inbound1.VPNType,
@@ -40,7 +41,7 @@ func TestApplyDomainAndPortToInbounds(t *testing.T) {
 		UserCount: 2,
 		Port:      "203",
 		StartPort: 2000,
-		EndPort:   3000,
+		EndPort:   2001,
 	})
 
 	vpnSvc.Create(&vpn.CreateVPN{
@@ -50,12 +51,25 @@ func TestApplyDomainAndPortToInbounds(t *testing.T) {
 		UserCount: 2,
 		Port:      "203",
 		StartPort: 2000,
-		EndPort:   3000,
+		EndPort:   2000,
 	})
+
+	vpnSvc.Create(&vpn.CreateVPN{
+		VpnType:   inbound11.VPNType,
+		Country:   inbound11.Country,
+		Domain:    "twitter.com",
+		UserCount: 2,
+		Port:      "203",
+		StartPort: 2000,
+		EndPort:   2000,
+	})
+
 	inboundCreated1, _ := inboundRepo.Create(inbound1)
 	inboundCreated2, _ := inboundRepo.Create(inbound2)
 	inboundCreated3, _ := inboundRepo.Create(inbound3)
 	inboundCreated4, _ := inboundRepo.Create(inbound7)
+	inboundCreated5, _ := inboundRepo.Create(inbound11)
+	inboundCreated6, _ := inboundRepo.Create(inbound12)
 
 	inboundHostSvc.AssignDomainToInbounds()
 
@@ -63,7 +77,8 @@ func TestApplyDomainAndPortToInbounds(t *testing.T) {
 	ret2, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated2.ID))
 	ret3, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated3.ID))
 	ret4, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated4.ID))
-
+	ret5, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated5.ID))
+	ret6, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated6.ID))
 	if ret1.IsAssigned != true ||
 		ret2.IsAssigned != true ||
 		ret1.Domain != "instagram.com" ||
@@ -77,6 +92,10 @@ func TestApplyDomainAndPortToInbounds(t *testing.T) {
 
 	if ret3.Domain != "instagram.com" {
 		t.Fatal("wrong inbound is updated")
+	}
+
+	if (ret5.IsAssigned && ret6.IsAssigned) || (!ret5.IsAssigned && !ret6.IsAssigned) {
+		t.Fatal("error to compare data")
 	}
 }
 

@@ -50,7 +50,6 @@ func (hi *HostInbound) AssignDomainToInbounds() {
 	if err != nil {
 		return
 	}
-
 	portUserSummery, err := hi.summeryDomainPorts()
 	if err != nil {
 		return
@@ -63,7 +62,6 @@ func (hi *HostInbound) AssignDomainToInbounds() {
 		return
 	}
 	availbleVPNsAddresses := hi.getAvailbleAddressesByVPNPortCountry(vpns, portUserSummery)
-
 	hi.setAddresses(inbounds, availbleVPNsAddresses)
 }
 
@@ -125,11 +123,12 @@ func (i *HostInbound) getVPNTypes(inbounds []*entity.Inbound) []entity.VPNType {
 func (i *HostInbound) getAvailbleAddressesByVPNPortCountry(vpns []*entity.VPN, domainPortSummery map[string][]string) map[entity.VPNType]map[string][]*AvailbleVPNAddress {
 	res := make(map[entity.VPNType]map[string][]*AvailbleVPNAddress)
 	for _, vpn := range vpns {
-		if _, isExistCountry := res[vpn.VPNType][vpn.Country]; !isExistCountry {
+		if _, isExistVPNType := res[vpn.VPNType]; !isExistVPNType {
 			res[vpn.VPNType] = make(map[string][]*AvailbleVPNAddress, 0)
+		}
+		if _, isExistCountry := res[vpn.VPNType][vpn.Country]; !isExistCountry {
 			res[vpn.VPNType][vpn.Country] = make([]*AvailbleVPNAddress, 0)
 		}
-
 		res[vpn.VPNType][vpn.Country] = append(
 			res[vpn.VPNType][vpn.Country],
 			i.getAvailblePortsByVPN(vpn, domainPortSummery)...,
