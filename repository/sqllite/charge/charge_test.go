@@ -33,7 +33,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func TestCharge(t *testing.T) {
+func TestCreateCharge(t *testing.T) {
 	defer chargeRepo.DeleteAll()
 	chargeCreated, err := chargeRepo.Create(charge1)
 	if err != nil {
@@ -46,6 +46,16 @@ func TestCharge(t *testing.T) {
 		chargeCreated.Status != charge1.Status ||
 		chargeCreated.UserID != charge1.UserID ||
 		chargeCreated.ID == "" {
+		t.Fatal("error to comapre data")
+	}
+
+	chargeCreated, err = chargeRepo.Create(charge10)
+	if err != nil {
+		t.Fatalf("something went wrong the problem was %v", err)
+	}
+
+	if chargeCreated.InboundID != "" ||
+		chargeCreated.VPNType != entity.XRAY_VPN {
 		t.Fatal("error to comapre data")
 	}
 }
@@ -92,13 +102,14 @@ func TestFilterCharges(t *testing.T) {
 	chargeRepo.Create(charge1)
 	chargeRepo.Create(charge2)
 	chargeRepo.Create(charge3)
+	chargeRepo.Create(charge10)
 
 	charges, err := chargeRepo.FilterCharges(&chargeRepositoryDto.FilterChargesDto{})
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
 	}
 
-	if len(charges) != 3 {
+	if len(charges) != 4 {
 		t.Fatalf("we expected the lengh of charges be 3 but we got %v", len(charges))
 	}
 
@@ -171,6 +182,7 @@ func TestRetriveAvailbleChargesForInbounds(t *testing.T) {
 	chargeCreated1, _ := chargeRepo.Create(charge6)
 	chargeRepo.Create(charge7)
 	chargeRepo.Create(charge8)
+	chargeRepo.Create(charge10)
 	chargeCreated4, _ := chargeRepo.Create(charge9)
 
 	charges, err := chargeRepo.RetriveAvailbleChargesForInbounds([]string{"15", "16", "17"})
@@ -187,6 +199,32 @@ func TestRetriveAvailbleChargesForInbounds(t *testing.T) {
 	}
 
 	if !(chargeCreated4.ID == charges[0].ID || chargeCreated4.ID == charges[1].ID) {
+		t.Fatal("error to compare data")
+	}
+}
+
+func TestRetriveChargesApprovedWithoutInbound(t *testing.T) {
+	defer chargeRepo.DeleteAll()
+
+	chargeCreated2, _ := chargeRepo.Create(charge11)
+	chargeCreated1, _ := chargeRepo.Create(charge10)
+	chargeRepo.Create(charge6)
+	chargeRepo.Create(charge9)
+
+	charges, err := chargeRepo.RetriveChargesApprovedWithoutInbound()
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	if len(charges) != 2 {
+		t.Fatalf("we expected the lengh of charges be 2 but we got %d", len(charges))
+	}
+
+	if !(chargeCreated1.ID == charges[0].ID || chargeCreated1.ID == charges[1].ID) {
+		t.Fatal("error to compare data")
+	}
+
+	if !(chargeCreated2.ID == charges[0].ID || chargeCreated2.ID == charges[1].ID) {
 		t.Fatal("error to compare data")
 	}
 }

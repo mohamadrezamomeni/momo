@@ -7,6 +7,8 @@ CREATE TABLE charges (
     inbound_id INTEGER,
     user_id VARCHAR(32) NOT NULL,
     package_id VARCHAR(32) NOT NULL,
+    country varchar(128) NOT NULL,
+    vpn_type varchar(32) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (inbound_id) REFERENCES inbounds(inbound_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id)

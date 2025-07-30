@@ -31,7 +31,7 @@ func main() {
 
 	migration.UP()
 
-	hostSvc, vpnSvc, _, _, _, _, _, _, _, healingUpInbound, hostInboundSvc, inboundTrafficSvc, _ := serviceInitializer.GetServices(&cfg)
+	hostSvc, vpnSvc, _, _, _, _, _, _, _, healingUpInbound, hostInboundSvc, inboundTrafficSvc, _, inboundCharge := serviceInitializer.GetServices(&cfg)
 
 	done := make(chan struct{})
 
@@ -39,7 +39,7 @@ func main() {
 
 	go func() {
 		wg.Add(1)
-		scheduler := scheduler.New(healingUpInbound, inboundTrafficSvc, hostInboundSvc, vpnSvc, hostSvc)
+		scheduler := scheduler.New(healingUpInbound, inboundTrafficSvc, hostInboundSvc, vpnSvc, hostSvc, inboundCharge)
 		scheduler.Start(done, &wg)
 	}()
 

@@ -70,7 +70,7 @@ func (t *Telegram) getCommands() ([]tgbotapi.BotCommand, error) {
 		},
 		{
 			Description: createVPNTitle,
-			Command:     "create_inbound",
+			Command:     "create_charge",
 		},
 		{
 			Description: listVPNsTitle,
@@ -78,7 +78,7 @@ func (t *Telegram) getCommands() ([]tgbotapi.BotCommand, error) {
 		},
 		{
 			Description: createChargeTitle,
-			Command:     "create_charge",
+			Command:     "charge_inbound",
 		},
 	}, nil
 }

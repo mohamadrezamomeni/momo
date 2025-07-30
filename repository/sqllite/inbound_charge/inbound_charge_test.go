@@ -47,12 +47,14 @@ func TestMain(m *testing.M) {
 }
 
 func TestChargeInbound(t *testing.T) {
+	defer inboundRepo.DeleteAll()
+	defer vpnPackageRepo.DeleteAll()
+	defer chargeRepo.DeleteAll()
 	inbound, _ := inboundRepo.Create(inbound1)
 	vpnPackage, _ := vpnPackageRepo.Create(vpnPackage1)
 	charge1.InboundID = strconv.Itoa(inbound.ID)
 	charge1.PackageID = vpnPackage.ID
 	charge, _ := chargeRepo.Create(charge1)
-
 	err := inboundChargeRepo.AssignChargeToInbound(inbound, charge, vpnPackage)
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
@@ -72,5 +74,15 @@ func TestChargeInbound(t *testing.T) {
 
 	if !((yp == ye && mp == me && de == dp) && (yn == ys && mn == ms && dn == ds)) {
 		t.Fatal("error to comapre data")
+	}
+}
+
+func TestCreateInbound(t *testing.T) {
+	vpnPackage, _ := vpnPackageRepo.Create(vpnPackage1)
+	charge1.PackageID = vpnPackage.ID
+	charge, _ := chargeRepo.Create(charge1)
+	err := inboundChargeRepo.CreateInbound(charge.ID, inbound2)
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
 	}
 }

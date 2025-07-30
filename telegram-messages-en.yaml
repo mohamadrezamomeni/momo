@@ -33,9 +33,6 @@ inbound:
     block: "⛔ Blocked"
     active: "🟢 Active"
     deactive: "🔴 Inactive"
-  create:
-    successfully_creation: 🎉 Your VPN has been set up
-    select_traffic_limit: 📝 select your desire trafficlimit
   select_vpn:
     ask_id: "<b>📝 select one of your VPNs:</b>\n\n"
     item: "ID:  :ID: - :VPNType:"
@@ -56,7 +53,7 @@ charge:
   extend_button: 📶 Extend your VPN now!
   detail_button: 📝 write your detail of payment
   successfully_extending: 🎉 Your VPN has been extended
-
+  successfully_creating_vpn_request: "🎉 Your VPN request has been successfully set up \n !Please wait while the admin reviews your request then your config is sent by this robot."
   approve_charge_admin: "🌟 Great News! 🌟 \n Your charge #:id: has been approved by the admin ✅ \n Thank you for your patience and trust. \n We're happy to have you with us! 💙"
 
 vpn_source:

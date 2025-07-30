@@ -8,6 +8,8 @@ type Charge struct {
 	InboundID    string
 	UserID       string
 	PackageID    string
+	VPNType      VPNType
+	Country      string
 }
 
 type ChargeStatus = int

@@ -67,7 +67,6 @@ func (h *Handler) SelectVPN(update *core.Update) (*core.ResponseHandlerFunc, err
 	if vpnType == entity.UknownVPNType {
 		return nil, momoError.Scope(scope).ErrorWrite()
 	}
-
 	state.SetData("vpn_type", vpnType)
 	return nil, nil
 }

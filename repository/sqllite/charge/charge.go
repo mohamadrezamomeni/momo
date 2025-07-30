@@ -32,18 +32,23 @@ func (e *Charge) DeleteAll() error {
 func (c *Charge) Create(inpt *chargeRepositoryDto.CreateDto) (*entity.Charge, error) {
 	scope := "chargeRepository.create"
 
-	charge := &entity.Charge{}
+	charge := &entity.Charge{
+		VPNType: inpt.VPNType,
+	}
+
 	status := ""
 	err := c.db.Conn().QueryRow(`
-	INSERT INTO charges (status, detail, admin_comment, inbound_id, user_id, package_id)
-	VALUES (?, ?, ?, ?, ?, ?)
-	RETURNING id, status, detail, admin_comment, inbound_id, user_id, package_id
+	INSERT INTO charges (status, detail, admin_comment, inbound_id, user_id, package_id, country, vpn_type)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+	RETURNING id, status, detail, admin_comment, inbound_id, user_id, package_id, country
 	`, entity.TranslateChargeStatus(inpt.Status),
 		inpt.Detail,
 		"",
 		inpt.InboundID,
 		inpt.UserID,
 		inpt.PackageID,
+		inpt.Country,
+		entity.VPNTypeString(inpt.VPNType),
 	).Scan(
 		&charge.ID,
 		&status,
@@ -52,17 +57,18 @@ func (c *Charge) Create(inpt *chargeRepositoryDto.CreateDto) (*entity.Charge, er
 		&charge.InboundID,
 		&charge.UserID,
 		&charge.PackageID,
+		&charge.Country,
 	)
 
-	if err == nil {
-		charge.Status = entity.ConvertStringToChargeStatus(status)
-		return charge, nil
-	}
-
-	if errorRepository.IsDuplicateError(err) {
+	if err != nil && errorRepository.IsDuplicateError(err) {
 		return nil, momoError.Wrap(err).Input(inpt).Duplicate().Scope(scope).DebuggingError()
 	}
-	return nil, momoError.Wrap(err).Input(inpt).UnExpected().Scope(scope).DebuggingError()
+	if err != nil {
+		return nil, momoError.Wrap(err).Input(inpt).UnExpected().Scope(scope).DebuggingError()
+	}
+
+	charge.Status = entity.ConvertStringToChargeStatus(status)
+	return charge, nil
 }
 
 func (c *Charge) FindChargeByID(id string) (*entity.Charge, error) {
@@ -71,6 +77,7 @@ func (c *Charge) FindChargeByID(id string) (*entity.Charge, error) {
 	var createdAt interface{}
 	charge := &entity.Charge{}
 	status := ""
+	var VPNType string
 	s := fmt.Sprintf("SELECT * FROM charges WHERE id=%s LIMIT 1", id)
 	err := c.db.Conn().QueryRow(s).Scan(
 		&charge.ID,
@@ -80,17 +87,21 @@ func (c *Charge) FindChargeByID(id string) (*entity.Charge, error) {
 		&charge.InboundID,
 		&charge.UserID,
 		&charge.PackageID,
+		&charge.Country,
+		&VPNType,
 		&createdAt,
 	)
 
-	if err == nil {
-		charge.Status = entity.ConvertStringToChargeStatus(status)
-		return charge, nil
-	}
 	if err == sql.ErrNoRows {
 		return nil, momoError.Wrap(err).Scope(scope).NotFound().Input(id).DebuggingError()
 	}
-	return nil, momoError.Wrap(err).Scope(scope).Input(id).UnExpected().DebuggingError()
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).Input(id).UnExpected().DebuggingError()
+	}
+	charge.VPNType = entity.ConvertStringVPNTypeToEnum(VPNType)
+	charge.Status = entity.ConvertStringToChargeStatus(status)
+
+	return charge, nil
 }
 
 func (c *Charge) UpdateCharge(id string, inpt *chargeRepositoryDto.UpdateChargeDto) error {
@@ -135,7 +146,7 @@ func (c *Charge) RetriveAvailbleChargesForInbounds(inboundIDs []string) ([]*enti
 			WHERE inbound_id IN (%s) AND status = '%s'
 			GROUP BY inbound_id
 		) available_charge
-		ON c.id = available_charge.id `
+		ON c.id = available_charge.id`
 
 	query := fmt.Sprintf(
 		queryFormat,
@@ -211,6 +222,8 @@ func (e *Charge) scan(rows *sql.Rows) (*entity.Charge, error) {
 
 	charge := &entity.Charge{}
 	status := ""
+	var vpnType string
+
 	var createdAt interface{}
 	err := rows.Scan(
 		&charge.ID,
@@ -220,12 +233,16 @@ func (e *Charge) scan(rows *sql.Rows) (*entity.Charge, error) {
 		&charge.InboundID,
 		&charge.UserID,
 		&charge.PackageID,
+		&charge.Country,
+		&vpnType,
 		&createdAt,
 	)
 	if err != nil {
 		return nil, momoError.Wrap(err).Scope(scope).Input(rows).DebuggingError()
 	}
+	charge.VPNType = entity.ConvertStringVPNTypeToEnum(vpnType)
 	charge.Status = entity.ConvertStringToChargeStatus(status)
+
 	return charge, nil
 }
 
@@ -237,6 +254,7 @@ func (e *Charge) GetFirstAvailbleInboundCharge(inboundID string) (*entity.Charge
 	charge := &entity.Charge{}
 	status := ""
 	var createdAt interface{}
+	var vpnType string
 	err := e.db.Conn().QueryRow(query).Scan(
 		&charge.ID,
 		&status,
@@ -245,14 +263,38 @@ func (e *Charge) GetFirstAvailbleInboundCharge(inboundID string) (*entity.Charge
 		&charge.InboundID,
 		&charge.UserID,
 		&charge.PackageID,
+		&charge.Country,
+		&vpnType,
 		&createdAt,
 	)
-	if err == nil {
-		charge.Status = entity.ConvertStringToChargeStatus(status)
-		return charge, nil
-	}
 	if err == sql.ErrNoRows {
 		return nil, momoError.Wrap(err).Scope(scope).NotFound().Input(inboundID).DebuggingError()
 	}
-	return nil, momoError.Wrap(err).Scope(scope).Input(inboundID).UnExpected().DebuggingError()
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).Input(inboundID).UnExpected().DebuggingError()
+	}
+
+	charge.Status = entity.ConvertStringToChargeStatus(status)
+	return charge, nil
+}
+
+func (c *Charge) RetriveChargesApprovedWithoutInbound() ([]*entity.Charge, error) {
+	scope := "chargeRepository.RetriveChargesApprovedWithoutInbound"
+
+	query := "SELECT * FROM charges WHERE (inbound_id IS NULL OR inbound_id = \"\") AND status = 'approved'"
+	rows, err := c.db.Conn().Query(query)
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).DebuggingError()
+	}
+
+	charges := make([]*entity.Charge, 0)
+
+	for rows.Next() {
+		charge, err := c.scan(rows)
+		if err != nil {
+			return nil, err
+		}
+		charges = append(charges, charge)
+	}
+	return charges, nil
 }

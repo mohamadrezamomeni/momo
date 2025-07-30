@@ -4,8 +4,10 @@ import (
 	"database/sql"
 	"time"
 
+	inboundChargeRepoDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound_charge"
 	"github.com/mohamadrezamomeni/momo/entity"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
+	errorRepository "github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
 
 func (ic *InboundCharge) AssignChargeToInbound(
@@ -14,7 +16,6 @@ func (ic *InboundCharge) AssignChargeToInbound(
 	vpnPackage *entity.VPNPackage,
 ) error {
 	scope := "inboundcharge.repository.assignChargeToInbound"
-
 	tx, err := ic.db.Conn().Begin()
 	if err != nil {
 		return momoError.Wrap(err).Scope(scope).ErrorWrite()
@@ -25,13 +26,11 @@ func (ic *InboundCharge) AssignChargeToInbound(
 		tx.Rollback()
 		return err
 	}
-
 	err = ic.updateChargeStatusToAssigned(tx, charge)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
-
 	if err := tx.Commit(); err != nil {
 		return momoError.Wrap(err).Scope(scope).Errorf("error to commit")
 	}
@@ -66,4 +65,87 @@ func (ic *InboundCharge) updateInbound(
 	}
 
 	return nil
+}
+
+func (ic *InboundCharge) CreateInbound(
+	chargeID string,
+	createInboundByCharge *inboundChargeRepoDto.CreateInboundByCharge,
+) error {
+	scope := "inboundcharge.repository.CreateInbound"
+
+	tx, err := ic.db.Conn().Begin()
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).ErrorWrite()
+	}
+
+	inboundID, err := ic.createInbound(tx, createInboundByCharge)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = ic.updateChargeInboundID(tx, chargeID, inboundID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return momoError.Wrap(err).Scope(scope).Errorf("error to commit")
+	}
+	return nil
+}
+
+func (ic *InboundCharge) updateChargeInboundID(tx *sql.Tx, chargeID string, inboundID string) error {
+	scope := "inboundcharge.repository.UpdateChargeInboundID"
+
+	sql := "UPDATE charges SET inbound_id = $1 WHERE id = $2"
+	_, err := tx.Exec(sql, inboundID, chargeID)
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).ErrorWrite()
+	}
+
+	return nil
+}
+
+func (ic *InboundCharge) createInbound(
+	tx *sql.Tx,
+	createInboundByCharge *inboundChargeRepoDto.CreateInboundByCharge,
+) (string, error) {
+	scope := "inboundcharge.repository.createInbound"
+
+	var id string
+	err := tx.QueryRow(`
+	INSERT INTO inbounds (protocol, domain, vpn_type, port, user_id, tag, is_active, start, end, is_block, is_assigned, is_notified, traffic_usage, traffic_limit, country)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+	RETURNING id
+	`, createInboundByCharge.Protocol,
+		createInboundByCharge.Domain,
+		entity.VPNTypeString(createInboundByCharge.VPNType),
+		createInboundByCharge.Port,
+		createInboundByCharge.UserID,
+		createInboundByCharge.Tag,
+		createInboundByCharge.IsActive,
+		createInboundByCharge.Start,
+		createInboundByCharge.End,
+		createInboundByCharge.IsBlock,
+		createInboundByCharge.IsAssigned,
+		createInboundByCharge.IsNotified,
+		createInboundByCharge.TrafficUsage,
+		createInboundByCharge.TrafficLimit,
+		createInboundByCharge.Country,
+	).Scan(&id)
+
+	if errorRepository.IsDuplicateError(err) {
+		return "", momoError.Wrap(err).Input(createInboundByCharge).Duplicate().Scope(scope).DebuggingError()
+	}
+	if err != nil {
+		return "", momoError.Wrap(err).Input(createInboundByCharge).DebuggingError()
+	}
+	return id, nil
 }

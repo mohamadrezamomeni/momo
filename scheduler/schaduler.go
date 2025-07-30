@@ -14,6 +14,7 @@ type Scheduler struct {
 	vpnSvc              VPNService
 	hostSvc             HostService
 	sch                 *gocron.Scheduler
+	inboundChargeSvc    InboundChargeService
 }
 
 type HealingUpInboundService interface {
@@ -26,6 +27,11 @@ type HealingUpInboundService interface {
 
 type InboundTrafficService interface {
 	UpdateTraffics()
+}
+
+type InboundChargeService interface {
+	ChargeInbounds()
+	CreateInbounds()
 }
 
 type HostInboundService interface {
@@ -46,8 +52,10 @@ func New(
 	hostInboundSvc HostInboundService,
 	vpnSvc VPNService,
 	hostSvc HostService,
+	inboundChargeSvc InboundChargeService,
 ) *Scheduler {
 	return &Scheduler{
+		inboundChargeSvc:    inboundChargeSvc,
 		healingUpInboundSvc: healingUpInboundSvc,
 		inboundTrafficSvc:   inboundTrafficSvc,
 		hostInboundSvc:      hostInboundSvc,
@@ -69,6 +77,8 @@ func (s *Scheduler) Start(done <-chan struct{}, wg *sync.WaitGroup) {
 	s.sch.Cron("*/1 * * * *").Do(s.inboundTrafficSvc.UpdateTraffics)
 	s.sch.Cron("*/2 * * * *").Do(s.vpnSvc.MonitorVPNs)
 	s.sch.Cron("*/2 * * * *").Do(s.hostSvc.MonitorHosts)
+	s.sch.Cron("*/5 * * * *").Do(s.inboundChargeSvc.ChargeInbounds)
+	s.sch.Cron("*/2 * * * *").Do(s.inboundChargeSvc.CreateInbounds)
 	s.sch.StartAsync()
 
 	<-done

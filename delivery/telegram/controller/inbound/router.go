@@ -10,11 +10,6 @@ func (h *Handler) SetRouter(telegramRouter *core.Router) {
 		h.ListInbounds,
 		middleware.IdentifyUser(h.userSvc),
 	)
-	telegramRouter.Register("create_inbound",
-		h.CreateInbound,
-		middleware.IdentifyUser(h.userSvc),
-		h.SetStateCreateInbound,
-	)
 	telegramRouter.Register("ask_selecting_inbound",
 		h.AskSelectingInbound,
 		middleware.IdentifyUser(h.userSvc),

@@ -37,8 +37,9 @@ func (i *Inbound) Create(inpt *inboundServiceDto.CreateInbound) (*entity.Inbound
 	if inpt.VPNType == entity.XRAY_VPN {
 		protocol = "vmess"
 	}
+	tag := i.GenerateInboundTag(inpt.Country, inpt.UserID)
 	inboundCreated, err := i.inboundRepo.Create(&inboundRepoDto.CreateInbound{
-		Tag:          fmt.Sprintf("%s-%s-%s", inpt.Country, inpt.UserID, uuid.New().String()),
+		Tag:          tag,
 		Protocol:     protocol,
 		Port:         "",
 		Domain:       "",
@@ -55,6 +56,10 @@ func (i *Inbound) Create(inpt *inboundServiceDto.CreateInbound) (*entity.Inbound
 		return nil, err
 	}
 	return inboundCreated, nil
+}
+
+func (i *Inbound) GenerateInboundTag(country string, userID string) string {
+	return fmt.Sprintf("%s-%s-%s", country, userID, uuid.New().String())
 }
 
 func (i *Inbound) Filter(inpt *inboundServiceDto.FilterInbounds) ([]*entity.Inbound, error) {

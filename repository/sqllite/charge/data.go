@@ -13,6 +13,7 @@ var (
 		InboundID: "12",
 		PackageID: "1",
 	}
+
 	charge2 = &chargeRepositoryDto.CreateDto{
 		Status:    entity.PendingStatusCharge,
 		UserID:    "f47ac10b-58cc-4372-a567-0e02b2c3d477",
@@ -74,5 +75,19 @@ var (
 		Detail:    "hi",
 		InboundID: "16",
 		PackageID: "3",
+	}
+	charge10 = &chargeRepositoryDto.CreateDto{
+		VPNType: entity.XRAY_VPN,
+		Status:  entity.ApprovedStatusCharge,
+		UserID:  "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		Detail:  "hello",
+		Country: "1000",
+	}
+	charge11 = &chargeRepositoryDto.CreateDto{
+		VPNType: entity.XRAY_VPN,
+		Status:  entity.ApprovedStatusCharge,
+		UserID:  "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		Detail:  "hello",
+		Country: "1000",
 	}
 )

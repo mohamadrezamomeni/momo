@@ -8,4 +8,6 @@ type CreateDto struct {
 	Status    entity.ChargeStatus
 	UserID    string
 	PackageID string
+	Country   string
+	VPNType   entity.VPNType
 }

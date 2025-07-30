@@ -2,7 +2,9 @@ package inboundcharge
 
 import (
 	"strconv"
+	"time"
 
+	inboundChargeDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound_charge"
 	"github.com/mohamadrezamomeni/momo/entity"
 )
 
@@ -11,6 +13,7 @@ type InboundCharge struct {
 	vpnPackageSvc     VPNPackageService
 	inboundRepo       InboundRepository
 	chargeRepo        ChargeRepository
+	inboundSvc        InboundService
 }
 
 type InboundRepository interface {
@@ -20,6 +23,7 @@ type InboundRepository interface {
 
 type ChargeRepository interface {
 	RetriveAvailbleChargesForInbounds(inboundIDs []string) ([]*entity.Charge, error)
+	RetriveChargesApprovedWithoutInbound() ([]*entity.Charge, error)
 }
 
 type InboundChargeRepository interface {
@@ -28,6 +32,14 @@ type InboundChargeRepository interface {
 		charge *entity.Charge,
 		vpnPackage *entity.VPNPackage,
 	) error
+	CreateInbound(
+		chargeID string,
+		createInboundByCharge *inboundChargeDto.CreateInboundByCharge,
+	) error
+}
+
+type InboundService interface {
+	GenerateInboundTag(string, string) string
 }
 
 type VPNPackageService interface {
@@ -39,12 +51,14 @@ func New(
 	vpnPackageSvc VPNPackageService,
 	inboundRepo InboundRepository,
 	chargeRepo ChargeRepository,
+	inboundSvc InboundService,
 ) *InboundCharge {
 	return &InboundCharge{
 		inboundChargeRepo: inboundChargeRepo,
 		vpnPackageSvc:     vpnPackageSvc,
 		inboundRepo:       inboundRepo,
 		chargeRepo:        chargeRepo,
+		inboundSvc:        inboundSvc,
 	}
 }
 
@@ -86,4 +100,44 @@ func (ic *InboundCharge) getInboundIDs(inbounds []*entity.Inbound) []string {
 		inboundIDs = append(inboundIDs, strconv.Itoa(inbound.ID))
 	}
 	return inboundIDs
+}
+
+func (ic *InboundCharge) CreateInbounds() {
+	charges, err := ic.chargeRepo.RetriveChargesApprovedWithoutInbound()
+	if err != nil {
+		return
+	}
+	ic.createInboundsByCharges(charges)
+}
+
+func (ic *InboundCharge) createInboundsByCharges(charges []*entity.Charge) {
+	for _, charge := range charges {
+		ic.createInboundByCharge(charge)
+	}
+}
+
+func (ic *InboundCharge) createInboundByCharge(charge *entity.Charge) {
+	pkg, err := ic.vpnPackageSvc.FindVPNPackageByID(charge.PackageID)
+	if err != nil {
+		return
+	}
+	now := time.Now()
+	end := now.AddDate(0, int(pkg.Months), int(pkg.Days))
+
+	tag := ic.inboundSvc.GenerateInboundTag(charge.Country, charge.UserID)
+
+	ic.inboundChargeRepo.CreateInbound(charge.ID, &inboundChargeDto.CreateInboundByCharge{
+		Tag:          tag,
+		TrafficLimit: pkg.TrafficLimit,
+		Start:        now,
+		End:          end,
+		VPNType:      charge.VPNType,
+		Country:      charge.Country,
+		UserID:       charge.UserID,
+		Protocol:     "vmess",
+	})
+
+	if err != nil {
+		return
+	}
 }

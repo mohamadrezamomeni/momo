@@ -7,18 +7,21 @@ import (
 
 func (h *Handler) SetRouter(telegramRouter *core.Router) {
 	telegramRouter.Register("create_charge",
-		h.CreateCharge,
+		h.CreateInbound,
 		middleware.IdentifyUser(h.userSvc),
 		h.SetStateCreateCharge,
 	)
 	telegramRouter.Register("ask_detail_charge",
 		h.AskDetail,
 		middleware.IdentifyUser(h.userSvc),
-		h.SetStateCreateCharge,
 	)
 	telegramRouter.Register("answer_detail_charge",
 		h.AnswerDetail,
 		middleware.IdentifyUser(h.userSvc),
-		h.SetStateCreateCharge,
+	)
+	telegramRouter.Register("charge_inbound",
+		h.ChargeInbound,
+		middleware.IdentifyUser(h.userSvc),
+		h.SetStateChargeInbound,
 	)
 }
