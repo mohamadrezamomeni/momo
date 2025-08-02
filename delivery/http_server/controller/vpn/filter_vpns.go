@@ -49,6 +49,8 @@ func (h *Handler) Filter(c echo.Context) error {
 			Domain:    vpn.Domain,
 			VPNType:   entity.VPNTypeString(vpn.VPNType),
 			Country:   vpn.Country,
+			StartPort: vpn.StartPort,
+			EndPort:   vpn.EndPort,
 		})
 	}
 	return c.JSON(http.StatusAccepted, filterVpnsSerializer)
