@@ -8,5 +8,5 @@ type CreateChargeDto struct {
 	InboundID string
 	Detail    string
 	VPNType   entity.VPNType
-	VPNSource *entity.VPNSource
+	VPNSource string
 }

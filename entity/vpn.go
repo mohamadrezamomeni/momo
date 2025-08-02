@@ -28,7 +28,7 @@ func VPNTypeString(vpnType int) string {
 	}
 }
 
-func ConvertStringVPNTypeToEnum(key string) int {
+func ConvertStringVPNTypeToEnum(key string) VPNType {
 	switch key {
 	case "xray":
 		return XRAY_VPN

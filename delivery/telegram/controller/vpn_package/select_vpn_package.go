@@ -96,6 +96,6 @@ func (h *Handler) SelectVPNPackage(update *core.Update) (*core.ResponseHandlerFu
 	if !isExist {
 		return nil, momoError.Scope(scope).DebuggingError()
 	}
-	state.SetData("vpn_package", pkg)
+	state.SetData("vpn_package_id", pkg.ID)
 	return nil, nil
 }

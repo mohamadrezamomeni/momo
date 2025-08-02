@@ -1,13 +1,10 @@
 package charge
 
 import (
-	"strconv"
-
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/mohamadrezamomeni/momo/delivery/telegram/core"
 	telegramState "github.com/mohamadrezamomeni/momo/delivery/telegram/state"
 	chargeServiceDto "github.com/mohamadrezamomeni/momo/dto/service/charge"
-	"github.com/mohamadrezamomeni/momo/entity"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 	telegrammessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
@@ -39,14 +36,14 @@ func (h *Handler) SetStateChargeInbound(next core.HandlerFunc) core.HandlerFunc 
 }
 
 func (h *Handler) ChargeInbound(update *core.Update) (*core.ResponseHandlerFunc, error) {
-	inbound, pkg, detail, err := h.getDataChargeInbound(update)
+	inboundID, packageID, detail, err := h.getDataChargeInbound(update)
 	if err != nil {
 		return nil, err
 	}
 	_, err = h.chargeSvc.Create(&chargeServiceDto.CreateChargeDto{
 		UserID:    update.UserSystem.ID,
-		PackageID: pkg.ID,
-		InboundID: strconv.Itoa(inbound.ID),
+		PackageID: packageID,
+		InboundID: inboundID,
 		Detail:    detail,
 	})
 	if err != nil {
@@ -71,42 +68,27 @@ func (h *Handler) ChargeInbound(update *core.Update) (*core.ResponseHandlerFunc,
 	}, nil
 }
 
-func (h *Handler) getDataChargeInbound(update *core.Update) (*entity.Inbound, *entity.VPNPackage, string, error) {
+func (h *Handler) getDataChargeInbound(update *core.Update) (string, string, string, error) {
 	scope := "telegram.charge.getDataChargeCharge"
 	state, isExist := telegramState.FindState(update.UserSystem.TelegramID)
 	if !isExist {
-		return nil, nil, "", momoError.Scope(scope).ErrorWrite()
+		return "", "", "", momoError.Scope(scope).ErrorWrite()
 	}
 
-	val, isExist := state.GetData("vpn_package")
+	vpnPackageID, isExist := state.GetData("vpn_package_id")
 	if !isExist {
-		return nil, nil, "", momoError.Scope(scope).DebuggingError()
+		return "", vpnPackageID, "", momoError.Scope(scope).DebuggingError()
 	}
 
-	vpnPackage, ok := val.(*entity.VPNPackage)
-	if !ok {
-		return nil, nil, "", momoError.Scope(scope).DebuggingError()
-	}
-
-	val, isExist = state.GetData("inbound")
+	inboundID, isExist := state.GetData("inbound_id")
 	if !isExist {
-		return nil, nil, "", momoError.Scope(scope).DebuggingError()
+		return "", "", "", momoError.Scope(scope).DebuggingError()
 	}
 
-	inbound, ok := val.(*entity.Inbound)
-	if !ok {
-		return nil, nil, "", momoError.Scope(scope).DebuggingError()
-	}
-
-	val, isExist = state.GetData("detail")
+	detail, isExist := state.GetData("detail")
 	if !isExist {
-		return nil, nil, "", momoError.Scope(scope).DebuggingError()
+		return "", "", "", momoError.Scope(scope).DebuggingError()
 	}
 
-	detail, ok := val.(string)
-	if !ok {
-		return nil, nil, "", momoError.Scope(scope).DebuggingError()
-	}
-
-	return inbound, vpnPackage, detail, nil
+	return inboundID, vpnPackageID, detail, nil
 }

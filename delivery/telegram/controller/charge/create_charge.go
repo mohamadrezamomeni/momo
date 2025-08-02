@@ -38,13 +38,13 @@ func (h *Handler) SetStateCreateCharge(next core.HandlerFunc) core.HandlerFunc {
 }
 
 func (h *Handler) CreateInbound(update *core.Update) (*core.ResponseHandlerFunc, error) {
-	VPNSource, pkg, detail, VPNType, err := getDataCreateCharge(update)
+	VPNSource, packageID, detail, VPNType, err := getDataCreateCharge(update)
 	if err != nil {
 		return nil, err
 	}
 	_, err = h.chargeSvc.Create(&chargeServiceDto.CreateChargeDto{
 		UserID:    update.UserSystem.ID,
-		PackageID: pkg.ID,
+		PackageID: packageID,
 		VPNSource: VPNSource,
 		Detail:    detail,
 		VPNType:   VPNType,
@@ -71,51 +71,36 @@ func (h *Handler) CreateInbound(update *core.Update) (*core.ResponseHandlerFunc,
 	}, nil
 }
 
-func getDataCreateCharge(update *core.Update) (*entity.VPNSource, *entity.VPNPackage, string, entity.VPNType, error) {
+func getDataCreateCharge(update *core.Update) (string, string, string, entity.VPNType, error) {
 	scope := "telegram.charge.getDataCreateCharge"
 	state, isExist := telegramState.FindState(update.UserSystem.TelegramID)
 	if !isExist {
-		return nil, nil, "", 0, momoError.Scope(scope).Input(update.UserSystem.TelegramID).Errorf("error to gat state")
+		return "", "", "", 0, momoError.Scope(scope).Input(update.UserSystem.TelegramID).Errorf("error to gat state")
 	}
 
-	val, isExist := state.GetData("vpn_package")
+	vpnPackageID, isExist := state.GetData("vpn_package_id")
 	if !isExist {
-		return nil, nil, "", 0, momoError.Scope(scope).Input(state).DebuggingErrorf("error to get package")
+		return "", "", "", 0, momoError.Scope(scope).Input(state).DebuggingErrorf("error to get package")
 	}
 
-	vpnPackage, ok := val.(*entity.VPNPackage)
-	if !ok {
-		return nil, nil, "", 0, momoError.Scope(scope).DebuggingErrorf("error to validate package")
-	}
-
-	val, isExist = state.GetData("vpn_source")
+	VPNSource, isExist := state.GetData("vpn_source")
 	if !isExist {
-		return nil, nil, "", 0, momoError.Scope(scope).Input(state).DebuggingErrorf("error to get vpn source")
-	}
-	VPNSource, ok := val.(*entity.VPNSource)
-	if !ok {
-		return nil, nil, "", 0, momoError.Scope(scope).Input(state).DebuggingErrorf("error to validate vpn source")
+		return "", "", "", 0, momoError.Scope(scope).Input(state).DebuggingErrorf("error to get vpn source id")
 	}
 
-	val, isExist = state.GetData("vpn_type")
+	vpnTypeStr, isExist := state.GetData("vpn_type")
 	if !isExist {
-		return nil, nil, "", 0, momoError.Scope(scope).DebuggingError()
+		return "", "", "", 0, momoError.Scope(scope).DebuggingError()
+	}
+	VPNType := entity.ConvertStringVPNTypeToEnum(vpnTypeStr)
+	if VPNType == entity.UknownVPNType || VPNType == 0 {
+		return "", "", "", 0, momoError.Scope(scope).Input(state).DebuggingErrorf("error to get vpn type")
 	}
 
-	VPNType, ok := val.(entity.VPNType)
-	if !ok {
-		return nil, nil, "", 0, momoError.Scope(scope).DebuggingErrorf("error to validate vpn_type")
-	}
-
-	val, isExist = state.GetData("detail")
+	detail, isExist := state.GetData("detail")
 	if !isExist {
-		return nil, nil, "", 0, momoError.Scope(scope).Input(state).DebuggingErrorf("error to get detail")
+		return "", "", "", 0, momoError.Scope(scope).Input(state).DebuggingErrorf("error to get detail")
 	}
 
-	detail, ok := val.(string)
-	if !ok {
-		return nil, nil, "", 0, momoError.Scope(scope).Input(state).DebuggingErrorf("error to validaqte detail")
-	}
-
-	return VPNSource, vpnPackage, detail, VPNType, nil
+	return VPNSource, vpnPackageID, detail, VPNType, nil
 }

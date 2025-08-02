@@ -19,6 +19,6 @@ func (h *Handler) AnswerVPNSource(update *core.Update) (*core.ResponseHandlerFun
 	if !isExist {
 		return nil, momoError.Scope(scope).DebuggingError()
 	}
-	state.SetData("vpn_source", vpnSource)
+	state.SetData("vpn_source", vpnSource.Country)
 	return nil, nil
 }

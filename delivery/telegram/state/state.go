@@ -8,7 +8,7 @@ type State struct {
 	telegramID string
 	idx        int
 	Paths      []string
-	data       map[string]any
+	data       map[string]string
 }
 
 func NewState(telegramID string, paths ...string) *State {
@@ -16,7 +16,7 @@ func NewState(telegramID string, paths ...string) *State {
 		telegramID: telegramID,
 		Paths:      paths,
 		idx:        0,
-		data:       make(map[string]any),
+		data:       make(map[string]string),
 	}
 	cache.Set(telegramID, newState)
 	return newState
@@ -67,15 +67,15 @@ func (s *State) GetPath() string {
 	return s.Paths[s.idx]
 }
 
-func (s *State) SetData(key string, value any) {
+func (s *State) SetData(key string, value string) {
 	s.data[key] = value
 	s.Save()
 }
 
-func (s *State) GetData(key string) (any, bool) {
+func (s *State) GetData(key string) (string, bool) {
 	val, isExist := s.data[key]
 	if isExist {
 		return val, true
 	}
-	return nil, false
+	return "", false
 }

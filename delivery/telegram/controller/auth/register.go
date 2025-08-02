@@ -73,11 +73,7 @@ func getData(update *core.Update) (string, string, string, string, error) {
 	if !isExist {
 		return "", "", "", "", momoError.Scope(scope).UnExpected().ErrorWrite()
 	}
-	val, isExist := state.GetData("username")
-	if !isExist {
-		return "", "", "", "", momoError.Scope(scope).UnExpected().ErrorWrite()
-	}
-	username, isExist := val.(string)
+	username, isExist := state.GetData("username")
 	if !isExist {
 		return "", "", "", "", momoError.Scope(scope).UnExpected().ErrorWrite()
 	}

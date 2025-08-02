@@ -84,6 +84,6 @@ func (h *Handler) AnswerSelectingInbound(update *core.Update) (*core.ResponseHan
 		return nil, momoError.Scope(scope).ErrorWrite()
 	}
 
-	state.SetData("inbound", inbound)
+	state.SetData("inbound_id", strconv.Itoa(inbound.ID))
 	return nil, nil
 }
