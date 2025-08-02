@@ -23,6 +23,7 @@ func VPNTypeString(vpnType int) string {
 	switch vpnType {
 	case XRAY_VPN:
 		return "xray"
+
 	default:
 		return "unkhown"
 	}

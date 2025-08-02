@@ -105,6 +105,7 @@ func (v *VPN) Filter(inpt *vpnManagerDto.FilterVPNs) ([]*entity.VPN, error) {
 	scope := "vpnRepository.Filter"
 
 	query := v.makeSQlFilter(inpt)
+	fmt.Println(query)
 	rows, err := v.db.Conn().Query(query)
 	if err != nil {
 		return nil, momoError.Wrap(err).Scope(scope).Input(inpt).DebuggingError()

@@ -38,6 +38,8 @@ func (v *VPNService) Create(createVPNDto *vpnServiceDto.CreateVPN) (*entity.VPN,
 		IsActive:  false,
 		UserCount: createVPNDto.UserCount,
 		Country:   createVPNDto.Country,
+		StartPort: createVPNDto.StartPort,
+		EndPort:   createVPNDto.EndPort,
 	})
 }
 
@@ -71,9 +73,13 @@ func (v *VPNService) MonitorVPNs() {
 }
 
 func (v *VPNService) Filter(vpnFilterDto *vpnServiceDto.FilterVPNs) ([]*entity.VPN, error) {
+	VPNTypes := make([]entity.VPNType, 0)
+	if vpnFilterDto.VPNType != 0 {
+		VPNTypes = append(VPNTypes, vpnFilterDto.VPNType)
+	}
 	return v.vpnRepo.Filter(&vpnManagerRepositoryDto.FilterVPNs{
 		Domain:   vpnFilterDto.Domain,
-		VPNTypes: []entity.VPNType{vpnFilterDto.VPNType},
+		VPNTypes: VPNTypes,
 	})
 }
 
