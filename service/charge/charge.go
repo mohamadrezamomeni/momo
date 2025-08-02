@@ -44,6 +44,7 @@ func (c *Charge) Create(createChargeDto *chargeServiceDto.CreateChargeDto) (*ent
 		PackageID: createChargeDto.PackageID,
 		UserID:    createChargeDto.UserID,
 		VPNType:   createChargeDto.VPNType,
+		Country:   createChargeDto.VPNSource,
 	})
 	if err != nil {
 		return nil, err

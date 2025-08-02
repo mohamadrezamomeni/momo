@@ -101,6 +101,5 @@ func getDataCreateCharge(update *core.Update) (string, string, string, entity.VP
 	if !isExist {
 		return "", "", "", 0, momoError.Scope(scope).Input(state).DebuggingErrorf("error to get detail")
 	}
-
 	return VPNSource, vpnPackageID, detail, VPNType, nil
 }
