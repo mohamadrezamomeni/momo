@@ -7,4 +7,5 @@ type UserSerialize struct {
 	FirstName    string `json:"firstname"`
 	IsAdmin      bool   `json:"is_admin"`
 	IsSuperAdmin bool   `json:"is_super_admin"`
+	IsApproved   bool   `json:"is_approved"`
 }

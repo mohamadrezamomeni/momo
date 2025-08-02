@@ -27,6 +27,7 @@ func (u *Handler) filterUsers(c echo.Context) error {
 			FirstName:    user.FirstName,
 			Lastname:     user.LastName,
 			IsSuperAdmin: user.IsSuperAdmin,
+			IsApproved:   user.IsApproved,
 		})
 	}
 	return c.JSON(http.StatusAccepted, filterSerializer)
