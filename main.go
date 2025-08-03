@@ -15,6 +15,7 @@ import (
 
 	serviceInitializer "github.com/mohamadrezamomeni/momo/pkg/service"
 	authValidator "github.com/mohamadrezamomeni/momo/validator/auth"
+	chargeValidator "github.com/mohamadrezamomeni/momo/validator/charge"
 	hostValidator "github.com/mohamadrezamomeni/momo/validator/host"
 	inboundValidator "github.com/mohamadrezamomeni/momo/validator/inbound"
 	userValidator "github.com/mohamadrezamomeni/momo/validator/user"
@@ -65,6 +66,7 @@ func main() {
 		inboundValidator.New(userSvc, inboundSvc),
 		vpnSourceValidator.New(),
 		vpnPackageValidator.New(),
+		chargeValidator.New(),
 	)
 
 	go func() {

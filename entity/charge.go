@@ -18,7 +18,7 @@ const (
 	UnkhownStatusCharge = iota + 1
 	ApprovedStatusCharge
 	PendingStatusCharge
-	RegejectedStatusCharge
+	RejectedStatusCharge
 	AssignedCharged
 )
 
@@ -28,7 +28,7 @@ func TranslateChargeStatus(enum ChargeStatus) string {
 		return "approved"
 	case PendingStatusCharge:
 		return "pending"
-	case RegejectedStatusCharge:
+	case RejectedStatusCharge:
 		return "regected"
 	case AssignedCharged:
 		return "assiggned"
@@ -44,7 +44,7 @@ func ConvertStringToChargeStatus(s string) ChargeStatus {
 	case "pending":
 		return PendingStatusCharge
 	case "regected":
-		return RegejectedStatusCharge
+		return RejectedStatusCharge
 	case "assiggned":
 		return AssignedCharged
 	case "unkhown":
@@ -52,4 +52,24 @@ func ConvertStringToChargeStatus(s string) ChargeStatus {
 	default:
 		return 0
 	}
+}
+
+func ConvertLabelsToChargeStatuses(labels []string) []ChargeStatus {
+	statuses := make([]ChargeStatus, 0)
+	for _, label := range labels {
+		status := ConvertStringToChargeStatus(label)
+		if status != 0 {
+			statuses = append(statuses, status)
+		}
+	}
+	return statuses
+}
+
+func ConvertStatusesToStatusLabels(statuses []ChargeStatus) []string {
+	lablels := make([]string, 0)
+	for _, status := range statuses {
+		label := TranslateChargeStatus(status)
+		lablels = append(lablels, label)
+	}
+	return lablels
 }

@@ -3,7 +3,6 @@ package charge
 import (
 	"database/sql"
 	"fmt"
-	"reflect"
 	"strings"
 
 	chargeRepositoryDto "github.com/mohamadrezamomeni/momo/dto/repository/charge"
@@ -193,20 +192,20 @@ func (c *Charge) FilterCharges(filterChargesDto *chargeRepositoryDto.FilterCharg
 }
 
 func (c *Charge) makeQuery(filterChargesDto *chargeRepositoryDto.FilterChargesDto) string {
-	v := reflect.ValueOf(*filterChargesDto)
-	t := reflect.TypeOf(*filterChargesDto)
-
-	subQueries := []string{}
-	for i := 0; i < v.NumField(); i++ {
-		field := t.Field(i)
-		value := v.Field(i)
-		if field.Name == "UserID" && len(value.String()) > 0 {
-			subQueries = append(subQueries, fmt.Sprintf("user_id = '%s'", value.String()))
-		} else if field.Name == "InboundID" && len(value.String()) > 0 {
-			subQueries = append(subQueries, fmt.Sprintf("inbound_id = %s", value.String()))
-		} else if field.Name == "Status" && value.Int() > 0 {
-			subQueries = append(subQueries, fmt.Sprintf("status = '%s'", entity.TranslateChargeStatus(int(value.Int()))))
-		}
+	subQueries := make([]string, 0)
+	if filterChargesDto.InboundID != "" {
+		subQueries = append(subQueries, fmt.Sprintf("inbound_id = %s", filterChargesDto.InboundID))
+	}
+	if filterChargesDto.UserID != "" {
+		subQueries = append(subQueries, fmt.Sprintf("user_id = '%s'", filterChargesDto.UserID))
+	}
+	if len(filterChargesDto.Statuses) > 0 {
+		subQueries = append(
+			subQueries,
+			fmt.Sprintf("status IN ('%s')",
+				strings.Join(entity.ConvertStatusesToStatusLabels(filterChargesDto.Statuses), "', '"),
+			),
+		)
 	}
 
 	sql := "SELECT * FROM charges"

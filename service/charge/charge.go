@@ -96,3 +96,11 @@ func (c *Charge) ApproveCharge(id string) error {
 func (c *Charge) FindAvailbleCharge(inboundID string) (*entity.Charge, error) {
 	return c.chargeRepo.GetFirstAvailbleInboundCharge(inboundID)
 }
+
+func (c *Charge) FilterCharges(filterCharges *chargeServiceDto.FilterCharges) ([]*entity.Charge, error) {
+	return c.chargeRepo.FilterCharges(&chargeRepositoryDto.FilterChargesDto{
+		InboundID: filterCharges.InboundID,
+		UserID:    filterCharges.UserID,
+		Statuses:  filterCharges.Statuses,
+	})
+}

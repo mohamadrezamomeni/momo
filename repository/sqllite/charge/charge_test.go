@@ -83,7 +83,7 @@ func TestUpdateCharge(t *testing.T) {
 	err := chargeRepo.UpdateCharge(chargeCreated.ID, &chargeRepositoryDto.UpdateChargeDto{
 		Detail:       newDetail,
 		AdminComment: adminComment,
-		Status:       entity.RegejectedStatusCharge,
+		Status:       entity.RejectedStatusCharge,
 	})
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
@@ -92,7 +92,7 @@ func TestUpdateCharge(t *testing.T) {
 	chargeFound, _ := chargeRepo.FindChargeByID(chargeCreated.ID)
 	if chargeFound.AdminComment != adminComment ||
 		chargeFound.Detail != newDetail ||
-		chargeFound.Status != entity.RegejectedStatusCharge {
+		chargeFound.Status != entity.RejectedStatusCharge {
 		t.Fatal("error to comapre data")
 	}
 }
@@ -114,7 +114,7 @@ func TestFilterCharges(t *testing.T) {
 	}
 
 	charges, err = chargeRepo.FilterCharges(&chargeRepositoryDto.FilterChargesDto{
-		Status: entity.RegejectedStatusCharge,
+		Statuses: []entity.ChargeStatus{entity.RejectedStatusCharge},
 	})
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
@@ -149,7 +149,7 @@ func TestFilterCharges(t *testing.T) {
 	charges, err = chargeRepo.FilterCharges(&chargeRepositoryDto.FilterChargesDto{
 		InboundID: "12",
 		UserID:    "f47ac10b-58cc-4372-a567-0e02b2c3d477",
-		Status:    entity.PendingStatusCharge,
+		Statuses:  []entity.ChargeStatus{entity.PendingStatusCharge},
 	})
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
