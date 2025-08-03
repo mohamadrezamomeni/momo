@@ -43,6 +43,16 @@ func VPNStatusString(VPNStatus VPNType) string {
 	}
 }
 
+func ConvertVPNStatusesToVPNStatusLabels(vpnStatuses []VPNStatus) []string {
+	labels := make([]string, 0)
+	for _, vpnStatus := range vpnStatuses {
+		if vpnStatus != 0 {
+			labels = append(labels, VPNStatusString(vpnStatus))
+		}
+	}
+	return labels
+}
+
 func ConvertVPNStatusLabelToVPNStatus(label string) VPNStatus {
 	switch label {
 	case "cordon":

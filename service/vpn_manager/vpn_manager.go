@@ -123,5 +123,8 @@ func (v *VPNService) GetAvailableVPNSourceDomains(coutntries []string, vpnTypes 
 	return v.vpnRepo.Filter(&vpnManagerRepositoryDto.FilterVPNs{
 		VPNTypes:   vpnTypes,
 		Coountries: coutntries,
+		VPNStatuses: []entity.VPNStatus{
+			entity.Ready,
+		},
 	})
 }

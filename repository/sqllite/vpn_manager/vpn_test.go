@@ -120,6 +120,43 @@ func TestFilterVPNs(t *testing.T) {
 	if len(vpns) != 2 {
 		t.Errorf("5. the number of vpns must be 2 but the result was %v", len(vpns))
 	}
+
+	vpns, err = vpnRepo.Filter(&vpnManagerDto.FilterVPNs{})
+	if err != nil {
+		t.Errorf("6. something wrong has happend that was %v", err)
+	}
+
+	if len(vpns) != 3 {
+		t.Errorf("6. the number of vpns must be 3 but the result was %d", len(vpns))
+	}
+
+	vpns, err = vpnRepo.Filter(&vpnManagerDto.FilterVPNs{
+		VPNStatuses: []entity.VPNStatus{
+			entity.Ready,
+			entity.Cordon,
+			entity.Drain,
+		},
+	})
+	if err != nil {
+		t.Errorf("7. something wrong has happend that was %v", err)
+	}
+
+	if len(vpns) != 3 {
+		t.Errorf("7. the number of vpns must be 3 but the result was %d", len(vpns))
+	}
+
+	vpns, err = vpnRepo.Filter(&vpnManagerDto.FilterVPNs{
+		VPNStatuses: []entity.VPNStatus{
+			entity.Ready,
+		},
+	})
+	if err != nil {
+		t.Errorf("8. something wrong has happend that was %v", err)
+	}
+
+	if len(vpns) != 1 {
+		t.Errorf("9. the number of vpns must be 3 but the result was %d", len(vpns))
+	}
 }
 
 func TestGroupingByCountry(t *testing.T) {

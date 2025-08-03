@@ -165,6 +165,16 @@ func (v *VPN) makeSQlFilter(inpt *vpnManagerDto.FilterVPNs) string {
 		subQueries = append(subQueries, fmt.Sprintf("country IN ('%s')", strings.Join(inpt.Coountries, "', '")))
 	}
 
+	if inpt.VPNStatuses != nil && len(inpt.VPNStatuses) > 0 {
+		subQueries = append(
+			subQueries,
+			fmt.Sprintf("status IN ('%s')", strings.Join(
+				entity.ConvertVPNStatusesToVPNStatusLabels(inpt.VPNStatuses),
+				"', '",
+			)),
+		)
+	}
+
 	joinSQL := strings.Join(subQueries, " AND ")
 
 	if len(joinSQL) > 0 {
