@@ -39,6 +39,15 @@ func (v *Validator) ValidateCreatingVPN(req vpnControllerDto.CreateVPN) error {
 				return nil
 			})),
 		validation.Field(
+			&req.VPNStatusLabel,
+			validation.Required,
+			validation.In(
+				"drain",
+				"cordon",
+				"ready",
+			),
+		),
+		validation.Field(
 			&req.VpnType,
 			validation.Required,
 			validation.By(func(value interface{}) error {

@@ -43,14 +43,15 @@ func (h *Handler) Filter(c echo.Context) error {
 	}
 	for _, vpn := range vpns {
 		filterVpnsSerializer.VPNs = append(filterVpnsSerializer.VPNs, &vpnSerializer.VPNSerializer{
-			ID:        vpn.ID,
-			ApiPort:   vpn.ApiPort,
-			UserCount: vpn.UserCount,
-			Domain:    vpn.Domain,
-			VPNType:   entity.VPNTypeString(vpn.VPNType),
-			Country:   vpn.Country,
-			StartPort: vpn.StartPort,
-			EndPort:   vpn.EndPort,
+			ID:          vpn.ID,
+			ApiPort:     vpn.ApiPort,
+			UserCount:   vpn.UserCount,
+			Domain:      vpn.Domain,
+			VPNType:     entity.VPNTypeString(vpn.VPNType),
+			Country:     vpn.Country,
+			StartPort:   vpn.StartPort,
+			EndPort:     vpn.EndPort,
+			StatusLabel: entity.VPNStatusString(vpn.VPNStatus),
 		})
 	}
 	return c.JSON(http.StatusAccepted, filterVpnsSerializer)

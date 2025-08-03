@@ -24,17 +24,47 @@ func TestMain(m *testing.M) {
 
 func TestCreateVPN(t *testing.T) {
 	err := validator.ValidateCreatingVPN(vpnControllerDto.CreateVPN{
-		VpnType:   "xray",
-		Port:      "322",
-		Domain:    "mohamadreza.com",
-		Country:   "uk",
-		UserCount: 2,
-		StartPort: 1000,
-		EndPort:   2000,
+		VpnType:        "xray",
+		Port:           "322",
+		Domain:         "mohamadreza.com",
+		Country:        "uk",
+		UserCount:      2,
+		StartPort:      1000,
+		VPNStatusLabel: "drain",
+		EndPort:        2000,
 	})
 	if err != nil {
 		t.Errorf("someting went wrong that was %v", err)
 	}
+
+	err = validator.ValidateCreatingVPN(vpnControllerDto.CreateVPN{
+		VpnType:        "xray",
+		Port:           "322",
+		Domain:         "mohamadreza.com",
+		Country:        "uk",
+		UserCount:      2,
+		StartPort:      1000,
+		VPNStatusLabel: "draind",
+		EndPort:        2000,
+	})
+	if err == nil {
+		t.Errorf("someting went wrong that was %v", err)
+	}
+
+	err = validator.ValidateCreatingVPN(vpnControllerDto.CreateVPN{
+		VpnType:        "xray",
+		Port:           "322",
+		Domain:         "mohamadreza.com",
+		Country:        "uk",
+		UserCount:      2,
+		StartPort:      1000,
+		VPNStatusLabel: "",
+		EndPort:        2000,
+	})
+	if err == nil {
+		t.Errorf("someting went wrong that was %v", err)
+	}
+
 	err = validator.ValidateCreatingVPN(vpnControllerDto.CreateVPN{
 		VpnType:   "xray",
 		Port:      "3m22",

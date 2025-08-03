@@ -27,6 +27,7 @@ func (h *Handler) CreateVPN(c echo.Context) error {
 		})
 	}
 
+	VPNStatus := entity.ConvertVPNStatusLabelToVPNStatus(req.VPNStatusLabel)
 	_, err = h.vpnSvc.Create(&vpnServiceDto.CreateVPN{
 		VpnType:   entity.ConvertStringVPNTypeToEnum(req.VpnType),
 		UserCount: req.UserCount,
@@ -35,6 +36,7 @@ func (h *Handler) CreateVPN(c echo.Context) error {
 		Country:   req.Country,
 		StartPort: req.StartPort,
 		EndPort:   req.EndPort,
+		VPNStatus: VPNStatus,
 	})
 	if err != nil {
 		msg, code := momoErrorHttp.Error(err)

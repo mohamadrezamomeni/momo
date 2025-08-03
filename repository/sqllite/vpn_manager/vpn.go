@@ -20,10 +20,11 @@ func (v *VPN) Create(inpt *vpnManagerDto.AddVPN) (*entity.VPN, error) {
 		VPNType:   inpt.VPNType,
 		UserCount: inpt.UserCount,
 		Country:   inpt.Country,
+		VPNStatus: inpt.VPNStatus,
 	}
 	err := v.db.Conn().QueryRow(`
-	INSERT INTO vpns (domain, is_active, api_port, vpn_type, user_count, country, start_port, end_port)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+	INSERT INTO vpns (domain, is_active, api_port, vpn_type, user_count, country, start_port, end_port, status)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 	RETURNING id
 	`, inpt.Domain,
 		inpt.IsActive,
@@ -33,6 +34,7 @@ func (v *VPN) Create(inpt *vpnManagerDto.AddVPN) (*entity.VPN, error) {
 		inpt.Country,
 		inpt.StartPort,
 		inpt.EndPort,
+		entity.VPNStatusString(inpt.VPNStatus),
 	).Scan(
 		&vpn.ID,
 	)
@@ -116,6 +118,7 @@ func (v *VPN) Filter(inpt *vpnManagerDto.FilterVPNs) ([]*entity.VPN, error) {
 		vpn := &entity.VPN{}
 		var createdAt, updatedAt interface{}
 		var vpnType string
+		var vpnStatusLabel string
 		err := rows.Scan(
 			&vpn.ID,
 			&vpn.Domain,
@@ -126,6 +129,7 @@ func (v *VPN) Filter(inpt *vpnManagerDto.FilterVPNs) ([]*entity.VPN, error) {
 			&vpn.Country,
 			&vpn.StartPort,
 			&vpn.EndPort,
+			&vpnStatusLabel,
 			&createdAt,
 			&updatedAt,
 		)
@@ -133,11 +137,8 @@ func (v *VPN) Filter(inpt *vpnManagerDto.FilterVPNs) ([]*entity.VPN, error) {
 			return nil, momoError.Wrap(err).Scope(scope).Input(inpt).DebuggingError()
 		}
 
-		vpnTypeEnum := entity.ConvertStringVPNTypeToEnum(vpnType)
-		if vpnTypeEnum == entity.UknownVPNType {
-			return nil, momoError.Wrap(err).Scope(scope).Input(inpt, vpnType).DebuggingError()
-		}
-		vpn.VPNType = vpnTypeEnum
+		vpn.VPNStatus = entity.ConvertVPNStatusLabelToVPNStatus(vpnStatusLabel)
+		vpn.VPNType = entity.ConvertStringVPNTypeToEnum(vpnType)
 		vpns = append(vpns, vpn)
 	}
 

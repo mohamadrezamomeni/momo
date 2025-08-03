@@ -10,4 +10,5 @@ type CreateVPN struct {
 	Country   string
 	StartPort int
 	EndPort   int
+	VPNStatus entity.VPNStatus
 }

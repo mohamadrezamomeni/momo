@@ -40,6 +40,7 @@ func (v *VPNService) Create(createVPNDto *vpnServiceDto.CreateVPN) (*entity.VPN,
 		Country:   createVPNDto.Country,
 		StartPort: createVPNDto.StartPort,
 		EndPort:   createVPNDto.EndPort,
+		VPNStatus: createVPNDto.VPNStatus,
 	})
 }
 
