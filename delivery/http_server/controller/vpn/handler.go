@@ -16,6 +16,7 @@ type Handler struct {
 type VPNService interface {
 	Create(*vpnServiceDto.CreateVPN) (*entity.VPN, error)
 	Filter(*vpnServiceDto.FilterVPNs) ([]*entity.VPN, error)
+	Update(string, *vpnServiceDto.Update) error
 }
 
 func New(vpnSvc VPNService, validation *validator.Validator, authSvc *auth.Auth) *Handler {

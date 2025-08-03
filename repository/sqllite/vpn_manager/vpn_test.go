@@ -2,6 +2,7 @@ package vpnmanager
 
 import (
 	"os"
+	"strconv"
 	"testing"
 
 	vpnManagerDto "github.com/mohamadrezamomeni/momo/dto/repository/vpn_manager"
@@ -205,5 +206,36 @@ func ValidateResponseGroupDomainByVPNSource(
 				t.Fatalf("the domain %s was missed", domain)
 			}
 		}
+	}
+}
+
+func TestFindVPN(t *testing.T) {
+	defer vpnRepo.DeleteAll()
+	vpnCreated, _ := vpnRepo.Create(vpn1)
+
+	vpnFounded, err := vpnRepo.Find(strconv.Itoa(vpnCreated.ID))
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	if vpnFounded.VPNStatus != vpnCreated.VPNStatus {
+		t.Error("error to compare data")
+	}
+}
+
+func TestUpdate(t *testing.T) {
+	defer vpnRepo.DeleteAll()
+	vpnCreated, _ := vpnRepo.Create(vpn1)
+
+	err := vpnRepo.Update(strconv.Itoa(vpnCreated.ID), &vpnManagerDto.UpdateVPN{
+		VPNStatus: entity.Cordon,
+	})
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	vpnFounded, _ := vpnRepo.Find(strconv.Itoa(vpnCreated.ID))
+	if vpnFounded.VPNStatus != entity.Cordon {
+		t.Fatalf("error to compare data")
 	}
 }

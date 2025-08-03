@@ -2,6 +2,7 @@ package vpn
 
 import (
 	"fmt"
+	"strconv"
 
 	vpnManagerDto "github.com/mohamadrezamomeni/momo/dto/repository/vpn_manager"
 	"github.com/mohamadrezamomeni/momo/entity"
@@ -94,4 +95,13 @@ func (mv *MockVPN) GroupAvailbleVPNsByCountry() ([]string, error) {
 		}
 	}
 	return res, nil
+}
+
+func (mv *MockVPN) Update(id string, updateVPNDto *vpnManagerDto.UpdateVPN) error {
+	for _, mv := range mv.vpns {
+		if id == strconv.Itoa(mv.ID) {
+			mv.VPNStatus = updateVPNDto.VPNStatus
+		}
+	}
+	return nil
 }

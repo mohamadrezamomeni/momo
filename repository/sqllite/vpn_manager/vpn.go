@@ -1,6 +1,7 @@
 package vpnmanager
 
 import (
+	"database/sql"
 	"fmt"
 	"strings"
 
@@ -181,6 +182,67 @@ func (v *VPN) makeSQlFilter(inpt *vpnManagerDto.FilterVPNs) string {
 		sql += fmt.Sprintf(" WHERE %s", joinSQL)
 	}
 	return sql
+}
+
+func (v *VPN) Update(id string, updateVPNManagerDto *vpnManagerDto.UpdateVPN) error {
+	scope := "vpnRepository.Update"
+
+	updates := make([]string, 0)
+
+	if updateVPNManagerDto.VPNStatus != 0 {
+		updates = append(
+			updates,
+			fmt.Sprintf("status = '%s'", entity.VPNStatusString(updateVPNManagerDto.VPNStatus)),
+		)
+	}
+
+	sql := fmt.Sprintf(
+		"UPDATE vpns SET %s WHERE id = %s",
+		strings.Join(updates, ", "),
+		id,
+	)
+
+	_, err := v.db.Conn().Exec(sql)
+	if err != nil {
+		return momoError.Wrap(err).Scope(scope).Input(id, updateVPNManagerDto).DebuggingError()
+	}
+	return nil
+}
+
+func (v *VPN) Find(id string) (*entity.VPN, error) {
+	scope := "vpnRepository.Find"
+
+	vpn := &entity.VPN{}
+	var createdAt, updatedAt interface{}
+	var vpnType string
+	var vpnStatusLabel string
+
+	s := fmt.Sprintf("SELECT * FROM vpns WHERE id = %s LIMIT 1", id)
+	err := v.db.Conn().QueryRow(s).Scan(
+		&vpn.ID,
+		&vpn.Domain,
+		&vpn.IsActive,
+		&vpn.ApiPort,
+		&vpnType,
+		&vpn.UserCount,
+		&vpn.Country,
+		&vpn.StartPort,
+		&vpn.EndPort,
+		&vpnStatusLabel,
+		&createdAt,
+		&updatedAt,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, momoError.Wrap(err).Scope(scope).NotFound().Input(id).DebuggingError()
+	}
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).Input(id).UnExpected().DebuggingError()
+	}
+
+	vpn.VPNStatus = entity.ConvertVPNStatusLabelToVPNStatus(vpnStatusLabel)
+	vpn.VPNType = entity.ConvertStringVPNTypeToEnum(vpnType)
+	return vpn, nil
 }
 
 func (v *VPN) GroupAvailbleVPNsByCountry() ([]string, error) {
