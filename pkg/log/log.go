@@ -67,7 +67,6 @@ func logger(record *Record) {
 	}
 
 	defer file.Close()
-	fmt.Println(row)
 	_, _ = file.WriteString(row)
 }
 
