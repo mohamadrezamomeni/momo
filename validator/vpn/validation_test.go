@@ -149,3 +149,19 @@ func TestValidateFilter(t *testing.T) {
 		t.Errorf("we expected an error")
 	}
 }
+
+func TestValidateUpdate(t *testing.T) {
+	err := validator.ValidateUpdatingVPN(vpnControllerDto.UpdateVPN{
+		VPNStatusLabel: "cordon",
+	})
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+
+	err = validator.ValidateUpdatingVPN(vpnControllerDto.UpdateVPN{
+		VPNStatusLabel: "cordonn",
+	})
+	if err == nil {
+		t.Fatal("we expected error would be occured")
+	}
+}

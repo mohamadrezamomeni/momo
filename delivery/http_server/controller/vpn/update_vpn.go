@@ -19,10 +19,17 @@ func (v *Handler) Update(c echo.Context) error {
 		})
 	}
 
+	err := v.validation.ValidateUpdatingVPN(req)
+	if err != nil {
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
+		})
+	}
 	vpnStatus := entity.ConvertVPNStatusLabelToVPNStatus(
 		req.VPNStatusLabel,
 	)
-	err := v.vpnSvc.Update(req.ID, &vpnServiceDto.Update{
+	err = v.vpnSvc.Update(req.ID, &vpnServiceDto.Update{
 		VPNStatus: vpnStatus,
 	})
 	if err != nil {
