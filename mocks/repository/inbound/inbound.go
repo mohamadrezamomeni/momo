@@ -184,12 +184,13 @@ func (i *MockInbound) FindInboundIsNotAssigned() ([]*entity.Inbound, error) {
 	return result, nil
 }
 
-func (i *MockInbound) UpdateDomainPort(id int, domain string, port string) error {
+func (i *MockInbound) UpdateDomainPort(id int, domain string, port string, VPNID string) error {
 	for _, inbound := range i.inbounds {
 		if inbound.ID == id {
 			inbound.Domain = domain
 			inbound.Port = port
 			inbound.IsAssigned = true
+			inbound.VPNID = VPNID
 		}
 	}
 	return nil

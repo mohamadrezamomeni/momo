@@ -16,8 +16,10 @@ CREATE TABLE `inbounds` (
         `traffic_usage` INTEGER DEFAULT 0,
         `traffic_limit` INTEGER NOT NULL,
         `country` VARCHAR(128) NOT NULL,
+        `vpn_id` INTEGER,
         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (vpn_id) REFERENCES vpns(id)
 );
 
 -- +migrate Down

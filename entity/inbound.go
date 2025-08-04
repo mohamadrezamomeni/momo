@@ -14,6 +14,7 @@ type Inbound struct {
 	VPNType      VPNType
 	Domain       string
 	Port         string
+	VPNID        string
 	IsNotified   bool
 	IsAssigned   bool
 	UserID       string

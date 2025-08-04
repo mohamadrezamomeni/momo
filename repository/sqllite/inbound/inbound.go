@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
@@ -71,6 +72,7 @@ func (i *Inbound) FindInboundByID(id string) (*entity.Inbound, error) {
 	var createdAt, updatedAt interface{}
 	var inbound *entity.Inbound = &entity.Inbound{}
 	var vpnType string
+	var VPNID sql.NullInt64
 	s := fmt.Sprintf("SELECT * FROM inbounds WHERE id=%s LIMIT 1", id)
 	err := i.db.Conn().QueryRow(s).Scan(
 		&inbound.ID,
@@ -89,18 +91,22 @@ func (i *Inbound) FindInboundByID(id string) (*entity.Inbound, error) {
 		&inbound.TrafficUsage,
 		&inbound.TrafficLimit,
 		&inbound.Country,
+		&VPNID,
 		&createdAt,
 		&updatedAt,
 	)
 
-	if err == nil {
-		inbound.VPNType = entity.ConvertStringVPNTypeToEnum(vpnType)
-		return inbound, nil
-	}
 	if err == sql.ErrNoRows {
 		return nil, momoError.Wrap(err).Scope(scope).NotFound().Input(id).DebuggingError()
 	}
-	return nil, momoError.Wrap(err).Scope(scope).Input(id).UnExpected().DebuggingError()
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).Input(id).UnExpected().DebuggingError()
+	}
+	inbound.VPNType = entity.ConvertStringVPNTypeToEnum(vpnType)
+	if VPNID.Valid {
+		inbound.VPNID = strconv.Itoa(int(VPNID.Int64))
+	}
+	return inbound, nil
 }
 
 func (i *Inbound) Delete(id int) error {
@@ -346,13 +352,14 @@ func (i *Inbound) FindInboundIsNotAssigned() ([]*entity.Inbound, error) {
 	return inbounds, nil
 }
 
-func (i *Inbound) UpdateDomainPort(id int, domain string, port string) error {
+func (i *Inbound) UpdateDomainPort(id int, domain string, port string, VPNID string) error {
 	scope := "inboundRepository.UpdateDomainPort"
 
 	sql := fmt.Sprintf(
-		"UPDATE inbounds SET domain = '%s', port = '%s', is_assigned = true WHERE id = %v",
+		"UPDATE inbounds SET domain = '%s', port = '%s', vpn_id=%s, is_assigned = true WHERE id = %v",
 		domain,
 		port,
+		VPNID,
 		id,
 	)
 
@@ -477,6 +484,7 @@ func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
 	inbound := &entity.Inbound{}
 	var createdAt, updatedAt interface{}
 	var vpnType string
+	var VPNID sql.NullInt64
 	err := rows.Scan(
 		&inbound.ID,
 		&inbound.Protocol,
@@ -494,6 +502,7 @@ func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
 		&inbound.TrafficUsage,
 		&inbound.TrafficLimit,
 		&inbound.Country,
+		&VPNID,
 		&createdAt,
 		&updatedAt,
 	)
@@ -501,5 +510,9 @@ func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
 		return nil, momoError.Wrap(err).Scope(scope).Input(rows).DebuggingError()
 	}
 	inbound.VPNType = entity.ConvertStringVPNTypeToEnum(vpnType)
+	inbound.VPNType = entity.ConvertStringVPNTypeToEnum(vpnType)
+	if VPNID.Valid {
+		inbound.VPNID = strconv.Itoa(int(VPNID.Int64))
+	}
 	return inbound, nil
 }

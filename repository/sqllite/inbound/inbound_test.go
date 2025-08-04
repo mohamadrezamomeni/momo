@@ -67,12 +67,12 @@ func TestChangeStatus(t *testing.T) {
 }
 
 func TestFilterInbounds(t *testing.T) {
+	defer inboundRepo.DeleteAll()
 	inboundRepo.Create(inbound1)
 	inboundRepo.Create(inbound2)
 	inboundRepo.Create(inbound3)
 	inboundRepo.Create(inbound4)
 
-	defer inboundRepo.DeleteAll()
 	inbounds, err := inboundRepo.Filter(&inboundDto.FilterInbound{Port: port2})
 	if err != nil {
 		t.Errorf("1. the problem has occured that is %v", err)
@@ -255,14 +255,17 @@ func TestUpdateInbound(t *testing.T) {
 	defer inboundRepo.DeleteAll()
 	newDomain := "facebook.com"
 	newPort := "2020"
-	err := inboundRepo.UpdateDomainPort(inboundCreated.ID, newDomain, newPort)
+	err := inboundRepo.UpdateDomainPort(inboundCreated.ID, newDomain, newPort, "3")
 	if err != nil {
 		t.Fatalf("update has field the problem was %v", err)
 	}
 
 	inbound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
 
-	if inbound.Domain != newDomain || inbound.Port != newPort || inbound.IsAssigned != true {
+	if inbound.VPNID != "3" ||
+		inbound.Domain != newDomain ||
+		inbound.Port != newPort ||
+		inbound.IsAssigned != true {
 		t.Fatalf("update hasn't worked carefuly")
 	}
 }
