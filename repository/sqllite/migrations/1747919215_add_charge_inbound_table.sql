@@ -10,9 +10,9 @@ CREATE TABLE charges (
     country varchar(128) NOT NULL,
     vpn_type varchar(32) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (inbound_id) REFERENCES inbounds(inbound_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
-    FOREIGN KEY (package_id) REFERENCES vpn_package(package_id)
+    FOREIGN KEY (inbound_id) REFERENCES inbounds(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (package_id) REFERENCES vpn_package(id)
 );
 
 -- +migrate Down
