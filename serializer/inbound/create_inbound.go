@@ -1,5 +1,5 @@
 package inbound
 
 type CredateInboundSerializer struct {
-	ID int `json:"id"`
+	ID string `json:"id"`
 }

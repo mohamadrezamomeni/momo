@@ -1,8 +1,6 @@
 package inbound
 
 import (
-	"strconv"
-
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/mohamadrezamomeni/momo/delivery/telegram/core"
 	inboundServiceDto "github.com/mohamadrezamomeni/momo/dto/service/inbound"
@@ -52,7 +50,7 @@ func (h *Handler) RenderClientConfigButtons(update *core.Update) (*core.Response
 func (h *Handler) renderClientConfigButton(inbound *entity.Inbound) (*tgbotapi.InlineKeyboardButton, error) {
 	blockedTitle, err := telegrammessages.GetMessage("inbound.client_config.client_config_item_block", map[string]string{
 		"VPNType": entity.VPNTypeString(inbound.VPNType),
-		"ID":      strconv.Itoa(inbound.ID),
+		"ID":      inbound.ID,
 	})
 	if err != nil {
 		return nil, err
@@ -60,7 +58,7 @@ func (h *Handler) renderClientConfigButton(inbound *entity.Inbound) (*tgbotapi.I
 
 	okConfigItem, err := telegrammessages.GetMessage("inbound.client_config.client_config_item_ok", map[string]string{
 		"VPNType": entity.VPNTypeString(inbound.VPNType),
-		"ID":      strconv.Itoa(inbound.ID),
+		"ID":      inbound.ID,
 	})
 	if err != nil {
 		return nil, err
@@ -68,18 +66,18 @@ func (h *Handler) renderClientConfigButton(inbound *entity.Inbound) (*tgbotapi.I
 
 	pendingItem, err := telegrammessages.GetMessage("inbound.client_config.client_config_item_pending", map[string]string{
 		"VPNType": entity.VPNTypeString(inbound.VPNType),
-		"ID":      strconv.Itoa(inbound.ID),
+		"ID":      inbound.ID,
 	})
 	if err != nil {
 		return nil, err
 	}
 	var button tgbotapi.InlineKeyboardButton
 	if inbound.IsBlock {
-		button = tgbotapi.NewInlineKeyboardButtonData(blockedTitle, strconv.Itoa(inbound.ID))
+		button = tgbotapi.NewInlineKeyboardButtonData(blockedTitle, inbound.ID)
 	} else if !inbound.IsAssigned {
-		button = tgbotapi.NewInlineKeyboardButtonData(pendingItem, strconv.Itoa(inbound.ID))
+		button = tgbotapi.NewInlineKeyboardButtonData(pendingItem, inbound.ID)
 	} else {
-		button = tgbotapi.NewInlineKeyboardButtonData(okConfigItem, strconv.Itoa(inbound.ID))
+		button = tgbotapi.NewInlineKeyboardButtonData(okConfigItem, inbound.ID)
 	}
 	return &button, nil
 }

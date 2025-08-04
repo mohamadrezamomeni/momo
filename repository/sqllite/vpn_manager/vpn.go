@@ -84,15 +84,15 @@ func (i *VPN) DeleteAll() error {
 	return nil
 }
 
-func (v *VPN) ActiveVPN(id int) error {
+func (v *VPN) ActiveVPN(id string) error {
 	return v.updateActivationVPN(id, true)
 }
 
-func (v *VPN) DeactiveVPN(id int) error {
+func (v *VPN) DeactiveVPN(id string) error {
 	return v.updateActivationVPN(id, false)
 }
 
-func (v *VPN) updateActivationVPN(id int, status bool) error {
+func (v *VPN) updateActivationVPN(id string, status bool) error {
 	scope := "vpnRepository.updateActivationVPN"
 
 	sql := fmt.Sprintf("UPDATE vpns SET is_active = %v WHERE id = %v", status, id)

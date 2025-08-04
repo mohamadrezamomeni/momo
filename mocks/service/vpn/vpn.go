@@ -1,6 +1,8 @@
 package vpn
 
 import (
+	"strconv"
+
 	"github.com/mohamadrezamomeni/momo/adapter"
 	vpnServiceDto "github.com/mohamadrezamomeni/momo/dto/service/vpn"
 	"github.com/mohamadrezamomeni/momo/entity"
@@ -9,19 +11,19 @@ import (
 
 type MockVPN struct {
 	vpns []*entity.VPN
+	idx  int
 }
 
 func New() *MockVPN {
-	return &MockVPN{}
+	return &MockVPN{
+		vpns: make([]*entity.VPN, 0),
+		idx:  0,
+	}
 }
 
 func (mv *MockVPN) Create(createVPNDto *vpnServiceDto.CreateVPN) (*entity.VPN, error) {
-	id := 0
-	if len(mv.vpns) != 0 {
-		id = mv.vpns[len(mv.vpns)-1].ID
-	}
 	vpn := &entity.VPN{
-		ID:        id,
+		ID:        strconv.Itoa(mv.idx),
 		Domain:    createVPNDto.Domain,
 		VPNType:   createVPNDto.VpnType,
 		Country:   createVPNDto.Country,
@@ -30,6 +32,7 @@ func (mv *MockVPN) Create(createVPNDto *vpnServiceDto.CreateVPN) (*entity.VPN, e
 		StartPort: createVPNDto.StartPort,
 		EndPort:   createVPNDto.EndPort,
 	}
+	mv.idx += 1
 	mv.vpns = append(mv.vpns, vpn)
 	return vpn, nil
 }

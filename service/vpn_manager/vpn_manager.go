@@ -10,8 +10,8 @@ import (
 
 type VPNRepo interface {
 	Filter(*vpnManagerRepositoryDto.FilterVPNs) ([]*entity.VPN, error)
-	ActiveVPN(int) error
-	DeactiveVPN(int) error
+	ActiveVPN(string) error
+	DeactiveVPN(string) error
 	Create(*vpnManagerRepositoryDto.AddVPN) (*entity.VPN, error)
 	GroupAvailbleVPNsByCountry() ([]string, error)
 	Update(string, *vpnManagerRepositoryDto.UpdateVPN) error

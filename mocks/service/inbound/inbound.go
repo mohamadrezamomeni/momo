@@ -22,7 +22,7 @@ func New() *MockInboundService {
 
 func (i *MockInboundService) Create(inpt *inboundServiceDto.CreateInbound) (*entity.Inbound, error) {
 	inbound := &entity.Inbound{
-		ID:         i.idx,
+		ID:         strconv.Itoa(i.idx),
 		Domain:     "",
 		Protocol:   "vmess",
 		UserID:     inpt.UserID,
@@ -41,7 +41,7 @@ func (i *MockInboundService) Create(inpt *inboundServiceDto.CreateInbound) (*ent
 
 func (i *MockInboundService) FindInboundByID(id string) (*entity.Inbound, error) {
 	for _, inbound := range i.inbounds {
-		if strconv.Itoa(inbound.ID) == id {
+		if inbound.ID == id {
 			return inbound, nil
 		}
 	}

@@ -1,8 +1,6 @@
 package inbound
 
 import (
-	"strconv"
-
 	"github.com/mohamadrezamomeni/momo/adapter"
 	inboundRepoDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound"
 	"github.com/mohamadrezamomeni/momo/entity"
@@ -69,7 +67,7 @@ func (i *InboundTraffic) updateTraffic(inbound *entity.Inbound, proxy adapter.Pr
 	}
 
 	i.inboundRepo.IncreaseTrafficUsage(
-		strconv.Itoa(inbound.ID),
+		inbound.ID,
 		uint32(traffic.Download)+uint32(traffic.Upload),
 	)
 }

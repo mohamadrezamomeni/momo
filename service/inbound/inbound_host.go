@@ -28,7 +28,7 @@ type InboundHostRepo interface {
 		Domain string
 		Ports  []string
 	}, error)
-	UpdateDomainPort(int, string, string, string) error
+	UpdateDomainPort(string, string, string, string) error
 }
 
 type Address struct {
@@ -157,7 +157,7 @@ func (i *HostInbound) getAvailblePortsByVPN(vpn *entity.VPN, domainPortSummery m
 				Domain:  domain,
 				VPNType: vpn.VPNType,
 				Port:    strconv.Itoa(p),
-				VPNID:   strconv.Itoa(vpn.ID),
+				VPNID:   vpn.ID,
 			})
 		}
 	}

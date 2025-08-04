@@ -24,7 +24,6 @@ CREATE TABLE `inbounds_new` (
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. Copy data (excluding vpn_id)
 INSERT INTO inbounds_new (
     id, protocol, is_active, domain, vpn_type, port, user_id, tag,
     is_block, start, end, is_notified, is_assigned,
@@ -36,8 +35,6 @@ SELECT
     traffic_usage, traffic_limit, country, created_at, updated_at
 FROM inbounds;
 
--- 3. Drop old table
 DROP TABLE inbounds;
 
--- 4. Rename new table to original
 ALTER TABLE inbounds_new RENAME TO inbounds;

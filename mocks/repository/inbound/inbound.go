@@ -25,7 +25,7 @@ func New() *MockInbound {
 func (i *MockInbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, error) {
 	i.id += 1
 	inbound := &entity.Inbound{
-		ID:         i.id,
+		ID:         strconv.Itoa(i.id),
 		VPNType:    entity.XRAY_VPN,
 		Protocol:   inpt.Protocol,
 		Tag:        inpt.Tag,
@@ -45,14 +45,14 @@ func (i *MockInbound) Create(inpt *inboundDto.CreateInbound) (*entity.Inbound, e
 
 func (i *MockInbound) FindInboundByID(id string) (*entity.Inbound, error) {
 	for _, inbound := range i.inbounds {
-		if strconv.Itoa(inbound.ID) == id {
+		if inbound.ID == id {
 			return inbound, nil
 		}
 	}
 	return nil, fmt.Errorf("the record wasn't find")
 }
 
-func (i *MockInbound) Delete(id int) error {
+func (i *MockInbound) Delete(id string) error {
 	idx := -1
 	for i, inbound := range i.inbounds {
 		if inbound.ID == id {
@@ -92,7 +92,7 @@ func (i *MockInbound) GetListOfPortsByDomain() ([]struct {
 	return ret, nil
 }
 
-func (i *MockInbound) Active(id int) error {
+func (i *MockInbound) Active(id string) error {
 	for _, inbound := range i.inbounds {
 		if inbound.ID == id {
 			inbound.IsActive = true
@@ -102,7 +102,7 @@ func (i *MockInbound) Active(id int) error {
 	return fmt.Errorf("the record hasn't found")
 }
 
-func (i *MockInbound) DeActive(id int) error {
+func (i *MockInbound) DeActive(id string) error {
 	for _, inbound := range i.inbounds {
 		if inbound.ID == id {
 			inbound.IsActive = false
@@ -184,7 +184,7 @@ func (i *MockInbound) FindInboundIsNotAssigned() ([]*entity.Inbound, error) {
 	return result, nil
 }
 
-func (i *MockInbound) UpdateDomainPort(id int, domain string, port string, VPNID string) error {
+func (i *MockInbound) UpdateDomainPort(id string, domain string, port string, VPNID string) error {
 	for _, inbound := range i.inbounds {
 		if inbound.ID == id {
 			inbound.Domain = domain

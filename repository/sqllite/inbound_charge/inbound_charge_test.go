@@ -2,7 +2,6 @@ package inboundcharge
 
 import (
 	"os"
-	"strconv"
 	"testing"
 	"time"
 
@@ -52,7 +51,7 @@ func TestChargeInbound(t *testing.T) {
 	defer chargeRepo.DeleteAll()
 	inbound, _ := inboundRepo.Create(inbound1)
 	vpnPackage, _ := vpnPackageRepo.Create(vpnPackage1)
-	charge1.InboundID = strconv.Itoa(inbound.ID)
+	charge1.InboundID = inbound.ID
 	charge1.PackageID = vpnPackage.ID
 	charge, _ := chargeRepo.Create(charge1)
 	err := inboundChargeRepo.AssignChargeToInbound(inbound, charge, vpnPackage)

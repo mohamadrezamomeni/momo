@@ -1,7 +1,6 @@
 package inboundcharge
 
 import (
-	"strconv"
 	"time"
 
 	inboundChargeDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound_charge"
@@ -97,7 +96,7 @@ func (ic *InboundCharge) ChargeInbounds() {
 func (ic *InboundCharge) getInboundIDs(inbounds []*entity.Inbound) []string {
 	inboundIDs := []string{}
 	for _, inbound := range inbounds {
-		inboundIDs = append(inboundIDs, strconv.Itoa(inbound.ID))
+		inboundIDs = append(inboundIDs, inbound.ID)
 	}
 	return inboundIDs
 }

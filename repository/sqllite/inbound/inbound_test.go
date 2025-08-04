@@ -2,7 +2,6 @@ package inbound
 
 import (
 	"os"
-	"strconv"
 	"testing"
 	"time"
 
@@ -18,7 +17,7 @@ var inboundRepo *Inbound
 func TestMain(m *testing.M) {
 	config := &sqllite.DBConfig{
 		Dialect:    "sqlite3",
-		Path:       "test-inbound.db",
+		Path:       "test-inbbound.db",
 		Migrations: "./repository/sqllite/migrations",
 	}
 
@@ -37,6 +36,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestCreateInbound(t *testing.T) {
+	defer inboundRepo.DeleteAll()
 	ret, err := inboundRepo.Create(inbound1)
 	if err != nil {
 		t.Errorf("something wrong has happend the problem was %v", err)
@@ -49,11 +49,10 @@ func TestCreateInbound(t *testing.T) {
 		ret.VPNType != inbound1.VPNType {
 		t.Error("data wasn't saved currectly")
 	}
-
-	inboundRepo.DeleteAll()
 }
 
 func TestChangeStatus(t *testing.T) {
+	defer inboundRepo.DeleteAll()
 	ret, err := inboundRepo.Create(inbound1)
 	if err != nil {
 		t.Errorf("something wrong has happend the problem was %v", err)
@@ -63,7 +62,6 @@ func TestChangeStatus(t *testing.T) {
 	if err != nil {
 		t.Errorf("error has happend that was %v", err)
 	}
-	inboundRepo.DeleteAll()
 }
 
 func TestFilterInbounds(t *testing.T) {
@@ -161,7 +159,7 @@ func TestRetriveActiveInboundExpired(t *testing.T) {
 	if len(inbounds) != 2 {
 		t.Errorf("we expected the lengh of result be 2 but we got %d", len(inbounds))
 	}
-	seen := map[int]struct{}{}
+	seen := map[string]struct{}{}
 	for _, inbound := range inbounds {
 		seen[inbound.ID] = struct{}{}
 	}
@@ -239,9 +237,9 @@ func TestInboundsIsNotAssigned(t *testing.T) {
 }
 
 func TestFindInboundByUserID(t *testing.T) {
-	inboundCreated, _ := inboundRepo.Create(inbound10)
 	defer inboundRepo.DeleteAll()
-	inbound, err := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
+	inboundCreated, _ := inboundRepo.Create(inbound10)
+	inbound, err := inboundRepo.FindInboundByID(inboundCreated.ID)
 	if err != nil {
 		t.Fatalf("the query was field the problem was %v", err)
 	}
@@ -251,8 +249,8 @@ func TestFindInboundByUserID(t *testing.T) {
 }
 
 func TestUpdateInbound(t *testing.T) {
-	inboundCreated, _ := inboundRepo.Create(inbound10)
 	defer inboundRepo.DeleteAll()
+	inboundCreated, _ := inboundRepo.Create(inbound10)
 	newDomain := "facebook.com"
 	newPort := "2020"
 	err := inboundRepo.UpdateDomainPort(inboundCreated.ID, newDomain, newPort, "3")
@@ -260,7 +258,7 @@ func TestUpdateInbound(t *testing.T) {
 		t.Fatalf("update has field the problem was %v", err)
 	}
 
-	inbound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
+	inbound, _ := inboundRepo.FindInboundByID(inboundCreated.ID)
 
 	if inbound.VPNID != "3" ||
 		inbound.Domain != newDomain ||
@@ -271,11 +269,10 @@ func TestUpdateInbound(t *testing.T) {
 }
 
 func TestGetListOfPortsByDomain(t *testing.T) {
+	defer inboundRepo.DeleteAll()
 	inboundRepo.Create(inbound12)
 	inboundRepo.Create(inbound13)
 	inboundRepo.Create(inbound14)
-
-	defer inboundRepo.DeleteAll()
 
 	summery, err := inboundRepo.GetListOfPortsByDomain()
 	if err != nil {
@@ -300,15 +297,15 @@ func TestGetListOfPortsByDomain(t *testing.T) {
 }
 
 func TestBlock(t *testing.T) {
-	inboundCreated, _ := inboundRepo.Create(inbound1)
 	defer inboundRepo.DeleteAll()
+	inboundCreated, _ := inboundRepo.Create(inbound1)
 
-	err := inboundRepo.ChangeBlockState(strconv.Itoa(inboundCreated.ID), true)
+	err := inboundRepo.ChangeBlockState(inboundCreated.ID, true)
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
 	}
 
-	inboundFound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
+	inboundFound, _ := inboundRepo.FindInboundByID(inboundCreated.ID)
 
 	if !inboundFound.IsBlock {
 		t.Fatal("inbound that is founded must be blocked")
@@ -318,12 +315,12 @@ func TestBlock(t *testing.T) {
 func TestUnBlock(t *testing.T) {
 	inboundCreated, _ := inboundRepo.Create(inbound5)
 	defer inboundRepo.DeleteAll()
-	err := inboundRepo.ChangeBlockState(strconv.Itoa(inboundCreated.ID), false)
+	err := inboundRepo.ChangeBlockState(inboundCreated.ID, false)
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
 	}
 
-	inboundFound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
+	inboundFound, _ := inboundRepo.FindInboundByID(inboundCreated.ID)
 
 	if inboundFound.IsBlock {
 		t.Fatal("inbound that is founded must be blocked")
@@ -334,7 +331,7 @@ func TestUpdate(t *testing.T) {
 	defer inboundRepo.DeleteAll()
 	inboundCreated, _ := inboundRepo.Create(inbound1)
 
-	err := inboundRepo.Update(strconv.Itoa(inboundCreated.ID), &inboundDto.UpdateInboundDto{
+	err := inboundRepo.Update(inboundCreated.ID, &inboundDto.UpdateInboundDto{
 		Start:        utils.GetDateTime("2026-04-21 14:30:00"),
 		End:          utils.GetDateTime("2026-04-22 14:30:00"),
 		TrafficLimit: 200,
@@ -343,7 +340,7 @@ func TestUpdate(t *testing.T) {
 		t.Fatalf("the error was %v", err)
 	}
 
-	inboundFound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
+	inboundFound, _ := inboundRepo.FindInboundByID(inboundCreated.ID)
 
 	if inboundFound.Start != utils.GetDateTime("2026-04-21 14:30:00") {
 		t.Errorf("we expected start be %s", inboundFound.Start.Format(time.DateTime))
@@ -359,14 +356,14 @@ func TestUpdate(t *testing.T) {
 
 	inboundCreated, _ = inboundRepo.Create(inbound2)
 
-	err = inboundRepo.Update(strconv.Itoa(inboundCreated.ID), &inboundDto.UpdateInboundDto{
+	err = inboundRepo.Update(inboundCreated.ID, &inboundDto.UpdateInboundDto{
 		Start: utils.GetDateTime("2026-04-21 14:30:00"),
 	})
 	if err != nil {
 		t.Fatalf("the error was %v", err)
 	}
 
-	inboundFound, _ = inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
+	inboundFound, _ = inboundRepo.FindInboundByID(inboundCreated.ID)
 
 	if inboundFound.Start != utils.GetDateTime("2026-04-21 14:30:00") {
 		t.Errorf("we expected start be %s", inboundFound.Start.Format(time.DateTime))
@@ -379,7 +376,7 @@ func TestExtendInbound(t *testing.T) {
 	inboundCreated, _ := inboundRepo.Create(inbound1)
 	endTime, _ := timeTransformer.ConvertStrToTime("2026-04-21 14:30:00")
 	endTime.Truncate(time.Second)
-	err := inboundRepo.ExtendInbound(strconv.Itoa(inboundCreated.ID), &inboundDto.ExtendInboundDto{
+	err := inboundRepo.ExtendInbound(inboundCreated.ID, &inboundDto.ExtendInboundDto{
 		TrafficExtended: 200,
 		End:             endTime,
 	})
@@ -387,7 +384,7 @@ func TestExtendInbound(t *testing.T) {
 		t.Fatalf("something went wrong the problem was %v", err)
 	}
 
-	err = inboundRepo.ExtendInbound(strconv.Itoa(inboundCreated.ID), &inboundDto.ExtendInboundDto{
+	err = inboundRepo.ExtendInbound(inboundCreated.ID, &inboundDto.ExtendInboundDto{
 		TrafficExtended: 400,
 		End:             endTime,
 	})
@@ -395,7 +392,7 @@ func TestExtendInbound(t *testing.T) {
 		t.Fatalf("something went wrong the problem was %v", err)
 	}
 
-	inboundFound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
+	inboundFound, _ := inboundRepo.FindInboundByID(inboundCreated.ID)
 	if inboundFound.TrafficLimit != 600 {
 		t.Fatalf("the field of trafficlimit must be 600 but we got %d", inboundFound.TrafficLimit)
 	}
@@ -410,11 +407,11 @@ func TestIncreateTrafficUsage(t *testing.T) {
 	inboundCreated, _ := inboundRepo.Create(inbound1)
 
 	var trafficUsage uint32 = 50000
-	err := inboundRepo.IncreaseTrafficUsage(strconv.Itoa(inboundCreated.ID), trafficUsage)
+	err := inboundRepo.IncreaseTrafficUsage(inboundCreated.ID, trafficUsage)
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
 	}
-	inboundFound, _ := inboundRepo.FindInboundByID(strconv.Itoa(inboundCreated.ID))
+	inboundFound, _ := inboundRepo.FindInboundByID(inboundCreated.ID)
 	if inboundFound.TrafficUsage != trafficUsage {
 		t.Fatalf("error to compare data")
 	}
@@ -438,11 +435,11 @@ func TestRetriveFinishedInbounds(t *testing.T) {
 	}
 
 	if !(inboundCreated1.ID != inbounds[0].ID || inboundCreated1.ID != inbounds[1].ID) {
-		t.Fatalf("we expected the inbound that are returned contain %s", strconv.Itoa(inboundCreated1.ID))
+		t.Fatalf("we expected the inbound that are returned contain %s", inboundCreated1.ID)
 	}
 
 	if !(inboundCreated2.ID != inbounds[0].ID || inboundCreated2.ID != inbounds[1].ID) {
-		t.Fatalf("we expected the inbound that is returned contain %s", strconv.Itoa(inboundCreated2.ID))
+		t.Fatalf("we expected the inbound that is returned contain %s", inboundCreated2.ID)
 	}
 }
 
@@ -459,7 +456,7 @@ func TestActiveInbounds(t *testing.T) {
 	if len(inbounds) != 2 {
 		t.Fatalf("we expeted the lentgh of inbounds be %d but we got %d", 2, len(inbounds))
 	}
-	inboundIDMap := make(map[int]struct{})
+	inboundIDMap := make(map[string]struct{})
 	inboundIDMap[inboundCreated1.ID] = struct{}{}
 	inboundIDMap[inboundCreated2.ID] = struct{}{}
 	if _, isExist := inboundIDMap[inboundCreated1.ID]; !isExist {

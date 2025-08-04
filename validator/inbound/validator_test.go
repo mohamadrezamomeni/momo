@@ -2,7 +2,6 @@ package inbound
 
 import (
 	"os"
-	"strconv"
 	"testing"
 	"time"
 
@@ -154,7 +153,7 @@ func TestValidateExtendingInbound(t *testing.T) {
 
 	err := validator.ValidateExtendingInbound(inbound.ExtendInboundDto{
 		IdentifyInbounbdDto: inbound.IdentifyInbounbdDto{
-			ID: strconv.Itoa(inboundCreated.ID),
+			ID: inboundCreated.ID,
 		},
 		End:                  now.AddDate(0, 2, 0).Format(time.DateTime),
 		ExtendedTrafficLimit: 20,
@@ -165,7 +164,7 @@ func TestValidateExtendingInbound(t *testing.T) {
 
 	err = validator.ValidateExtendingInbound(inbound.ExtendInboundDto{
 		IdentifyInbounbdDto: inbound.IdentifyInbounbdDto{
-			ID: strconv.Itoa(inboundCreated.ID),
+			ID: inboundCreated.ID,
 		},
 		End:                  now.AddDate(0, 1, 0).Format(time.DateTime),
 		ExtendedTrafficLimit: 20,
@@ -176,7 +175,7 @@ func TestValidateExtendingInbound(t *testing.T) {
 
 	err = validator.ValidateExtendingInbound(inbound.ExtendInboundDto{
 		IdentifyInbounbdDto: inbound.IdentifyInbounbdDto{
-			ID: strconv.Itoa(inboundCreated.ID),
+			ID: inboundCreated.ID,
 		},
 		End:                  now.AddDate(0, 0, 2).Format(time.DateTime),
 		ExtendedTrafficLimit: 20,
@@ -194,7 +193,7 @@ func TestValidateExtendingInbound(t *testing.T) {
 
 	err = validator.ValidateExtendingInbound(inbound.ExtendInboundDto{
 		IdentifyInbounbdDto: inbound.IdentifyInbounbdDto{
-			ID: strconv.Itoa(inboundCreated.ID),
+			ID: inboundCreated.ID,
 		},
 		End:                  now.AddDate(1, 0, 2).Format(time.DateTime),
 		ExtendedTrafficLimit: 20,
@@ -219,7 +218,7 @@ func TestValidateSettingPeriodTime(t *testing.T) {
 
 	err := validator.ValidateSettingPeriodTime(inboundControllerDto.SetPeriodDto{
 		IdentifyInbounbdDto: inboundControllerDto.IdentifyInbounbdDto{
-			ID: strconv.Itoa(inboundCreated.ID),
+			ID: inboundCreated.ID,
 		},
 		Start:        now.AddDate(0, 1, 1).Format(time.DateTime),
 		End:          now.AddDate(0, 1, 2).Format(time.DateTime),
@@ -231,7 +230,7 @@ func TestValidateSettingPeriodTime(t *testing.T) {
 
 	err = validator.ValidateSettingPeriodTime(inboundControllerDto.SetPeriodDto{
 		IdentifyInbounbdDto: inboundControllerDto.IdentifyInbounbdDto{
-			ID: strconv.Itoa(inboundCreated.ID),
+			ID: inboundCreated.ID,
 		},
 		Start:        now.AddDate(0, 1, 1).Format(time.DateTime),
 		End:          now.Format(time.DateTime),
@@ -243,7 +242,7 @@ func TestValidateSettingPeriodTime(t *testing.T) {
 
 	err = validator.ValidateSettingPeriodTime(inboundControllerDto.SetPeriodDto{
 		IdentifyInbounbdDto: inboundControllerDto.IdentifyInbounbdDto{
-			ID: strconv.Itoa(inboundCreated.ID),
+			ID: inboundCreated.ID,
 		},
 		Start:        now.AddDate(0, -1, -1).Format(time.DateTime),
 		End:          now.AddDate(0, 1, 2).Format(time.DateTime),

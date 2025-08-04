@@ -1,7 +1,7 @@
 package entity
 
 type VPN struct {
-	ID        int
+	ID        string
 	Domain    string
 	IsActive  bool
 	ApiPort   string

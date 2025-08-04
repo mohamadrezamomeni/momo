@@ -22,7 +22,7 @@ func New() *MockVPN {
 
 func (mv *MockVPN) Create(inpt *vpnManagerDto.AddVPN) (*entity.VPN, error) {
 	vpn := &entity.VPN{
-		ID:        mv.id,
+		ID:        strconv.Itoa(mv.id),
 		IsActive:  inpt.IsActive,
 		VPNType:   inpt.VPNType,
 		ApiPort:   inpt.ApiPort,
@@ -33,7 +33,7 @@ func (mv *MockVPN) Create(inpt *vpnManagerDto.AddVPN) (*entity.VPN, error) {
 	return vpn, nil
 }
 
-func (mv *MockVPN) FindByID(id int) *entity.VPN {
+func (mv *MockVPN) FindByID(id string) *entity.VPN {
 	for _, vpn := range mv.vpns {
 		if vpn.ID == id {
 			return vpn
@@ -42,7 +42,7 @@ func (mv *MockVPN) FindByID(id int) *entity.VPN {
 	return nil
 }
 
-func (mv *MockVPN) ActiveVPN(id int) error {
+func (mv *MockVPN) ActiveVPN(id string) error {
 	for _, vpn := range mv.vpns {
 		if vpn.ID == id {
 			vpn.IsActive = true
@@ -52,7 +52,7 @@ func (mv *MockVPN) ActiveVPN(id int) error {
 	return fmt.Errorf("record hasn't found")
 }
 
-func (mv *MockVPN) DeactiveVPN(id int) error {
+func (mv *MockVPN) DeactiveVPN(id string) error {
 	for _, vpn := range mv.vpns {
 		if vpn.ID == id {
 			vpn.IsActive = false
@@ -99,7 +99,7 @@ func (mv *MockVPN) GroupAvailbleVPNsByCountry() ([]string, error) {
 
 func (mv *MockVPN) Update(id string, updateVPNDto *vpnManagerDto.UpdateVPN) error {
 	for _, mv := range mv.vpns {
-		if id == strconv.Itoa(mv.ID) {
+		if id == mv.ID {
 			mv.VPNStatus = updateVPNDto.VPNStatus
 		}
 	}

@@ -188,7 +188,7 @@ func (i *Inbound) GetListOfPortsByDomain() ([]struct {
 	return res, nil
 }
 
-func (i *Inbound) changeStatus(id int, state bool) error {
+func (i *Inbound) changeStatus(id string, state bool) error {
 	scope := "inboundRepository.changeStatus"
 
 	sql := fmt.Sprintf("UPDATE inbounds SET is_active = %v WHERE id = %v", state, id)
@@ -200,11 +200,11 @@ func (i *Inbound) changeStatus(id int, state bool) error {
 	return nil
 }
 
-func (i *Inbound) Active(id int) error {
+func (i *Inbound) Active(id string) error {
 	return i.changeStatus(id, true)
 }
 
-func (i *Inbound) DeActive(id int) error {
+func (i *Inbound) DeActive(id string) error {
 	return i.changeStatus(id, false)
 }
 
@@ -352,7 +352,7 @@ func (i *Inbound) FindInboundIsNotAssigned() ([]*entity.Inbound, error) {
 	return inbounds, nil
 }
 
-func (i *Inbound) UpdateDomainPort(id int, domain string, port string, VPNID string) error {
+func (i *Inbound) UpdateDomainPort(id string, domain string, port string, VPNID string) error {
 	scope := "inboundRepository.UpdateDomainPort"
 
 	sql := fmt.Sprintf(

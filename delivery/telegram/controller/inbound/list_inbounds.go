@@ -91,7 +91,7 @@ func (h *Handler) writeItem(i int, inbound *entity.Inbound) (string, error) {
 
 	idReport, err := telegrammessages.GetMessage("inbound.list.id_report", map[string]string{
 		"counter": strconv.Itoa(i + 1),
-		"id":      strconv.Itoa(inbound.ID),
+		"id":      inbound.ID,
 	})
 	if err != nil {
 		return "", err

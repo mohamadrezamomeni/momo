@@ -1,7 +1,6 @@
 package inbound
 
 import (
-	"strconv"
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -57,12 +56,12 @@ func (h *Handler) AskSelectingInbound(update *core.Update) (*core.ResponseHandle
 func (h *Handler) makeExtendingInboundButton(inbound *entity.Inbound) (*tgbotapi.InlineKeyboardButton, error) {
 	itemTtitle, err := telegrammessages.GetMessage("inbound.select_vpn.item", map[string]string{
 		"VPNType": entity.VPNTypeString(inbound.VPNType),
-		"ID":      strconv.Itoa(inbound.ID),
+		"ID":      inbound.ID,
 	})
 	if err != nil {
 		return nil, err
 	}
-	button := tgbotapi.NewInlineKeyboardButtonData(itemTtitle, strconv.Itoa(inbound.ID))
+	button := tgbotapi.NewInlineKeyboardButtonData(itemTtitle, inbound.ID)
 	return &button, nil
 }
 
@@ -84,6 +83,6 @@ func (h *Handler) AnswerSelectingInbound(update *core.Update) (*core.ResponseHan
 		return nil, momoError.Scope(scope).ErrorWrite()
 	}
 
-	state.SetData("inbound_id", strconv.Itoa(inbound.ID))
+	state.SetData("inbound_id", inbound.ID)
 	return nil, nil
 }

@@ -1,8 +1,6 @@
 package inbound
 
 import (
-	"strconv"
-
 	"github.com/mohamadrezamomeni/momo/adapter"
 	"github.com/mohamadrezamomeni/momo/entity"
 	vpnProxy "github.com/mohamadrezamomeni/momo/proxy/vpn"
@@ -22,8 +20,8 @@ type HealingUpInboundRepo interface {
 	RetriveActiveInboundsOverQuota() ([]*entity.Inbound, error)
 	RetriveDeactiveInboundsCharged() ([]*entity.Inbound, error)
 	RetriveActiveInbounds() ([]*entity.Inbound, error)
-	Active(id int) error
-	DeActive(id int) error
+	Active(id string) error
+	DeActive(id string) error
 }
 
 type UserService interface {
@@ -146,7 +144,7 @@ func (i *HealingUpInbound) deactiveInbounds(inbounds []*entity.Inbound) {
 }
 
 func (i *HealingUpInbound) healingUpExpiredInbound(inbound *entity.Inbound, vpnProxy vpnProxy.IProxyVPN) error {
-	charge, err := i.chargeSvc.FindAvailbleCharge(strconv.Itoa(inbound.ID))
+	charge, err := i.chargeSvc.FindAvailbleCharge(inbound.ID)
 	if err != nil {
 		return i.deActiveInbound(inbound, vpnProxy)
 	}

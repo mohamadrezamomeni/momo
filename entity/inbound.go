@@ -6,7 +6,7 @@ import (
 
 type Inbound struct {
 	IsActive     bool
-	ID           int
+	ID           string
 	TrafficUsage uint32
 	TrafficLimit uint32
 	Country      string

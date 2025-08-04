@@ -1,7 +1,7 @@
 package vpn
 
 type VPNSerializer struct {
-	ID          int    `json:"ID"`
+	ID          string `json:"ID"`
 	Domain      string `json:"domain"`
 	IsActive    bool   `json:"is_active"`
 	ApiPort     string `json:"api_port"`
