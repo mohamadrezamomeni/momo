@@ -91,9 +91,9 @@ func (i *Inbound) FindInboundByID(id string) (*entity.Inbound, error) {
 		&inbound.TrafficUsage,
 		&inbound.TrafficLimit,
 		&inbound.Country,
-		&VPNID,
 		&createdAt,
 		&updatedAt,
+		&VPNID,
 	)
 
 	if err == sql.ErrNoRows {
@@ -502,9 +502,9 @@ func (i *Inbound) scan(rows *sql.Rows) (*entity.Inbound, error) {
 		&inbound.TrafficUsage,
 		&inbound.TrafficLimit,
 		&inbound.Country,
-		&VPNID,
 		&createdAt,
 		&updatedAt,
+		&VPNID,
 	)
 	if err != nil {
 		return nil, momoError.Wrap(err).Scope(scope).Input(rows).DebuggingError()
