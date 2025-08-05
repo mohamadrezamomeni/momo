@@ -49,7 +49,7 @@ func (h *Handler) FilterCharges(c echo.Context) error {
 			Country:      charge.Country,
 			AdminComment: charge.AdminComment,
 			Detail:       charge.Detail,
-			InboundID:    charge.Detail,
+			InboundID:    charge.InboundID,
 			UserID:       charge.UserID,
 			PackageID:    charge.PackageID,
 		})
