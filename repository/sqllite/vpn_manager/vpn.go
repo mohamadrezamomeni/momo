@@ -189,13 +189,26 @@ func (v *VPN) Update(id string, updateVPNManagerDto *vpnManagerDto.UpdateVPN) er
 
 	updates := make([]string, 0)
 
+	if updateVPNManagerDto.ApiPort != "" {
+		updates = append(
+			updates,
+			fmt.Sprintf("api_port = '%s'", updateVPNManagerDto.ApiPort),
+		)
+	}
+
+	if updateVPNManagerDto.Domain != "" {
+		updates = append(
+			updates,
+			fmt.Sprintf("domain = '%s'", updateVPNManagerDto.Domain),
+		)
+	}
+
 	if updateVPNManagerDto.VPNStatus != 0 {
 		updates = append(
 			updates,
 			fmt.Sprintf("status = '%s'", entity.VPNStatusString(updateVPNManagerDto.VPNStatus)),
 		)
 	}
-
 	sql := fmt.Sprintf(
 		"UPDATE vpns SET %s WHERE id = %s",
 		strings.Join(updates, ", "),

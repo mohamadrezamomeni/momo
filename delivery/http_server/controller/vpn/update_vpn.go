@@ -31,6 +31,8 @@ func (v *Handler) Update(c echo.Context) error {
 	)
 	err = v.vpnSvc.Update(req.ID, &vpnServiceDto.Update{
 		VPNStatus: vpnStatus,
+		ApiPort:   req.ApiPort,
+		Domain:    req.Domain,
 	})
 	if err != nil {
 		msg, code := momoErrorHttp.Error(err)

@@ -133,5 +133,7 @@ func (v *VPNService) GetAvailableVPNSourceDomains(coutntries []string, vpnTypes 
 func (v *VPNService) Update(id string, updateVPNDto *vpnServiceDto.Update) error {
 	return v.vpnRepo.Update(id, &vpnManagerRepositoryDto.UpdateVPN{
 		VPNStatus: updateVPNDto.VPNStatus,
+		ApiPort:   updateVPNDto.ApiPort,
+		Domain:    updateVPNDto.Domain,
 	})
 }

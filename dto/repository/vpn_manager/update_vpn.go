@@ -4,4 +4,6 @@ import "github.com/mohamadrezamomeni/momo/entity"
 
 type UpdateVPN struct {
 	VPNStatus entity.VPNStatus
+	Domain    string
+	ApiPort   string
 }
