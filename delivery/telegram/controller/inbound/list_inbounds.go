@@ -97,8 +97,8 @@ func (h *Handler) writeItem(i int, inbound *entity.Inbound) (string, error) {
 		return "", err
 	}
 	trafficReport, err := telegrammessages.GetMessage("inbound.list.inbound_traffic_used", map[string]string{
-		"traffic_used":  strconv.Itoa(int(inbound.TrafficUsage)),
-		"traffic_limit": strconv.Itoa(int(inbound.TrafficLimit)),
+		"traffic_used":  strconv.Itoa(int(inbound.TrafficUsage) / (1000 * 1000)),
+		"traffic_limit": strconv.Itoa(int(inbound.TrafficLimit) / (1000 * 1000)),
 	})
 	if err != nil {
 		return "", err
