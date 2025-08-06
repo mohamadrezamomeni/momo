@@ -52,6 +52,7 @@ func (h *Handler) FilterCharges(c echo.Context) error {
 			InboundID:    charge.InboundID,
 			UserID:       charge.UserID,
 			PackageID:    charge.PackageID,
+			ID:           charge.ID,
 		})
 	}
 	return c.JSON(http.StatusOK, res)
