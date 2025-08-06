@@ -424,7 +424,7 @@ func (i *Inbound) Update(id string, inpt *inboundDto.UpdateInboundDto) error {
 	return nil
 }
 
-func (i *Inbound) IncreaseTrafficUsage(id string, trafficUsage uint32) error {
+func (i *Inbound) IncreaseTrafficUsage(id string, trafficUsage uint64) error {
 	scope := "inboundRepository.IncreaseTrafficUsage"
 	sql := fmt.Sprintf(
 		"UPDATE inbounds SET traffic_usage = traffic_usage + %v WHERE id = %s",

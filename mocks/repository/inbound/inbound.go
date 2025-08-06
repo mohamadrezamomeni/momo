@@ -208,7 +208,7 @@ func (i *MockInbound) ExtendInbound(_ string, _ *inboundDto.ExtendInboundDto) er
 	return nil
 }
 
-func (i *MockInbound) IncreaseTrafficUsage(_ string, _ uint32) error {
+func (i *MockInbound) IncreaseTrafficUsage(_ string, _ uint64) error {
 	return nil
 }
 

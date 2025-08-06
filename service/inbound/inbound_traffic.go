@@ -14,7 +14,7 @@ type InboundTraffic struct {
 
 type InboundTrafficRepository interface {
 	Filter(*inboundRepoDto.FilterInbound) ([]*entity.Inbound, error)
-	IncreaseTrafficUsage(string, uint32) error
+	IncreaseTrafficUsage(string, uint64) error
 }
 
 type VpnTrafficService interface {
@@ -68,6 +68,6 @@ func (i *InboundTraffic) updateTraffic(inbound *entity.Inbound, proxy adapter.Pr
 
 	i.inboundRepo.IncreaseTrafficUsage(
 		inbound.ID,
-		uint32(traffic.Download)+uint32(traffic.Upload),
+		uint64(traffic.Download)+uint64(traffic.Upload),
 	)
 }
