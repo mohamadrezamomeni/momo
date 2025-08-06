@@ -7,8 +7,8 @@ import (
 type Inbound struct {
 	IsActive     bool
 	ID           string
-	TrafficUsage uint32
-	TrafficLimit uint32
+	TrafficUsage uint64
+	TrafficLimit uint64
 	Country      string
 	Protocol     string
 	VPNType      VPNType

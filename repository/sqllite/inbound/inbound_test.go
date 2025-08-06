@@ -406,7 +406,7 @@ func TestIncreateTrafficUsage(t *testing.T) {
 	defer inboundRepo.DeleteAll()
 	inboundCreated, _ := inboundRepo.Create(inbound1)
 
-	var trafficUsage uint32 = 50000
+	var trafficUsage uint64 = 50000
 	err := inboundRepo.IncreaseTrafficUsage(inboundCreated.ID, trafficUsage)
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
