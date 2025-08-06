@@ -104,8 +104,8 @@ func (ic *InboundCharge) CreateInbound(
 func (ic *InboundCharge) updateChargeInboundID(tx *sql.Tx, chargeID string, inboundID string) error {
 	scope := "inboundcharge.repository.UpdateChargeInboundID"
 
-	sql := "UPDATE charges SET inbound_id = $1 WHERE id = $2"
-	_, err := tx.Exec(sql, inboundID, chargeID)
+	sql := "UPDATE charges SET inbound_id = $1, status = $2 WHERE id = $3"
+	_, err := tx.Exec(sql, inboundID, entity.TranslateChargeStatus(entity.AssignedCharged), chargeID)
 	if err != nil {
 		return momoError.Wrap(err).Scope(scope).ErrorWrite()
 	}

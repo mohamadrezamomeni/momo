@@ -84,4 +84,8 @@ func TestCreateInbound(t *testing.T) {
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
 	}
+	chargeFound, _ := chargeRepo.FindChargeByID(charge.ID)
+	if chargeFound.Status != entity.AssignedCharged {
+		t.Fatal("error to compare data")
+	}
 }
