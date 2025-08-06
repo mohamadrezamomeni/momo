@@ -17,7 +17,7 @@ func (h *Handler) ApproveCharge(c echo.Context) error {
 		})
 	}
 
-	err := h.chargeSvc.ApproveCharge(req.ID)
+	err := h.inboundChargeSvc.ApproveCharge(req.ID)
 	if err != nil {
 		msg, code := httperror.Error(err)
 		return c.JSON(code, map[string]string{

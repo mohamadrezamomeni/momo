@@ -8,24 +8,30 @@ import (
 )
 
 type Handler struct {
-	chargeSvc  ChargeService
-	authSvc    *auth.Auth
-	validation *validator.Validator
+	chargeSvc        ChargeService
+	authSvc          *auth.Auth
+	validation       *validator.Validator
+	inboundChargeSvc InboundChargeService
 }
 
 type ChargeService interface {
-	ApproveCharge(string) error
 	FilterCharges(*chargeServiceDto.FilterCharges) ([]*entity.Charge, error)
+}
+
+type InboundChargeService interface {
+	ApproveCharge(string) error
 }
 
 func New(
 	chargeSvc ChargeService,
 	authSvc *auth.Auth,
 	validation *validator.Validator,
+	inboundChargeSvc InboundChargeService,
 ) *Handler {
 	return &Handler{
-		chargeSvc:  chargeSvc,
-		authSvc:    authSvc,
-		validation: validation,
+		inboundChargeSvc: inboundChargeSvc,
+		chargeSvc:        chargeSvc,
+		authSvc:          authSvc,
+		validation:       validation,
 	}
 }

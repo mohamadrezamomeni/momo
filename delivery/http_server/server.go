@@ -21,6 +21,7 @@ import (
 	cryptService "github.com/mohamadrezamomeni/momo/service/crypt"
 	hostService "github.com/mohamadrezamomeni/momo/service/host"
 	inboundService "github.com/mohamadrezamomeni/momo/service/inbound"
+	inboundChargeService "github.com/mohamadrezamomeni/momo/service/inbound_charge"
 	userService "github.com/mohamadrezamomeni/momo/service/user"
 	vpnService "github.com/mohamadrezamomeni/momo/service/vpn_manager"
 	vpnPackageService "github.com/mohamadrezamomeni/momo/service/vpn_package"
@@ -56,6 +57,7 @@ func New(cfg *HTTPConfig,
 	hostSvc *hostService.Host,
 	vpnSvc *vpnService.VPNService,
 	inboundSvc *inboundService.Inbound,
+	inboundChargeSvc *inboundChargeService.InboundCharge,
 	chargeSvc *chargeService.Charge,
 	vpnPackageSvc *vpnPackageService.VPNPackage,
 	vpnSourceSvc *vpnSourceService.VPNSource,
@@ -77,7 +79,7 @@ func New(cfg *HTTPConfig,
 		hostHandler:       hostHandler.New(hostSvc, authSvc, hostValidator),
 		vpnHandler:        vpnHandler.New(vpnSvc, vpnValidator, authSvc),
 		inboundHandler:    inboundHandler.New(inboundSvc, inboundValidator, authSvc),
-		chargeHandler:     chargeHandler.New(chargeSvc, authSvc, chargeValidator),
+		chargeHandler:     chargeHandler.New(chargeSvc, authSvc, chargeValidator, inboundChargeSvc),
 		vpnSourceHandler:  vpnSourceHandler.New(vpnSourceSvc, vpnSourceValidator, authSvc),
 		vpnPackageHandler: vpnPackageHandler.New(vpnPackageSvc, vpnPackageValidator, authSvc),
 	}

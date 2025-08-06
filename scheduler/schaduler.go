@@ -31,7 +31,6 @@ type InboundTrafficService interface {
 
 type InboundChargeService interface {
 	ChargeInbounds()
-	CreateInbounds()
 }
 
 type HostInboundService interface {
@@ -78,7 +77,6 @@ func (s *Scheduler) Start(done <-chan struct{}, wg *sync.WaitGroup) {
 	s.sch.Cron("*/2 * * * *").Do(s.vpnSvc.MonitorVPNs)
 	s.sch.Cron("*/2 * * * *").Do(s.hostSvc.MonitorHosts)
 	s.sch.Cron("*/5 * * * *").Do(s.inboundChargeSvc.ChargeInbounds)
-	s.sch.Cron("*/2 * * * *").Do(s.inboundChargeSvc.CreateInbounds)
 	s.sch.StartAsync()
 
 	<-done

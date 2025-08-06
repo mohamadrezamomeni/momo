@@ -1,10 +1,14 @@
 package inboundcharge
 
 import (
+	"encoding/json"
 	"time"
 
 	inboundChargeDto "github.com/mohamadrezamomeni/momo/dto/repository/inbound_charge"
+	eventServiceDto "github.com/mohamadrezamomeni/momo/dto/service/event"
 	"github.com/mohamadrezamomeni/momo/entity"
+	chargeEvent "github.com/mohamadrezamomeni/momo/event/charge"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 )
 
 type InboundCharge struct {
@@ -13,6 +17,8 @@ type InboundCharge struct {
 	inboundRepo       InboundRepository
 	chargeRepo        ChargeRepository
 	inboundSvc        InboundService
+	eventSvc          EventService
+	chargeSvc         ChargeService
 }
 
 type InboundRepository interface {
@@ -23,6 +29,7 @@ type InboundRepository interface {
 type ChargeRepository interface {
 	RetriveAvailbleChargesForInbounds(inboundIDs []string) ([]*entity.Charge, error)
 	RetriveChargesApprovedWithoutInbound() ([]*entity.Charge, error)
+	FindChargeByID(id string) (*entity.Charge, error)
 }
 
 type InboundChargeRepository interface {
@@ -45,14 +52,26 @@ type VPNPackageService interface {
 	FindVPNPackageByID(string) (*entity.VPNPackage, error)
 }
 
+type EventService interface {
+	Create(*eventServiceDto.CreateEventDto)
+}
+
+type ChargeService interface {
+	Approve(*entity.Charge) error
+}
+
 func New(
 	inboundChargeRepo InboundChargeRepository,
 	vpnPackageSvc VPNPackageService,
 	inboundRepo InboundRepository,
 	chargeRepo ChargeRepository,
 	inboundSvc InboundService,
+	eventSvc EventService,
+	chargeSvc ChargeService,
 ) *InboundCharge {
 	return &InboundCharge{
+		chargeSvc:         chargeSvc,
+		eventSvc:          eventSvc,
 		inboundChargeRepo: inboundChargeRepo,
 		vpnPackageSvc:     vpnPackageSvc,
 		inboundRepo:       inboundRepo,
@@ -101,31 +120,49 @@ func (ic *InboundCharge) getInboundIDs(inbounds []*entity.Inbound) []string {
 	return inboundIDs
 }
 
-func (ic *InboundCharge) CreateInbounds() {
-	charges, err := ic.chargeRepo.RetriveChargesApprovedWithoutInbound()
+func (ic *InboundCharge) ApproveCharge(id string) error {
+	scope := "inboundCharge.approveCharge"
+
+	var err error
+	charge, err := ic.chargeRepo.FindChargeByID(id)
 	if err != nil {
-		return
+		return err
 	}
-	ic.createInboundsByCharges(charges)
+	if charge.InboundID != "" {
+		err = ic.chargeSvc.Approve(charge)
+	} else {
+		err = ic.createInboundByCharge(charge)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	chargeApprovingString, err := json.Marshal(chargeEvent.ApproveChargeEvent{
+		ID: id,
+	})
+	if err != nil {
+		momoError.Wrap(err).Scope(scope).DebuggingError()
+	}
+
+	ic.eventSvc.Create(&eventServiceDto.CreateEventDto{
+		Data: string(chargeApprovingString),
+		Name: "charge_approve",
+	})
+	return nil
 }
 
-func (ic *InboundCharge) createInboundsByCharges(charges []*entity.Charge) {
-	for _, charge := range charges {
-		ic.createInboundByCharge(charge)
-	}
-}
-
-func (ic *InboundCharge) createInboundByCharge(charge *entity.Charge) {
+func (ic *InboundCharge) createInboundByCharge(charge *entity.Charge) error {
 	pkg, err := ic.vpnPackageSvc.FindVPNPackageByID(charge.PackageID)
 	if err != nil {
-		return
+		return nil
 	}
 	now := time.Now()
 	end := now.AddDate(0, int(pkg.Months), int(pkg.Days))
 
 	tag := ic.inboundSvc.GenerateInboundTag(charge.Country, charge.UserID)
 
-	ic.inboundChargeRepo.CreateInbound(charge.ID, &inboundChargeDto.CreateInboundByCharge{
+	err = ic.inboundChargeRepo.CreateInbound(charge.ID, &inboundChargeDto.CreateInboundByCharge{
 		Tag:          tag,
 		TrafficLimit: pkg.TrafficLimit,
 		Start:        now,
@@ -135,8 +172,9 @@ func (ic *InboundCharge) createInboundByCharge(charge *entity.Charge) {
 		UserID:       charge.UserID,
 		Protocol:     "vmess",
 	})
-
 	if err != nil {
-		return
+		return err
 	}
+
+	return nil
 }
