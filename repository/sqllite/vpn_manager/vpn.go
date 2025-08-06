@@ -96,7 +96,6 @@ func (v *VPN) updateActivationVPN(id string, status bool) error {
 	scope := "vpnRepository.updateActivationVPN"
 
 	sql := fmt.Sprintf("UPDATE vpns SET is_active = %v WHERE id = %v", status, id)
-
 	_, err := v.db.Conn().Exec(sql)
 	if err != nil {
 		return momoError.Wrap(err).Scope(scope).Input(id, status).DebuggingError()

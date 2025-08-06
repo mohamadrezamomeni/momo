@@ -44,6 +44,7 @@ func (h *Handler) Filter(c echo.Context) error {
 	for _, vpn := range vpns {
 		filterVpnsSerializer.VPNs = append(filterVpnsSerializer.VPNs, &vpnSerializer.VPNSerializer{
 			ID:          vpn.ID,
+			IsActive:    vpn.IsActive,
 			ApiPort:     vpn.ApiPort,
 			UserCount:   vpn.UserCount,
 			Domain:      vpn.Domain,

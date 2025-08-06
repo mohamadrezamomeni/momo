@@ -53,9 +53,18 @@ func TestChangeStatus(t *testing.T) {
 		t.Fatalf("the error has happend that was %v", err)
 	}
 
+	v1Founded, _ := vpnRepo.Find(v1.ID)
+	if !v1Founded.IsActive {
+		t.Fatalf("error to compare data")
+	}
+
 	err = vpnRepo.DeactiveVPN(v1.ID)
 	if err != nil {
 		t.Fatalf("the error has happend that was %v", err)
+	}
+	v1Founded, _ = vpnRepo.Find(v1.ID)
+	if v1Founded.IsActive {
+		t.Fatalf("error to compare data")
 	}
 }
 
