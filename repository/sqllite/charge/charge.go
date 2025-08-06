@@ -245,10 +245,10 @@ func (e *Charge) scan(rows *sql.Rows) (*entity.Charge, error) {
 	return charge, nil
 }
 
-func (e *Charge) GetFirstAvailbleInboundCharge(inboundID string) (*entity.Charge, error) {
+func (e *Charge) GetFirstApprovedInboundCharge(inboundID string) (*entity.Charge, error) {
 	scope := "chargeRepository.GetFirstAvailbleInboundCharge"
 
-	query := fmt.Sprintf("SELECT * FROM charges WHERE inbound_id = %s ORDER BY created_at DESC LIMIT 1", inboundID)
+	query := fmt.Sprintf("SELECT * FROM charges WHERE inbound_id = %s AND status = 'approved' ORDER BY created_at DESC LIMIT 1", inboundID)
 
 	charge := &entity.Charge{}
 	status := ""

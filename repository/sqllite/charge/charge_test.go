@@ -6,6 +6,7 @@ import (
 
 	chargeRepositoryDto "github.com/mohamadrezamomeni/momo/dto/repository/charge"
 	"github.com/mohamadrezamomeni/momo/entity"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 	"github.com/mohamadrezamomeni/momo/repository/migrate"
 	"github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
@@ -166,13 +167,20 @@ func TestGetFirstAvailbleInboundCharge(t *testing.T) {
 	chargeCreated, _ := chargeRepo.Create(charge4)
 	chargeRepo.Create(charge5)
 
-	chargeFound, err := chargeRepo.GetFirstAvailbleInboundCharge(chargeCreated.InboundID)
+	chargeFound, err := chargeRepo.GetFirstApprovedInboundCharge(chargeCreated.InboundID)
 	if err != nil {
 		t.Fatalf("something went wrong that was %v", err)
 	}
 
 	if chargeFound.ID != chargeCreated.ID {
 		t.Fatal("error to compare data")
+	}
+
+	chargeFound, err = chargeRepo.GetFirstApprovedInboundCharge("232312")
+	if momoErr, isMomoErr := momoError.GetMomoError(err); err == nil ||
+		!isMomoErr ||
+		momoErr.GetErrorType() != momoError.NotFound {
+		t.Fatalf("something went wrong that was %v", err)
 	}
 }
 
