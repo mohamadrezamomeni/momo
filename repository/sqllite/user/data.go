@@ -1,6 +1,8 @@
 package user
 
-import userDto "github.com/mohamadrezamomeni/momo/dto/repository/user"
+import (
+	userDto "github.com/mohamadrezamomeni/momo/dto/repository/user"
+)
 
 var (
 	user1 = &userDto.Create{
@@ -11,6 +13,10 @@ var (
 		IsApproved:   true,
 		Password:     "12342",
 		IsSuperAdmin: true,
+		Tiers: []string{
+			"gold",
+			"silver",
+		},
 	}
 
 	user2 = &userDto.Create{
@@ -20,6 +26,9 @@ var (
 		IsAdmin:      true,
 		Password:     "12334",
 		IsSuperAdmin: false,
+		Tiers: []string{
+			"silver",
+		},
 	}
 
 	user3 = &userDto.Create{
@@ -29,6 +38,9 @@ var (
 		IsAdmin:      true,
 		Password:     "1244",
 		IsSuperAdmin: false,
+		Tiers: []string{
+			"silver",
+		},
 	}
 
 	user4 = &userDto.Create{
@@ -39,5 +51,8 @@ var (
 		Password:     "1244",
 		IsSuperAdmin: false,
 		IsApproved:   false,
+		Tiers: []string{
+			"silver",
+		},
 	}
 )

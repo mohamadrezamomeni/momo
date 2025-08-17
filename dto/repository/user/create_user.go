@@ -9,4 +9,5 @@ type Create struct {
 	IsSuperAdmin bool
 	TelegramID   string
 	IsApproved   bool
+	Tiers        []string
 }
