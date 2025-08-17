@@ -12,6 +12,7 @@ type Handler struct {
 
 type ChargeService interface {
 	Create(*chargeServiceDto.CreateChargeDto) (*entity.Charge, error)
+	FilterCharges(*chargeServiceDto.FilterCharges) ([]*entity.Charge, error)
 }
 
 type UserService interface {

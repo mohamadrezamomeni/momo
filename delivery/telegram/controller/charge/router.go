@@ -28,4 +28,9 @@ func (h *Handler) SetRouter(telegramRouter *core.Router) {
 		middleware.ValidateAccess(),
 		h.SetStateChargeInbound,
 	)
+	telegramRouter.Register("list_charges",
+		h.FilterCharges,
+		middleware.IdentifyUser(h.userSvc),
+		middleware.ValidateAccess(),
+	)
 }

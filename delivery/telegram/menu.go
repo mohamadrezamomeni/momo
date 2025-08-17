@@ -63,6 +63,11 @@ func (t *Telegram) getCommands() ([]tgbotapi.BotCommand, error) {
 		return nil, err
 	}
 
+	listChargesTitle, err := telegrammessages.GetMessage("charge.list.button", map[string]string{})
+	if err != nil {
+		return nil, err
+	}
+
 	return []tgbotapi.BotCommand{
 		{
 			Description: GenerateClientConfigTitle,
@@ -79,6 +84,10 @@ func (t *Telegram) getCommands() ([]tgbotapi.BotCommand, error) {
 		{
 			Description: createChargeTitle,
 			Command:     "charge_inbound",
+		},
+		{
+			Description: listChargesTitle,
+			Command:     "list_charges",
 		},
 	}, nil
 }

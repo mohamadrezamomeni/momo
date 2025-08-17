@@ -55,6 +55,11 @@ charge:
   successfully_extending: 🎉 Your VPN has been extended
   successfully_creating_vpn_request: "🎉 Your VPN request has been successfully set up \n !Please wait while the admin reviews your request then your config is sent by this robot."
   approve_charge_admin: "🌟 Great News! 🌟 \n Your charge #:id: has been approved by the admin ✅ \n Thank you for your patience and trust. \n We're happy to have you with us! 💙"
+  list:
+    not_found: "you havent payments yet"
+    button: see your payments
+    title: "<b>📊 payments Report:</b>\n\n"
+    id: ":counter:. 🆔 :id:\n"
 
 vpn_source:
   ask_vpn_source: select your destination
