@@ -31,7 +31,7 @@ func main() {
 
 	migration.UP()
 
-	hostSvc, vpnSvc, _, _, _, _, _, _, _, healingUpInbound, hostInboundSvc, inboundTrafficSvc, _, inboundCharge := serviceInitializer.GetServices(&cfg)
+	hostSvc, vpnSvc, _, _, _, _, _, _, _, healingUpInbound, hostInboundSvc, inboundTrafficSvc, _, inboundCharge, _ := serviceInitializer.GetServices(&cfg)
 
 	done := make(chan struct{})
 

@@ -11,7 +11,7 @@ import (
 	errorRepository "github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
 
-func (t *Tier) Create(createTierDto tierRepoDto.CreateTier) (*entity.Tier, error) {
+func (t *Tier) Create(createTierDto *tierRepoDto.CreateTier) (*entity.Tier, error) {
 	scope := "tierUserRepository.createTier"
 
 	tier := &entity.Tier{}
@@ -21,7 +21,7 @@ func (t *Tier) Create(createTierDto tierRepoDto.CreateTier) (*entity.Tier, error
 	RETURNING name, is_default
 `,
 		createTierDto.Name,
-		createTierDto.Default,
+		createTierDto.IsDefault,
 	).Scan(
 		&tier.Name,
 		&tier.IsDefault,

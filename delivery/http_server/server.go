@@ -11,6 +11,7 @@ import (
 	hostHandler "github.com/mohamadrezamomeni/momo/delivery/http_server/controller/host"
 	inboundHandler "github.com/mohamadrezamomeni/momo/delivery/http_server/controller/inbound"
 	metricHandler "github.com/mohamadrezamomeni/momo/delivery/http_server/controller/metric"
+	tierHandler "github.com/mohamadrezamomeni/momo/delivery/http_server/controller/tier"
 	userHandler "github.com/mohamadrezamomeni/momo/delivery/http_server/controller/user"
 	vpnHandler "github.com/mohamadrezamomeni/momo/delivery/http_server/controller/vpn"
 	vpnPackageHandler "github.com/mohamadrezamomeni/momo/delivery/http_server/controller/vpn_package"
@@ -22,6 +23,7 @@ import (
 	hostService "github.com/mohamadrezamomeni/momo/service/host"
 	inboundService "github.com/mohamadrezamomeni/momo/service/inbound"
 	inboundChargeService "github.com/mohamadrezamomeni/momo/service/inbound_charge"
+	tierService "github.com/mohamadrezamomeni/momo/service/tier"
 	userService "github.com/mohamadrezamomeni/momo/service/user"
 	vpnService "github.com/mohamadrezamomeni/momo/service/vpn_manager"
 	vpnPackageService "github.com/mohamadrezamomeni/momo/service/vpn_package"
@@ -48,6 +50,7 @@ type Server struct {
 	chargeHandler     *chargeHandler.Handler
 	vpnSourceHandler  *vpnSourceHandler.Handler
 	vpnPackageHandler *vpnPackageHandler.Handler
+	tierHandler       *tierHandler.Handler
 }
 
 func New(cfg *HTTPConfig,
@@ -61,6 +64,7 @@ func New(cfg *HTTPConfig,
 	chargeSvc *chargeService.Charge,
 	vpnPackageSvc *vpnPackageService.VPNPackage,
 	vpnSourceSvc *vpnSourceService.VPNSource,
+	tierSvc *tierService.Tier,
 	userValidation *userValidation.Validator,
 	authValidator *authValidation.Validation,
 	hostValidator *hostValidation.Validator,
@@ -82,6 +86,7 @@ func New(cfg *HTTPConfig,
 		chargeHandler:     chargeHandler.New(chargeSvc, authSvc, chargeValidator, inboundChargeSvc),
 		vpnSourceHandler:  vpnSourceHandler.New(vpnSourceSvc, vpnSourceValidator, authSvc),
 		vpnPackageHandler: vpnPackageHandler.New(vpnPackageSvc, vpnPackageValidator, authSvc),
+		tierHandler:       tierHandler.New(tierSvc, authSvc),
 	}
 }
 
@@ -100,6 +105,7 @@ func (s *Server) Serve() {
 	s.chargeHandler.SetRouter(api)
 	s.vpnSourceHandler.SetRouter(api)
 	s.vpnPackageHandler.SetRouter(api)
+	s.tierHandler.SetRouter(api)
 
 	address := fmt.Sprintf(":%s", s.config.Port)
 	if err := s.router.Start(address); err != nil {

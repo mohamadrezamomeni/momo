@@ -32,7 +32,7 @@ func main() {
 
 	migration.UP()
 
-	_, _, userSvc, inboundSvc, _, _, _, eventSvc, chargeSvc, _, _, _, _, _ := serviceInitializer.GetServices(&cfg)
+	_, _, userSvc, inboundSvc, _, _, _, eventSvc, chargeSvc, _, _, _, _, _, _ := serviceInitializer.GetServices(&cfg)
 
 	notification := notification.New(&cfg.Notification, inboundSvc, userSvc, chargeSvc, eventSvc)
 

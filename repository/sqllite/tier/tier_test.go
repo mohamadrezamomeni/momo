@@ -34,9 +34,9 @@ func TestMain(m *testing.M) {
 
 func TestCreateInbound(t *testing.T) {
 	defer tierRepo.DeleteAll()
-	tier1, err := tierRepo.Create(tieruser.CreateTier{
-		Name:    "silver",
-		Default: true,
+	tier1, err := tierRepo.Create(&tieruser.CreateTier{
+		Name:      "silver",
+		IsDefault: true,
 	})
 	if err != nil {
 		t.Errorf("something wrong has happend the problem was %v", err)
@@ -49,9 +49,9 @@ func TestCreateInbound(t *testing.T) {
 
 func TestFindingTierByID(t *testing.T) {
 	defer tierRepo.DeleteAll()
-	tierRepo.Create(tieruser.CreateTier{
-		Name:    "silver",
-		Default: true,
+	tierRepo.Create(&tieruser.CreateTier{
+		Name:      "silver",
+		IsDefault: true,
 	})
 	tier, err := tierRepo.FindByName("silver")
 	if err != nil {
@@ -64,13 +64,13 @@ func TestFindingTierByID(t *testing.T) {
 
 func TestFilterTiers(t *testing.T) {
 	defer tierRepo.DeleteAll()
-	tierRepo.Create(tieruser.CreateTier{
-		Name:    "silver",
-		Default: true,
+	tierRepo.Create(&tieruser.CreateTier{
+		Name:      "silver",
+		IsDefault: true,
 	})
-	tierRepo.Create(tieruser.CreateTier{
-		Name:    "gold",
-		Default: true,
+	tierRepo.Create(&tieruser.CreateTier{
+		Name:      "gold",
+		IsDefault: true,
 	})
 	tiers, err := tierRepo.Filter()
 	if err != nil {
@@ -84,9 +84,9 @@ func TestFilterTiers(t *testing.T) {
 
 func TestUpdateTier(t *testing.T) {
 	defer tierRepo.DeleteAll()
-	tierRepo.Create(tieruser.CreateTier{
-		Name:    "silver",
-		Default: true,
+	tierRepo.Create(&tieruser.CreateTier{
+		Name:      "silver",
+		IsDefault: true,
 	})
 
 	isDefault := false
