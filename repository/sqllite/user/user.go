@@ -14,8 +14,10 @@ import (
 
 func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 	scope := "userRepository.Create"
-
-	tiersStr := strings.Join(inpt.Tiers, ",")
+	tiersStr := ""
+	if inpt.Tiers != nil && len(inpt.Tiers) > 0 {
+		tiersStr = strings.Join(inpt.Tiers, ",")
+	}
 	user := &entity.User{}
 	err := u.db.Conn().QueryRow(`
 	INSERT INTO users (username, lastName, firstName, password, is_admin, is_super_admin, telegram_id, is_approved, tiers)
@@ -58,7 +60,11 @@ func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 func (u *User) Upsert(inpt *dto.Create) (*entity.User, error) {
 	scope := "userRepository.Upsert"
 
-	tiersStr := strings.Join(inpt.Tiers, ",")
+	tiersStr := ""
+	if inpt.Tiers != nil && len(inpt.Tiers) > 0 {
+		tiersStr = strings.Join(inpt.Tiers, ",")
+	}
+
 	user := &entity.User{}
 	err := u.db.Conn().QueryRow(`
 	INSERT INTO users (username, lastName, firstName, password, is_admin, is_super_admin, telegram_id, is_approved, tiers)
