@@ -16,7 +16,13 @@ import (
 
 func (h *Handler) AskSelectingVPNPackage(update *core.Update) (*core.ResponseHandlerFunc, error) {
 	var rows [][]tgbotapi.InlineKeyboardButton
-	vpnPackages, err := h.vpnPackageSvc.Filter(&vpnPackageServiceDto.FilterVPNPackage{})
+	active := true
+	vpnPackages, err := h.vpnPackageSvc.FilterByUserID(
+		update.UserSystem.ID,
+		&vpnPackageServiceDto.FilterVPNPackage{
+			IsActive: &active,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}

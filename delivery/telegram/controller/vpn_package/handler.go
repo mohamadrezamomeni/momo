@@ -11,7 +11,7 @@ type Handler struct {
 }
 
 type VPNPackageService interface {
-	Filter(*vpnPackageServiceDto.FilterVPNPackage) ([]*entity.VPNPackage, error)
+	FilterByUserID(string, *vpnPackageServiceDto.FilterVPNPackage) ([]*entity.VPNPackage, error)
 	FindVPNPackageByID(id string) (*entity.VPNPackage, error)
 }
 

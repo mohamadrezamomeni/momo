@@ -8,6 +8,7 @@ import (
 
 type VPNPackage struct {
 	vpnPackageRepo VPNPackageRepository
+	userTierSvc    UserTierService
 }
 type VPNPackageRepository interface {
 	Update(string, *vpnPackageRepositoryDto.UpdateVPNPackage) error
@@ -16,9 +17,14 @@ type VPNPackageRepository interface {
 	FindVPNPackageByID(string) (*entity.VPNPackage, error)
 }
 
-func New(vpnPackageRepo VPNPackageRepository) *VPNPackage {
+type UserTierService interface {
+	FilterTiersBelongToUser(string) ([]string, error)
+}
+
+func New(vpnPackageRepo VPNPackageRepository, userTierSvc UserTierService) *VPNPackage {
 	return &VPNPackage{
 		vpnPackageRepo: vpnPackageRepo,
+		userTierSvc:    userTierSvc,
 	}
 }
 
@@ -55,6 +61,17 @@ func (vp *VPNPackage) Deactive(id string) error {
 func (vp *VPNPackage) Filter(inpt *vpnPackageServiceDto.FilterVPNPackage) ([]*entity.VPNPackage, error) {
 	return vp.vpnPackageRepo.Filter(&vpnPackageRepositoryDto.FilterVPNPackage{
 		IsActive: inpt.IsActive,
+	})
+}
+
+func (vp *VPNPackage) FilterByUserID(userID string, inpt *vpnPackageServiceDto.FilterVPNPackage) ([]*entity.VPNPackage, error) {
+	tiers, err := vp.userTierSvc.FilterTiersBelongToUser(userID)
+	if err != nil {
+		return nil, err
+	}
+	return vp.vpnPackageRepo.Filter(&vpnPackageRepositoryDto.FilterVPNPackage{
+		IsActive: inpt.IsActive,
+		Tiers:    tiers,
 	})
 }
 
