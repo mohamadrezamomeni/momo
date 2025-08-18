@@ -31,7 +31,7 @@ func (ut *UserTiers) Create(createDto *userTierServiceDto.Create) error {
 }
 
 func (ut *UserTiers) Delete(identifyUserTierDto *userTierServiceDto.IdentifyUserTier) error {
-	return ut.userTierRepo.Create(&userTierRepoDto.Create{
+	return ut.userTierRepo.Delete(&userTierRepoDto.IdentifyUserTier{
 		UserID: identifyUserTierDto.UserID,
 		Tier:   identifyUserTierDto.Tier,
 	})
