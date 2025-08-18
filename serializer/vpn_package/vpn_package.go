@@ -2,6 +2,7 @@ package vpnpackage
 
 type VPNPackageSerializer struct {
 	ID                string `json:"id"`
+	Tier              string `json:"tier"`
 	TrafficLimit      uint64 `json:"traffic_limit"`
 	TrafficLimitTitle string `json:"traffic_limit_title"`
 	Days              uint64 `json:"days"`

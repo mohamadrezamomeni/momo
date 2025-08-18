@@ -8,4 +8,5 @@ type CreateVPNPackage struct {
 	IsActive          bool
 	Days              uint64
 	Months            uint64
+	Tier              string
 }

@@ -8,4 +8,5 @@ type CreateVPNPackage struct {
 	IsActive          bool   `json:"is_active"`
 	Days              uint64 `json:"days"`
 	Months            uint64 `json:"months"`
+	Tier              string `json:"tier"`
 }

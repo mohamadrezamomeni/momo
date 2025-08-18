@@ -8,6 +8,7 @@ CREATE TABLE `vpn_package` (
         `traffic_limit` INTEGER NOT NULL,
         `traffic_limit_title` varchar NOT NULL,
         `is_active`  BOOLEAN DEFAULT true,
+        `tier` VARCHAR(64) NOT NULL,
         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

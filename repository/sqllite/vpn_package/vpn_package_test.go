@@ -93,6 +93,7 @@ func TestFilterVPNPackages(t *testing.T) {
 	vpnPackageRepo.Create(vpnPackage1)
 	vpnPackageRepo.Create(vpnPackage2)
 	vpnPackageRepo.Create(vpnPackage3)
+	vpnPackageRepo.Create(vpnPackage4)
 
 	active := false
 	vpnPackages, err := vpnPackageRepo.Filter(&vpnpackageRepositoryDto.FilterVPNPackage{
@@ -102,8 +103,19 @@ func TestFilterVPNPackages(t *testing.T) {
 		t.Fatalf("something went wrong the error was %v", err)
 	}
 
-	if len(vpnPackages) != 2 {
-		t.Errorf("the lengh of result must be 2 but we got %d", len(vpnPackages))
+	if len(vpnPackages) != 3 {
+		t.Errorf("the lengh of result must be 3 but we got %d", len(vpnPackages))
+	}
+
+	vpnPackages, err = vpnPackageRepo.Filter(&vpnpackageRepositoryDto.FilterVPNPackage{
+		Tiers: []string{"silver", "gold"},
+	})
+	if err != nil {
+		t.Fatalf("something went wrong the error was %v", err)
+	}
+
+	if len(vpnPackages) != 3 {
+		t.Errorf("the lengh of result must be 3 but we got %d", len(vpnPackages))
 	}
 
 	vpnPackages, err = vpnPackageRepo.Filter(&vpnpackageRepositoryDto.FilterVPNPackage{})
@@ -111,7 +123,7 @@ func TestFilterVPNPackages(t *testing.T) {
 		t.Fatalf("something went wrong the error was %v", err)
 	}
 
-	if len(vpnPackages) != 3 {
-		t.Errorf("the lengh of result must be 3 but we got %d", len(vpnPackages))
+	if len(vpnPackages) != 4 {
+		t.Errorf("the lengh of result must be 4 but we got %d", len(vpnPackages))
 	}
 }

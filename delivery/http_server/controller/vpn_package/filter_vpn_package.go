@@ -45,6 +45,7 @@ func (h *Handler) makeVPNPackages(vpnPackages []*entity.VPNPackage) []*vpnPackag
 			Months:            vpnPackage.Months,
 			Days:              vpnPackage.Days,
 			ID:                vpnPackage.ID,
+			Tier:              vpnPackage.Tier,
 		})
 	}
 	return vpnPackagesSerializer

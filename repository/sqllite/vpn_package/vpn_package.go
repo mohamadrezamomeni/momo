@@ -3,7 +3,6 @@ package vpnpackage
 import (
 	"database/sql"
 	"fmt"
-	"reflect"
 	"strings"
 
 	vpnPackageRepositoryDto "github.com/mohamadrezamomeni/momo/dto/repository/vpn_package"
@@ -17,9 +16,9 @@ func (vp *VPNPackage) Create(inpt *vpnPackageRepositoryDto.CreateVPNPackage) (*e
 
 	vpnPackage := &entity.VPNPackage{}
 	err := vp.db.Conn().QueryRow(`
-	INSERT INTO vpn_package (price_tilte, price, days, months, traffic_limit, traffic_limit_title, is_active)
-	VALUES (?, ?, ?, ?, ?, ?, ?)
-	RETURNING id, price_tilte, price, days, months, traffic_limit, traffic_limit_title, is_active
+	INSERT INTO vpn_package (price_tilte, price, days, months, traffic_limit, traffic_limit_title, is_active, tier)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+	RETURNING id, price_tilte, price, days, months, traffic_limit, traffic_limit_title, is_active, tier
 `,
 		inpt.PriceTitle,
 		inpt.Price,
@@ -28,6 +27,7 @@ func (vp *VPNPackage) Create(inpt *vpnPackageRepositoryDto.CreateVPNPackage) (*e
 		inpt.TrafficLimit,
 		inpt.TrafficLimitTitle,
 		inpt.IsActive,
+		inpt.Tier,
 	).Scan(
 		&vpnPackage.ID,
 		&vpnPackage.PriceTitle,
@@ -37,6 +37,7 @@ func (vp *VPNPackage) Create(inpt *vpnPackageRepositoryDto.CreateVPNPackage) (*e
 		&vpnPackage.TrafficLimit,
 		&vpnPackage.TrafficLimitTitle,
 		&vpnPackage.IsActive,
+		&vpnPackage.Tier,
 	)
 	if err == nil {
 		return vpnPackage, nil
@@ -88,6 +89,7 @@ func (vp *VPNPackage) FindVPNPackageByID(id string) (*entity.VPNPackage, error) 
 		&vpnPackage.TrafficLimit,
 		&vpnPackage.TrafficLimitTitle,
 		&vpnPackage.IsActive,
+		&vpnPackage.Tier,
 		&createdAt,
 	)
 
@@ -157,19 +159,18 @@ func (vp *VPNPackage) Filter(inpt *vpnPackageRepositoryDto.FilterVPNPackage) ([]
 }
 
 func (vp *VPNPackage) makeQueryFilter(inpt *vpnPackageRepositoryDto.FilterVPNPackage) string {
-	v := reflect.ValueOf(*inpt)
-	t := reflect.TypeOf(*inpt)
 	subQueries := []string{}
 
-	for i := 0; i < v.NumField(); i++ {
-		field := t.Field(i)
-		value := v.Field(i)
-
-		if field.Name == "IsActive" && !value.IsNil() {
-			subQueries = append(subQueries, fmt.Sprintf("is_active = %v", value.Elem().Bool()))
-		}
+	if inpt.IsActive != nil {
+		subQueries = append(subQueries, fmt.Sprintf("is_active = %v", *inpt.IsActive))
 	}
 
+	if inpt.Tiers != nil && len(inpt.Tiers) > 0 {
+		subQueries = append(
+			subQueries,
+			fmt.Sprintf("tier IN ('%s')", strings.Join(inpt.Tiers, "', '")),
+		)
+	}
 	sql := "SELECT * FROM vpn_package"
 	if len(subQueries) > 0 {
 		sql += fmt.Sprintf(" WHERE %s", strings.Join(subQueries, " AND "))
@@ -191,6 +192,7 @@ func (vp *VPNPackage) scan(rows *sql.Rows) (*entity.VPNPackage, error) {
 		&vpnPackage.TrafficLimit,
 		&vpnPackage.TrafficLimitTitle,
 		&vpnPackage.IsActive,
+		&vpnPackage.Tier,
 		&createdAt,
 	)
 	if err != nil {

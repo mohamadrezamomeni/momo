@@ -34,6 +34,7 @@ func (h *Handler) Create(c echo.Context) error {
 			TrafficLimitTitle: req.TrafficLimitTitle,
 			TrafficLimit:      req.TrafficLimit,
 			PriceTitle:        req.PriceTitle,
+			Tier:              req.Tier,
 		},
 	)
 	if err != nil {

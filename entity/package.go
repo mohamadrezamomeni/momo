@@ -9,4 +9,5 @@ type VPNPackage struct {
 	Price             uint64
 	PriceTitle        string
 	IsActive          bool
+	Tier              string
 }
