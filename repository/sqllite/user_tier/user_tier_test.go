@@ -40,7 +40,7 @@ func TestMain(m *testing.M) {
 
 func TestCreating(t *testing.T) {
 	defer userTierRepo.DeleteAll()
-	err := userTierRepo.Create(usertierRepoDto.Create{
+	err := userTierRepo.Create(&usertierRepoDto.Create{
 		UserID: "0393ed06-29bb-41c2-b3f4-6382a6729c3e",
 		Tier:   "silver",
 	})
@@ -51,7 +51,7 @@ func TestCreating(t *testing.T) {
 
 func TestDeleteing(t *testing.T) {
 	defer userTierRepo.DeleteAll()
-	err := userTierRepo.Create(usertierRepoDto.Create{
+	err := userTierRepo.Create(&usertierRepoDto.Create{
 		UserID: "0393ed06-29bb-41c2-b3f4-6382a6729c3e",
 		Tier:   "silver",
 	})
@@ -88,15 +88,15 @@ func TestUserTiers(t *testing.T) {
 		Name:      "diamond",
 	})
 
-	userTierRepo.Create(usertierRepoDto.Create{
+	userTierRepo.Create(&usertierRepoDto.Create{
 		UserID: "0393ed06-29bb-41c2-b3f4-6382a6729c3e",
 		Tier:   "platinum",
 	})
-	userTierRepo.Create(usertierRepoDto.Create{
+	userTierRepo.Create(&usertierRepoDto.Create{
 		UserID: "0393ed06-29bb-41c2-b3f4-6382a6729c3e",
 		Tier:   "gold",
 	})
-	userTierRepo.Create(usertierRepoDto.Create{
+	userTierRepo.Create(&usertierRepoDto.Create{
 		UserID: "0393ed06-29bb-41c2-b3f4-6382a6729c33",
 		Tier:   "gold",
 	})
@@ -123,5 +123,47 @@ func TestUserTiers(t *testing.T) {
 
 	if _, isExist := seen["platinum"]; !isExist {
 		t.Fatal("we expected silver be exist")
+	}
+}
+
+func TestFiltering(t *testing.T) {
+	defer userTierRepo.DeleteAll()
+
+	tierRepo.Create(&tierRepositoryDto.CreateTier{
+		IsDefault: true,
+		Name:      "silver",
+	})
+	tierRepo.Create(&tierRepositoryDto.CreateTier{
+		IsDefault: false,
+		Name:      "gold",
+	})
+	tierRepo.Create(&tierRepositoryDto.CreateTier{
+		IsDefault: false,
+		Name:      "platinum",
+	})
+	tierRepo.Create(&tierRepositoryDto.CreateTier{
+		IsDefault: false,
+		Name:      "diamond",
+	})
+
+	userTierRepo.Create(&usertierRepoDto.Create{
+		UserID: "0393ed06-29bb-41c2-b3f4-6382a6729c3e",
+		Tier:   "platinum",
+	})
+	userTierRepo.Create(&usertierRepoDto.Create{
+		UserID: "0393ed06-29bb-41c2-b3f4-6382a6729c3e",
+		Tier:   "gold",
+	})
+	userTierRepo.Create(&usertierRepoDto.Create{
+		UserID: "0393ed06-29bb-41c2-b3f4-6382a6729c33",
+		Tier:   "gold",
+	})
+
+	tiers, err := userTierRepo.FilterTiersByUser("0393ed06-29bb-41c2-b3f4-6382a6729c3e")
+	if err != nil {
+		t.Fatalf("something went wrong that was %v", err)
+	}
+	if len(tiers) != 2 {
+		t.Fatalf("error to compare data we expected %d records but we got %d", 2, len(tiers))
 	}
 }

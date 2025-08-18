@@ -10,7 +10,7 @@ import (
 	errorRepository "github.com/mohamadrezamomeni/momo/repository/sqllite"
 )
 
-func (ut *UserTier) Create(createDto userTierRepoDto.Create) error {
+func (ut *UserTier) Create(createDto *userTierRepoDto.Create) error {
 	scope := "userTierRepository.create"
 
 	_, err := ut.db.Conn().Exec(`
@@ -80,16 +80,31 @@ func (ut *UserTier) FilterTiersBelongToUser(userID string) ([]*entity.Tier, erro
 	if err != nil {
 		return nil, momoError.Wrap(err).Scope(scope).Input(userID).ErrorWrite()
 	}
-	return ut.getInboundsFromRows(rows)
+	return ut.getTiersFromRows(rows)
 }
 
-func (ut *UserTier) getInboundsFromRows(rows *sql.Rows) ([]*entity.Tier, error) {
-	scope := "userTierRepository.getInboundsFromRows"
+func (ut *UserTier) FilterTiersByUser(userID string) ([]*entity.Tier, error) {
+	scope := "userTierRepository.FilterTiersBelongToUser"
+
+	rows, err := ut.db.Conn().Query(`
+    SELECT t.name, t.is_default
+    FROM tiers t
+    LEFT JOIN user_tiers ut ON t.name = ut.tier AND ut.user_id = ?
+    WHERE ut.user_id IS NOT NULL
+`, userID)
+	if err != nil {
+		return nil, momoError.Wrap(err).Scope(scope).Input(userID).ErrorWrite()
+	}
+	return ut.getTiersFromRows(rows)
+}
+
+func (ut *UserTier) getTiersFromRows(rows *sql.Rows) ([]*entity.Tier, error) {
+	scope := "userTierRepository.getTiersFromRows"
 
 	tiers := make([]*entity.Tier, 0)
 
 	for rows.Next() {
-		userTier, err := ut.scan(rows)
+		userTier, err := ut.scanTier(rows)
 		if err != nil {
 			return nil, momoError.Wrap(err).Scope(scope).UnExpected().DebuggingError()
 		}
@@ -99,7 +114,7 @@ func (ut *UserTier) getInboundsFromRows(rows *sql.Rows) ([]*entity.Tier, error) 
 	return tiers, nil
 }
 
-func (i *UserTier) scan(rows *sql.Rows) (*entity.Tier, error) {
+func (i *UserTier) scanTier(rows *sql.Rows) (*entity.Tier, error) {
 	scope := "userTierRepository.scan"
 
 	tier := &entity.Tier{}

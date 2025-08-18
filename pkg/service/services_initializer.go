@@ -11,6 +11,7 @@ import (
 	inboundChargeSqlite "github.com/mohamadrezamomeni/momo/repository/sqllite/inbound_charge"
 	tierSqlite "github.com/mohamadrezamomeni/momo/repository/sqllite/tier"
 	userSqlite "github.com/mohamadrezamomeni/momo/repository/sqllite/user"
+	userTierSqlite "github.com/mohamadrezamomeni/momo/repository/sqllite/user_tier"
 	vpnSqlite "github.com/mohamadrezamomeni/momo/repository/sqllite/vpn_manager"
 	vpnPackageSqlite "github.com/mohamadrezamomeni/momo/repository/sqllite/vpn_package"
 	vpnSourceSqlite "github.com/mohamadrezamomeni/momo/repository/sqllite/vpn_source"
@@ -25,6 +26,7 @@ import (
 	inboundChargeService "github.com/mohamadrezamomeni/momo/service/inbound_charge"
 	tierService "github.com/mohamadrezamomeni/momo/service/tier"
 	userService "github.com/mohamadrezamomeni/momo/service/user"
+	userTiersService "github.com/mohamadrezamomeni/momo/service/user_tiers"
 	vpnService "github.com/mohamadrezamomeni/momo/service/vpn_manager"
 	vpnPackageService "github.com/mohamadrezamomeni/momo/service/vpn_package"
 	vpnSourceService "github.com/mohamadrezamomeni/momo/service/vpn_source"
@@ -46,6 +48,7 @@ func GetServices(cfg *config.Config) (
 	*vpnSourceService.VPNSource,
 	*inboundChargeService.InboundCharge,
 	*tierService.Tier,
+	*userTiersService.UserTiers,
 ) {
 	db := sqllite.New(&cfg.DB)
 	userRepo := userSqlite.New(db)
@@ -58,11 +61,13 @@ func GetServices(cfg *config.Config) (
 	inboundChargeRepo := inboundChargeSqlite.New(db)
 	vpnSourceRepo := vpnSourceSqlite.New(db)
 	tierRepo := tierSqlite.New(db)
+	userTierRepo := userTierSqlite.New(db)
 
 	hostSvc := hostService.New(hostRepo, adapter.AdaptedWorkerFactory)
 	vpnSvc := vpnService.New(vpnRepo, adapter.AdaptedVPNProxyFactory)
 	cryptSvc := cryptService.New(&cfg.CryptConfig)
 
+	userTiersSvc := userTiersService.New(userTierRepo)
 	tierSvc := tierService.New(tierRepo)
 	eventSvc := eventService.New(eventRepo)
 	userSvc := userService.New(userRepo, cryptSvc, eventSvc)
@@ -90,5 +95,6 @@ func GetServices(cfg *config.Config) (
 		inboundTrafficSvc,
 		vpnSourceSvc,
 		inboundChargeSvc,
-		tierSvc
+		tierSvc,
+		userTiersSvc
 }
