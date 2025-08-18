@@ -20,6 +20,7 @@ import (
 	inboundValidator "github.com/mohamadrezamomeni/momo/validator/inbound"
 	tierValidator "github.com/mohamadrezamomeni/momo/validator/tier"
 	userValidator "github.com/mohamadrezamomeni/momo/validator/user"
+	userTierValidator "github.com/mohamadrezamomeni/momo/validator/user_tier"
 	vpnValidator "github.com/mohamadrezamomeni/momo/validator/vpn"
 	vpnPackageValidator "github.com/mohamadrezamomeni/momo/validator/vpn_package"
 	vpnSourceValidator "github.com/mohamadrezamomeni/momo/validator/vpn_source"
@@ -72,6 +73,7 @@ func main() {
 		vpnPackageValidator.New(),
 		chargeValidator.New(),
 		tierValidator.New(),
+		userTierValidator.New(userSvc, tierSvc),
 	)
 
 	go func() {

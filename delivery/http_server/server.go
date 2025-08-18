@@ -36,6 +36,7 @@ import (
 	inboundValidation "github.com/mohamadrezamomeni/momo/validator/inbound"
 	tierValidation "github.com/mohamadrezamomeni/momo/validator/tier"
 	userValidation "github.com/mohamadrezamomeni/momo/validator/user"
+	userTierValidation "github.com/mohamadrezamomeni/momo/validator/user_tier"
 	vpnValidation "github.com/mohamadrezamomeni/momo/validator/vpn"
 	vpnPackageValidation "github.com/mohamadrezamomeni/momo/validator/vpn_package"
 	vpnSourceValidation "github.com/mohamadrezamomeni/momo/validator/vpn_source"
@@ -79,6 +80,7 @@ func New(cfg *HTTPConfig,
 	vpnPackageValidator *vpnPackageValidation.Validator,
 	chargeValidator *chargeValidation.Validator,
 	tierValidator *tierValidation.Validator,
+	userTierValidator *userTierValidation.Validator,
 ) *Server {
 	return &Server{
 		router:            echo.New(),
@@ -93,7 +95,7 @@ func New(cfg *HTTPConfig,
 		vpnSourceHandler:  vpnSourceHandler.New(vpnSourceSvc, vpnSourceValidator, authSvc),
 		vpnPackageHandler: vpnPackageHandler.New(vpnPackageSvc, vpnPackageValidator, authSvc),
 		tierHandler:       tierHandler.New(tierSvc, authSvc, tierValidator),
-		userTierHandler:   userTierHandler.New(userTierSvc, authSvc),
+		userTierHandler:   userTierHandler.New(userTierSvc, authSvc, userTierValidator),
 	}
 }
 

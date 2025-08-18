@@ -18,6 +18,13 @@ func (h *Handler) Create(c echo.Context) error {
 		})
 	}
 
+	if err := h.userTierValidator.ValidateCreatingUserTier(req); err != nil {
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
+		})
+	}
+
 	err := h.userTierSvc.Create(&userTierServiceDto.Create{
 		UserID: req.UserID,
 		Tier:   req.Tier,
