@@ -17,6 +17,14 @@ func (h *Handler) Create(c echo.Context) error {
 			"message": msg,
 		})
 	}
+
+	if err := h.tierValiator.ValidateCreatingTier(req); err != nil {
+		msg, code := momoErrorHttp.Error(err)
+		return c.JSON(code, map[string]string{
+			"message": msg,
+		})
+	}
+
 	isDefault := false
 	if req.IsDefault != nil {
 		isDefault = *req.IsDefault
