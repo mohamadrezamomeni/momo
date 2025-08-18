@@ -46,17 +46,9 @@ func TestCreate(t *testing.T) {
 		userCreated.Password != user1.Password ||
 		userCreated.IsAdmin != user1.IsAdmin ||
 		userCreated.IsApproved != user1.IsApproved ||
-		userCreated.LastName != user1.LastName || len(userCreated.Tiers) != 2 {
+		userCreated.LastName != user1.LastName {
 		t.Error("user creation requires some troubleshooting")
 		return
-	}
-
-	tier1 := userCreated.Tiers[0]
-	tier2 := userCreated.Tiers[1]
-	if tier1 == tier2 ||
-		(tier1 != "gold" && tier1 != "silver") ||
-		(tier2 != "gold" && tier2 != "silver") {
-		t.Error("error to compare validating tiers")
 	}
 }
 
@@ -100,14 +92,6 @@ func TestFindByID(t *testing.T) {
 		t.Error("something went wrong to compare results")
 		return
 	}
-
-	tier1 := user.Tiers[0]
-	tier2 := user.Tiers[1]
-	if tier1 == tier2 ||
-		(tier1 != "gold" && tier1 != "silver") ||
-		(tier2 != "gold" && tier2 != "silver") {
-		t.Error("error to compare validating tiers")
-	}
 }
 
 func TestFilter(t *testing.T) {
@@ -147,10 +131,6 @@ func TestFilter(t *testing.T) {
 
 	if len(users) != 1 {
 		t.Errorf("3. something went wrong.")
-	}
-
-	if len(users[0].Tiers) != 1 && users[0].Tiers[0] == "silver" {
-		t.Error("3. we expected the user is filtered got only silver")
 	}
 
 	users, err = userRepo.FilterUsers(&userDto.FilterUsers{

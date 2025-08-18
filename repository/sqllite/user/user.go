@@ -14,15 +14,11 @@ import (
 
 func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 	scope := "userRepository.Create"
-	tiersStr := ""
-	if inpt.Tiers != nil && len(inpt.Tiers) > 0 {
-		tiersStr = strings.Join(inpt.Tiers, ",")
-	}
 	user := &entity.User{}
 	err := u.db.Conn().QueryRow(`
-	INSERT INTO users (username, lastName, firstName, password, is_admin, is_super_admin, telegram_id, is_approved, tiers)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-	RETURNING id, username, lastName, firstName, is_admin, password, is_super_admin, telegram_id, is_approved, tiers
+	INSERT INTO users (username, lastName, firstName, password, is_admin, is_super_admin, telegram_id, is_approved)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+	RETURNING id, username, lastName, firstName, is_admin, password, is_super_admin, telegram_id, is_approved
 `,
 		inpt.Username,
 		inpt.LastName,
@@ -32,7 +28,6 @@ func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 		inpt.IsSuperAdmin,
 		inpt.TelegramID,
 		inpt.IsApproved,
-		tiersStr,
 	).Scan(
 		&user.ID,
 		&user.Username,
@@ -43,11 +38,8 @@ func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 		&user.IsSuperAdmin,
 		&user.TelegramID,
 		&user.IsApproved,
-		&tiersStr,
 	)
 	if err == nil {
-		tiers := strings.Split(tiersStr, ",")
-		user.Tiers = tiers
 		return user, nil
 	}
 
@@ -60,21 +52,16 @@ func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 func (u *User) Upsert(inpt *dto.Create) (*entity.User, error) {
 	scope := "userRepository.Upsert"
 
-	tiersStr := ""
-	if inpt.Tiers != nil && len(inpt.Tiers) > 0 {
-		tiersStr = strings.Join(inpt.Tiers, ",")
-	}
-
 	user := &entity.User{}
 	err := u.db.Conn().QueryRow(`
-	INSERT INTO users (username, lastName, firstName, password, is_admin, is_super_admin, telegram_id, is_approved, tiers)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+	INSERT INTO users (username, lastName, firstName, password, is_admin, is_super_admin, telegram_id, is_approved)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 	ON CONFLICT(username) DO UPDATE SET
 		password = excluded.password,
 		firstname = excluded.firstname,
 		lastname = excluded.lastname,
 		is_admin = excluded.is_admin
-	RETURNING id, username, lastName, firstName, is_admin, password, is_super_admin, telegram_id, is_approved, tiers
+	RETURNING id, username, lastName, firstName, is_admin, password, is_super_admin, telegram_id, is_approved
 `, inpt.Username,
 		inpt.LastName,
 		inpt.FirstName,
@@ -83,7 +70,6 @@ func (u *User) Upsert(inpt *dto.Create) (*entity.User, error) {
 		inpt.IsSuperAdmin,
 		inpt.TelegramID,
 		inpt.IsApproved,
-		tiersStr,
 	).Scan(
 		&user.ID,
 		&user.Username,
@@ -94,12 +80,9 @@ func (u *User) Upsert(inpt *dto.Create) (*entity.User, error) {
 		&user.IsSuperAdmin,
 		&user.TelegramID,
 		&user.IsApproved,
-		&tiersStr,
 	)
 
 	if err == nil {
-		tiers := strings.Split(tiersStr, ",")
-		user.Tiers = tiers
 		return user, nil
 	}
 
@@ -178,7 +161,6 @@ func (u *User) FilterUsers(q *dto.FilterUsers) ([]*entity.User, error) {
 		return nil, momoError.Wrap(err).Scope(scope).Input(q).UnExpected().DebuggingError()
 	}
 	users := []*entity.User{}
-	var tiersStr string
 	for rows.Next() {
 		user := &entity.User{}
 
@@ -194,12 +176,10 @@ func (u *User) FilterUsers(q *dto.FilterUsers) ([]*entity.User, error) {
 			&user.IsSuperAdmin,
 			&user.IsApproved,
 			&user.TelegramID,
-			&tiersStr,
 		)
 		if err != nil {
 			return nil, momoError.Wrap(err).Scope(scope).Input(q).UnExpected().DebuggingError()
 		}
-		user.Tiers = strings.Split(tiersStr, ",")
 		users = append(users, user)
 	}
 	return users, nil
@@ -254,7 +234,6 @@ func (u *User) findUser(key string, value string) (*entity.User, error) {
 	var user *entity.User = &entity.User{}
 
 	var createdAt interface{}
-	var tiersStr string
 	s := fmt.Sprintf("SELECT * FROM users WHERE %s='%s' LIMIT 1", key, value)
 	err := u.db.Conn().QueryRow(s).Scan(
 		&user.ID,
@@ -267,10 +246,8 @@ func (u *User) findUser(key string, value string) (*entity.User, error) {
 		&user.IsSuperAdmin,
 		&user.IsApproved,
 		&user.TelegramID,
-		&tiersStr,
 	)
 	if err == nil {
-		user.Tiers = strings.Split(tiersStr, ",")
 		return user, nil
 	}
 	if err == sql.ErrNoRows {
