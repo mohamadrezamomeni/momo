@@ -13,7 +13,6 @@ import (
 	vpnPackageService "github.com/mohamadrezamomeni/momo/service/vpn_package"
 	vpnSourceService "github.com/mohamadrezamomeni/momo/service/vpn_source"
 
-	authHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/auth"
 	chargeHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/charge"
 	inboundHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/inbound"
 	rootHandler "github.com/mohamadrezamomeni/momo/delivery/telegram/controller/root"
@@ -29,7 +28,6 @@ type Telegram struct {
 	userSvc           *userService.User
 	bot               *tgbotapi.BotAPI
 	core              *core.Router
-	authHandler       *authHandler.Handler
 	rootHandler       *rootHandler.Handler
 	inboundHandler    *inboundHandler.Handler
 	vpnHandler        *vpnHandler.Handler
@@ -58,18 +56,17 @@ func New(
 		core:              core.New("menu"),
 		config:            cfg,
 		userSvc:           userSvc,
-		rootHandler:       rootHandler.New(userSvc),
-		authHandler:       authHandler.New(authSvc, userSvc),
-		vpnHandler:        vpnHandler.New(userSvc),
-		vpnPackageHandler: vpnPackageHandler.New(vpnPackageSvc, userSvc),
-		chargeHandler:     chargeHandler.New(chargeSvc, userSvc),
+		rootHandler:       rootHandler.New(),
+		vpnHandler:        vpnHandler.New(),
+		vpnPackageHandler: vpnPackageHandler.New(vpnPackageSvc),
+		chargeHandler:     chargeHandler.New(chargeSvc),
 		inboundHandler: inboundHandler.New(
 			userSvc,
 			inboundSvc,
 			vpnPackageSvc,
 			inboundValidator.New(userSvc, inboundSvc),
 		),
-		vpnSourceHandler: vpnSourceHandler.New(vpnSourceSvc, userSvc),
+		vpnSourceHandler: vpnSourceHandler.New(vpnSourceSvc),
 	}
 }
 
@@ -78,7 +75,8 @@ func (t *Telegram) Serve() {
 	u.Timeout = 60
 	updates := t.bot.GetUpdatesChan(u)
 
-	t.authHandler.SetRouter(t.core)
+	t.core.SetGlobalMiddlewares(t.getGlobalMiddlewares()...)
+
 	t.rootHandler.SetRouter(t.core)
 	t.inboundHandler.SetRouter(t.core)
 	t.vpnHandler.SetRouter(t.core)

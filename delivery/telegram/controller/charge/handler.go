@@ -7,7 +7,6 @@ import (
 
 type Handler struct {
 	chargeSvc ChargeService
-	userSvc   UserService
 }
 
 type ChargeService interface {
@@ -15,13 +14,8 @@ type ChargeService interface {
 	FilterCharges(*chargeServiceDto.FilterCharges) ([]*entity.Charge, error)
 }
 
-type UserService interface {
-	FindByTelegramID(string) (*entity.User, error)
-}
-
-func New(chargeSvc ChargeService, userSvc UserService) *Handler {
+func New(chargeSvc ChargeService) *Handler {
 	return &Handler{
 		chargeSvc: chargeSvc,
-		userSvc:   userSvc,
 	}
 }

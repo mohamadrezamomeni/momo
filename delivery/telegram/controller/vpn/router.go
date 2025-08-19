@@ -8,12 +8,10 @@ import (
 func (h *Handler) SetRouter(telegramRouter *core.Router) {
 	telegramRouter.Register("ask_selecting_VPN",
 		h.AskSelectingVPNType,
-		middleware.IdentifyUser(h.userSvc),
 		middleware.ValidateAccess(),
 	)
 	telegramRouter.Register("answer_selecting_VPN",
 		h.SelectVPN,
-		middleware.IdentifyUser(h.userSvc),
 		middleware.ValidateAccess(),
 	)
 }

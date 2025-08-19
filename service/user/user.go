@@ -43,18 +43,13 @@ func New(userRepo UserRepo, crypt *crypt.Crypt, eventSvc EventService) *User {
 }
 
 func (u *User) Create(userDto *userServiceDto.AddUser) (*entity.User, error) {
-	passwordHashed, err := u.crypt.Hash(userDto.Password)
-	if err != nil {
-		return nil, err
-	}
-
 	return u.userRepo.Create(&userRepoDto.Create{
-		IsAdmin:    userDto.IsAdmin,
-		TelegramID: userDto.TelegramID,
-		FirstName:  userDto.FirstName,
-		LastName:   userDto.LastName,
-		Username:   userDto.Username,
-		Password:   passwordHashed,
+		IsAdmin:          userDto.IsAdmin,
+		TelegramID:       userDto.TelegramID,
+		FirstName:        userDto.FirstName,
+		TelegramUsername: userDto.TelegramUsername,
+		LastName:         userDto.LastName,
+		Username:         userDto.Username,
 	})
 }
 

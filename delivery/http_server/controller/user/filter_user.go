@@ -21,13 +21,14 @@ func (u *Handler) filterUsers(c echo.Context) error {
 	}
 	for _, user := range users {
 		filterSerializer.Users = append(filterSerializer.Users, &userSerializer.UserSerialize{
-			ID:           user.ID,
-			Username:     user.Username,
-			IsAdmin:      user.IsAdmin,
-			FirstName:    user.FirstName,
-			Lastname:     user.LastName,
-			IsSuperAdmin: user.IsSuperAdmin,
-			IsApproved:   user.IsApproved,
+			ID:               user.ID,
+			Username:         user.Username,
+			IsAdmin:          user.IsAdmin,
+			FirstName:        user.FirstName,
+			Lastname:         user.LastName,
+			IsSuperAdmin:     user.IsSuperAdmin,
+			IsApproved:       user.IsApproved,
+			TelegramUsername: user.TelegramUsername,
 		})
 	}
 	return c.JSON(http.StatusAccepted, filterSerializer)

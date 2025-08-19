@@ -8,8 +8,9 @@ import (
 )
 
 type Router struct {
-	routing      map[string]HandlerFunc
-	defaultRoute string
+	routing           map[string]HandlerFunc
+	defaultRoute      string
+	globalMiddlewares []Middleware
 }
 
 func New(defaultRoute string) *Router {
@@ -22,7 +23,12 @@ func New(defaultRoute string) *Router {
 func (r *Router) Register(path string, h HandlerFunc, ms ...Middleware) {
 	scope := "telegram.core.registerroutes"
 
-	finalHandler := applyMiddleware(h, ms...)
+	curHanddler := h
+	if r.globalMiddlewares != nil && len(r.globalMiddlewares) > 0 {
+		curHanddler = applyMiddleware(h, r.globalMiddlewares...)
+	}
+	finalHandler := applyMiddleware(curHanddler, ms...)
+
 	if _, isExist := r.routing[path]; isExist {
 		momoError.Scope(scope).UnExpected().Fatalf("you can't set duplicated route %s is set before", path)
 	}
@@ -35,6 +41,10 @@ func (r *Router) getHandler(path string) HandlerFunc {
 	}
 
 	return r.RootHandler
+}
+
+func (r *Router) SetGlobalMiddlewares(middlewwares ...Middleware) {
+	r.globalMiddlewares = middlewwares
 }
 
 func (r *Router) Route(update *Update) (*ResponseHandlerFunc, error) {

@@ -7,7 +7,6 @@ import (
 
 type Handler struct {
 	vpnPackageSvc VPNPackageService
-	userSvc       UserService
 }
 
 type VPNPackageService interface {
@@ -15,13 +14,8 @@ type VPNPackageService interface {
 	FindVPNPackageByID(id string) (*entity.VPNPackage, error)
 }
 
-type UserService interface {
-	FindByTelegramID(string) (*entity.User, error)
-}
-
-func New(vpnPackageSvc VPNPackageService, userSvc UserService) *Handler {
+func New(vpnPackageSvc VPNPackageService) *Handler {
 	return &Handler{
 		vpnPackageSvc: vpnPackageSvc,
-		userSvc:       userSvc,
 	}
 }

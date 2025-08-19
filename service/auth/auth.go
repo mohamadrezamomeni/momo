@@ -40,18 +40,3 @@ func (a *Auth) Login(inpt *authServiceDto.LoginDto) (string, string, error) {
 
 	return token, "", nil
 }
-
-func (a *Auth) Register(registerDto *authServiceDto.RegisterDto) (string, error) {
-	user, err := a.userSvc.Create(&userServiceDto.AddUser{
-		IsAdmin:    false,
-		LastName:   registerDto.Lastname,
-		FirstName:  registerDto.Firstname,
-		Username:   registerDto.Username,
-		TelegramID: registerDto.TelegramID,
-	})
-	if err != nil {
-		return "", err
-	}
-
-	return user.ID, nil
-}
