@@ -34,7 +34,7 @@ func GetID(update *Update) (string, error) {
 }
 
 func GetTelegramUser(update *Update) (*tgbotapi.User, error) {
-	scope := "telegram.core.GetID"
+	scope := "telegram.core.GetTelegramUser"
 	var user *tgbotapi.User
 
 	if update.Message != nil {
@@ -52,8 +52,7 @@ func GetTelegramUser(update *Update) (*tgbotapi.User, error) {
 	} else if update.InlineQuery != nil {
 		user = update.InlineQuery.From
 	}
-
-	if user != nil {
+	if user == nil {
 		return nil, momoError.Scope(scope).Input(update).DebuggingError()
 	}
 	return user, nil
