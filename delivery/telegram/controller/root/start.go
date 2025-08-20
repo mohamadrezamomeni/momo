@@ -4,6 +4,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/mohamadrezamomeni/momo/delivery/telegram/core"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
+	telegrammessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
 
@@ -15,8 +16,12 @@ func (h *Handler) Start(update *core.Update) (*core.ResponseHandlerFunc, error) 
 	if err != nil {
 		return nil, momoError.Wrap(err).Scope(scope).Input(update).ErrorWrite()
 	}
+	welcomeText, err := telegrammessages.GetMessage("auth.welcome_text", map[string]string{})
+	if err != nil {
+		return nil, err
+	}
 
-	msgConfig := tgbotapi.NewMessage(int64(id), "hello welcome to our home")
+	msgConfig := tgbotapi.NewMessage(id, welcomeText)
 
 	return &core.ResponseHandlerFunc{
 		MessageConfig: &msgConfig,

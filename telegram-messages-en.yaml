@@ -6,10 +6,7 @@ error:
 auth:
   username_button: 📝 Please enter your username. This username may be used on the platform in the future.
   approve_user: 🎉 You're already approved by admin.
-  registeration:
-    duplicate_register: 🎉 You're already registered! No need to do it again.
-    username_existence: ❌ The username you chose has already been taken. Please try a different one.
-    successfully_registeration: "😊 You're welcome! Here is your information:\n  username: :username:\n⏳ Please wait while an admin approves your request! in the next 4 hour we will have sent you a message"
+  welcome_text: "Hey there! 👋 \n Welcome home."
 root:
   menu: 😊 Where would you like to go next?
   menu_button: menu
