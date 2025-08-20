@@ -8,4 +8,5 @@ type AddUser struct {
 	Username         string
 	TelegramID       string
 	TelegramUsername string
+	IsApproved       bool
 }

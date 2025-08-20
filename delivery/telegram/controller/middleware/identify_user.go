@@ -37,8 +37,7 @@ func IdentifyUser(userSvc UserService) core.Middleware {
 			}
 
 			user, err = userSvc.Create(&userServiceDto.AddUser{
-				IsAdmin:          true,
-				Password:         "",
+				IsApproved:       true,
 				TelegramUsername: userTelegram.UserName,
 				Username:         fmt.Sprintf("user-%s", userTelegramID),
 				LastName:         userTelegram.LastName,

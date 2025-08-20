@@ -50,6 +50,7 @@ func (u *User) Create(userDto *userServiceDto.AddUser) (*entity.User, error) {
 		TelegramUsername: userDto.TelegramUsername,
 		LastName:         userDto.LastName,
 		Username:         userDto.Username,
+		IsApproved:       userDto.IsApproved,
 	})
 }
 
