@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/mohamadrezamomeni/momo/delivery/telegram/core"
@@ -39,7 +40,7 @@ func IdentifyUser(userSvc UserService) core.Middleware {
 				IsAdmin:          true,
 				Password:         "",
 				TelegramUsername: userTelegram.UserName,
-				Username:         "",
+				Username:         fmt.Sprintf("user-%s", userTelegramID),
 				LastName:         userTelegram.LastName,
 				FirstName:        userTelegram.FirstName,
 				TelegramID:       userTelegramID,
