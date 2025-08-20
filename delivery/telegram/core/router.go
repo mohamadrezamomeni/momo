@@ -23,11 +23,11 @@ func New(defaultRoute string) *Router {
 func (r *Router) Register(path string, h HandlerFunc, ms ...Middleware) {
 	scope := "telegram.core.registerroutes"
 
-	curHanddler := h
+	finalHandler := applyMiddleware(h, ms...)
+
 	if r.globalMiddlewares != nil && len(r.globalMiddlewares) > 0 {
-		curHanddler = applyMiddleware(h, r.globalMiddlewares...)
+		finalHandler = applyMiddleware(finalHandler, r.globalMiddlewares...)
 	}
-	finalHandler := applyMiddleware(curHanddler, ms...)
 
 	if _, isExist := r.routing[path]; isExist {
 		momoError.Scope(scope).UnExpected().Fatalf("you can't set duplicated route %s is set before", path)
