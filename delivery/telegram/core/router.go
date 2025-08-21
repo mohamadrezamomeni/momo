@@ -133,7 +133,7 @@ func (r *Router) getResponseFromState(update *Update) (*ResponseHandlerFunc, err
 		return nil, momoError.Scope(scope).ErrorWrite()
 	}
 
-	if state.IsRequestCopeleted() {
+	if state.IsRequestCompleted() {
 		res, _ := r.RootHandler(update)
 		return res, nil
 	}
@@ -146,7 +146,7 @@ func (r *Router) getResponseFromState(update *Update) (*ResponseHandlerFunc, err
 		return res, err
 	}
 
-	if err != nil || state.IsRequestCopeleted() {
+	if err != nil || state.IsRequestCompleted() {
 		state.ReleaseState()
 	} else {
 		state.Save()

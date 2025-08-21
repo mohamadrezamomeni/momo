@@ -52,7 +52,7 @@ func (s *State) Delete() {
 	cache.Delete(s.telegramID)
 }
 
-func (s *State) IsRequestCopeleted() bool {
+func (s *State) IsRequestCompleted() bool {
 	if s.idx >= len(s.Paths) {
 		return true
 	}
