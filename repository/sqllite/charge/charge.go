@@ -222,14 +222,15 @@ func (e *Charge) scan(rows *sql.Rows) (*entity.Charge, error) {
 	charge := &entity.Charge{}
 	status := ""
 	var vpnType string
-
+	var adminComment sql.NullString
+	var inboundID sql.NullString
 	var createdAt interface{}
 	err := rows.Scan(
 		&charge.ID,
 		&status,
 		&charge.Detail,
-		&charge.AdminComment,
-		&charge.InboundID,
+		&adminComment,
+		&inboundID,
 		&charge.UserID,
 		&charge.PackageID,
 		&charge.Country,
@@ -238,6 +239,13 @@ func (e *Charge) scan(rows *sql.Rows) (*entity.Charge, error) {
 	)
 	if err != nil {
 		return nil, momoError.Wrap(err).Scope(scope).Input(rows).DebuggingError()
+	}
+
+	if adminComment.Valid {
+		charge.AdminComment = adminComment.String
+	}
+	if inboundID.Valid {
+		charge.InboundID = inboundID.String
 	}
 	charge.VPNType = entity.ConvertStringVPNTypeToEnum(vpnType)
 	charge.Status = entity.ConvertStringToChargeStatus(status)
