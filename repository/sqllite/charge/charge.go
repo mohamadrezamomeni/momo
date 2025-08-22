@@ -77,19 +77,27 @@ func (c *Charge) FindChargeByID(id string) (*entity.Charge, error) {
 	charge := &entity.Charge{}
 	status := ""
 	var VPNType string
+	var adminComment sql.NullString
+	var inboundID sql.NullString
 	s := fmt.Sprintf("SELECT * FROM charges WHERE id=%s LIMIT 1", id)
 	err := c.db.Conn().QueryRow(s).Scan(
 		&charge.ID,
 		&status,
 		&charge.Detail,
-		&charge.AdminComment,
-		&charge.InboundID,
+		&adminComment,
+		&inboundID,
 		&charge.UserID,
 		&charge.PackageID,
 		&charge.Country,
 		&VPNType,
 		&createdAt,
 	)
+	if adminComment.Valid {
+		charge.AdminComment = adminComment.String
+	}
+	if inboundID.Valid {
+		charge.InboundID = adminComment.String
+	}
 
 	if err == sql.ErrNoRows {
 		return nil, momoError.Wrap(err).Scope(scope).NotFound().Input(id).DebuggingError()
