@@ -56,10 +56,15 @@ charge:
     not_found: "you havent payments yet"
     button: see your payments
     title: "<b>📊 payments Report:</b>\n\n"
-    id: ":counter:. 🆔 :id:\n"
+    id: ":counter:. 🆔 :id:"
     status: "status: :status:"
     detail: "detail: :detail:"
-
+    admin_comment: "Moderator Note: :admin_comment:"
+    inbound_id: "inbound_id: :inboundID:"
+  status:
+    approved: ✅ approved
+    regected: ❌ rejected
+    pending: ⏳ pending
 vpn_source:
   ask_vpn_source: select your destination
   not_found_source: unforunetly admin haven't introduced any vpns for creating

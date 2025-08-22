@@ -8,6 +8,7 @@ import (
 	"github.com/mohamadrezamomeni/momo/delivery/telegram/core"
 	"github.com/mohamadrezamomeni/momo/dto/service/charge"
 	"github.com/mohamadrezamomeni/momo/entity"
+	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 	telegrammessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
 )
@@ -69,25 +70,44 @@ func (h *Handler) writeItem(i int, charge *entity.Charge) (string, error) {
 		return "", err
 	}
 
+	statusText, err := h.getStatusText(charge.Status)
+	if err != nil {
+		return "", err
+	}
+
 	statusReport, err := telegrammessages.GetMessage("charge.list.status", map[string]string{
-		"counter": strconv.Itoa(i + 1),
-		"status":  entity.TranslateChargeStatus(charge.Status),
+		"status": statusText,
 	})
 	if err != nil {
 		return "", err
 	}
 
 	detailReport, err := telegrammessages.GetMessage("charge.list.detail", map[string]string{
-		"counter": strconv.Itoa(i + 1),
-		"detail":  charge.Detail,
+		"detail": charge.Detail,
 	})
 	if err != nil {
 		return "", err
 	}
 
-	sb.WriteString(idReport)
-	sb.WriteString(statusReport)
-	sb.WriteString(detailReport)
+	adminCommentReport, err := telegrammessages.GetMessage("charge.list.admin_comment", map[string]string{
+		"admin_comment": charge.Detail,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	inboundIDReport, err := telegrammessages.GetMessage("charge.list.inbound_id", map[string]string{
+		"inboundID": charge.InboundID,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	sb.WriteString(idReport + "\n")
+	sb.WriteString(statusReport + "\n")
+	sb.WriteString(detailReport + "\n")
+	sb.WriteString(adminCommentReport + "\n")
+	sb.WriteString(inboundIDReport)
 
 	sb.WriteString("\n\n")
 	return sb.String(), nil
@@ -106,4 +126,18 @@ func (h *Handler) sendNotFoundCharges(user *entity.User) (*core.ResponseHandlerF
 		ReleaseState:  true,
 		RedirectRoot:  true,
 	}, nil
+}
+
+func (h *Handler) getStatusText(status entity.ChargeStatus) (string, error) {
+	scope := "chargeController.charge"
+
+	switch status {
+	case entity.ApprovedStatusCharge:
+		return telegrammessages.GetMessage("charge.status.approved", map[string]string{})
+	case entity.RejectedStatusCharge:
+		return telegrammessages.GetMessage("charge.status.rejected", map[string]string{})
+	case entity.AssignedCharged:
+		return telegrammessages.GetMessage("charge.status.pending", map[string]string{})
+	}
+	return "", momoError.Scope(scope).ErrorWrite()
 }
