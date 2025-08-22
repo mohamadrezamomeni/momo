@@ -57,6 +57,8 @@ charge:
     button: see your payments
     title: "<b>📊 payments Report:</b>\n\n"
     id: ":counter:. 🆔 :id:\n"
+    status: "status: :status:"
+    detail: "detail: :detail:"
 
 vpn_source:
   ask_vpn_source: select your destination

@@ -69,7 +69,26 @@ func (h *Handler) writeItem(i int, charge *entity.Charge) (string, error) {
 		return "", err
 	}
 
+	statusReport, err := telegrammessages.GetMessage("charge.list.status", map[string]string{
+		"counter": strconv.Itoa(i + 1),
+		"status":  entity.TranslateChargeStatus(charge.Status),
+	})
+	if err != nil {
+		return "", err
+	}
+
+	detailReport, err := telegrammessages.GetMessage("charge.list.detail", map[string]string{
+		"counter": strconv.Itoa(i + 1),
+		"detail":  charge.Detail,
+	})
+	if err != nil {
+		return "", err
+	}
+
 	sb.WriteString(idReport)
+	sb.WriteString(statusReport)
+	sb.WriteString(detailReport)
+
 	sb.WriteString("\n\n")
 	return sb.String(), nil
 }
