@@ -21,7 +21,8 @@ CREATE TABLE `users` (
     `is_super_admin` boolean DEFAULT false,
     `is_approved` boolean DEFAULT false,
     `telegram_id` varchar(32),
-    `telegram_username` varchar(256)
+    `telegram_username` varchar(256),
+    `language` varchar(64)
 );
 
 -- +migrate Down

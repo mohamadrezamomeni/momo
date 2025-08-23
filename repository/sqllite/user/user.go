@@ -14,11 +14,17 @@ import (
 
 func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 	scope := "userRepository.Create"
+	if inpt.Language == 0 {
+		inpt.Language = entity.EN
+	}
+
 	user := &entity.User{}
+
+	var languageStr string
 	err := u.db.Conn().QueryRow(`
-	INSERT INTO users (username, lastName, firstName, password, is_admin, is_super_admin, telegram_id, is_approved, telegram_username)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-	RETURNING id, username, lastName, firstName, is_admin, password, is_super_admin, telegram_id, is_approved, telegram_username
+	INSERT INTO users (username, lastName, firstName, password, is_admin, is_super_admin, telegram_id, is_approved, telegram_username, language)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	RETURNING id, username, lastName, firstName, is_admin, password, is_super_admin, telegram_id, is_approved, telegram_username, language
 `,
 		inpt.Username,
 		inpt.LastName,
@@ -29,6 +35,7 @@ func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 		inpt.TelegramID,
 		inpt.IsApproved,
 		inpt.TelegramUsername,
+		entity.LanguageString(inpt.Language),
 	).Scan(
 		&user.ID,
 		&user.Username,
@@ -40,8 +47,10 @@ func (u *User) Create(inpt *dto.Create) (*entity.User, error) {
 		&user.TelegramID,
 		&user.IsApproved,
 		&user.TelegramUsername,
+		&languageStr,
 	)
 	if err == nil {
+		user.Language = entity.ConvertLanguageLabelToEnum(languageStr)
 		return user, nil
 	}
 
@@ -55,15 +64,20 @@ func (u *User) Upsert(inpt *dto.Create) (*entity.User, error) {
 	scope := "userRepository.Upsert"
 
 	user := &entity.User{}
+	var languageStr string
+
+	if inpt.Language == 0 {
+		inpt.Language = entity.EN
+	}
 	err := u.db.Conn().QueryRow(`
-	INSERT INTO users (username, lastName, firstName, password, is_admin, is_super_admin, telegram_id, is_approved, telegram_username)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+	INSERT INTO users (username, lastName, firstName, password, is_admin, is_super_admin, telegram_id, is_approved, telegram_username, language)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	ON CONFLICT(username) DO UPDATE SET
 		password = excluded.password,
 		firstname = excluded.firstname,
 		lastname = excluded.lastname,
 		is_admin = excluded.is_admin
-	RETURNING id, username, lastName, firstName, is_admin, password, is_super_admin, telegram_id, is_approved, telegram_username
+	RETURNING id, username, lastName, firstName, is_admin, password, is_super_admin, telegram_id, is_approved, telegram_username, language
 `, inpt.Username,
 		inpt.LastName,
 		inpt.FirstName,
@@ -73,6 +87,7 @@ func (u *User) Upsert(inpt *dto.Create) (*entity.User, error) {
 		inpt.TelegramID,
 		inpt.IsApproved,
 		inpt.TelegramUsername,
+		entity.LanguageString(inpt.Language),
 	).Scan(
 		&user.ID,
 		&user.Username,
@@ -84,9 +99,11 @@ func (u *User) Upsert(inpt *dto.Create) (*entity.User, error) {
 		&user.TelegramID,
 		&user.IsApproved,
 		&user.TelegramUsername,
+		&languageStr,
 	)
 
 	if err == nil {
+		user.Language = entity.ConvertLanguageLabelToEnum(languageStr)
 		return user, nil
 	}
 
@@ -164,30 +181,8 @@ func (u *User) FilterUsers(q *dto.FilterUsers) ([]*entity.User, error) {
 	if err != nil {
 		return nil, momoError.Wrap(err).Scope(scope).Input(q).UnExpected().DebuggingError()
 	}
-	users := []*entity.User{}
-	for rows.Next() {
-		user := &entity.User{}
 
-		var createdAt interface{}
-		err = rows.Scan(
-			&user.ID,
-			&user.Username,
-			&createdAt,
-			&user.LastName,
-			&user.FirstName,
-			&user.Password,
-			&user.IsAdmin,
-			&user.IsSuperAdmin,
-			&user.IsApproved,
-			&user.TelegramID,
-			&user.TelegramUsername,
-		)
-		if err != nil {
-			return nil, momoError.Wrap(err).Scope(scope).Input(q).UnExpected().DebuggingError()
-		}
-		users = append(users, user)
-	}
-	return users, nil
+	return u.scanUsers(rows)
 }
 
 func (u *User) generateFilterUserQuery(q *dto.FilterUsers) (string, error) {
@@ -239,6 +234,7 @@ func (u *User) findUser(key string, value string) (*entity.User, error) {
 	var user *entity.User = &entity.User{}
 
 	var createdAt interface{}
+	var languageStr string
 	s := fmt.Sprintf("SELECT * FROM users WHERE %s='%s' LIMIT 1", key, value)
 	err := u.db.Conn().QueryRow(s).Scan(
 		&user.ID,
@@ -252,8 +248,10 @@ func (u *User) findUser(key string, value string) (*entity.User, error) {
 		&user.IsApproved,
 		&user.TelegramID,
 		&user.TelegramUsername,
+		&languageStr,
 	)
 	if err == nil {
+		user.Language = entity.ConvertLanguageLabelToEnum(languageStr)
 		return user, nil
 	}
 	if err == sql.ErrNoRows {
@@ -298,4 +296,34 @@ func (u *User) Update(id string, inpt *dto.UpdateUser) error {
 		return momoError.Wrap(err).Scope(scope).Input(id, inpt).DebuggingError()
 	}
 	return nil
+}
+
+func (u *User) scanUsers(rows *sql.Rows) ([]*entity.User, error) {
+	scope := "userRepository.scanUsers"
+	users := make([]*entity.User, 0)
+	for rows.Next() {
+		user := &entity.User{}
+		var languageStr string
+		var createdAt interface{}
+		err := rows.Scan(
+			&user.ID,
+			&user.Username,
+			&createdAt,
+			&user.LastName,
+			&user.FirstName,
+			&user.Password,
+			&user.IsAdmin,
+			&user.IsSuperAdmin,
+			&user.IsApproved,
+			&user.TelegramID,
+			&user.TelegramUsername,
+			&languageStr,
+		)
+		if err != nil {
+			return nil, momoError.Wrap(err).Scope(scope).Input(rows).UnExpected().DebuggingError()
+		}
+		user.Language = entity.ConvertLanguageLabelToEnum(languageStr)
+		users = append(users, user)
+	}
+	return users, nil
 }

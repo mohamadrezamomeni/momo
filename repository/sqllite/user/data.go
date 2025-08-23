@@ -2,6 +2,7 @@ package user
 
 import (
 	userDto "github.com/mohamadrezamomeni/momo/dto/repository/user"
+	"github.com/mohamadrezamomeni/momo/entity"
 )
 
 var (
@@ -14,6 +15,7 @@ var (
 		Password:         "12342",
 		IsSuperAdmin:     true,
 		TelegramUsername: "momo1",
+		Language:         entity.EN,
 	}
 
 	user2 = &userDto.Create{
@@ -24,6 +26,7 @@ var (
 		Password:         "12334",
 		IsSuperAdmin:     false,
 		TelegramUsername: "momo2",
+		Language:         entity.EN,
 	}
 
 	user3 = &userDto.Create{
@@ -34,6 +37,7 @@ var (
 		Password:         "1244",
 		IsSuperAdmin:     false,
 		TelegramUsername: "momo3",
+		Language:         entity.EN,
 	}
 
 	user4 = &userDto.Create{
@@ -45,5 +49,6 @@ var (
 		IsSuperAdmin:     false,
 		IsApproved:       false,
 		TelegramUsername: "momo4",
+		Language:         entity.EN,
 	}
 )

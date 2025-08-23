@@ -1,5 +1,7 @@
 package dto
 
+import "github.com/mohamadrezamomeni/momo/entity"
+
 type Create struct {
 	Username         string
 	FirstName        string
@@ -10,4 +12,5 @@ type Create struct {
 	TelegramID       string
 	IsApproved       bool
 	TelegramUsername string
+	Language         entity.Language
 }
