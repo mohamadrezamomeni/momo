@@ -35,14 +35,22 @@ func (h *Handler) FilterCharges(update *core.Update) (*core.ResponseHandlerFunc,
 
 	var sb strings.Builder
 
-	title, err := telegrammessages.GetMessage("charge.list.title", map[string]string{})
+	title, err := telegrammessages.GetMessage(
+		"charge.list.title",
+		map[string]string{},
+		update.UserSystem.Language,
+	)
 	if err != nil {
 		return nil, err
 	}
 	sb.WriteString(title)
 
 	for i, charge := range charges {
-		item, err := h.writeItem(i, charge)
+		item, err := h.writeItem(
+			i,
+			charge,
+			update.UserSystem.Language,
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -59,46 +67,66 @@ func (h *Handler) FilterCharges(update *core.Update) (*core.ResponseHandlerFunc,
 	}, nil
 }
 
-func (h *Handler) writeItem(i int, charge *entity.Charge) (string, error) {
+func (h *Handler) writeItem(i int, charge *entity.Charge, language entity.Language) (string, error) {
 	var sb strings.Builder
 
-	idReport, err := telegrammessages.GetMessage("charge.list.id", map[string]string{
-		"counter": strconv.Itoa(i + 1),
-		"id":      charge.ID,
-	})
+	idReport, err := telegrammessages.GetMessage(
+		"charge.list.id",
+		map[string]string{
+			"counter": strconv.Itoa(i + 1),
+			"id":      charge.ID,
+		},
+		language,
+	)
 	if err != nil {
 		return "", err
 	}
 
-	statusText, err := h.getStatusText(charge.Status)
+	statusText, err := h.getStatusText(charge.Status, language)
 	if err != nil {
 		return "", err
 	}
 
-	statusReport, err := telegrammessages.GetMessage("charge.list.status", map[string]string{
-		"status": statusText,
-	})
+	statusReport, err := telegrammessages.GetMessage(
+		"charge.list.status",
+		map[string]string{
+			"status": statusText,
+		},
+		language,
+	)
 	if err != nil {
 		return "", err
 	}
 
-	detailReport, err := telegrammessages.GetMessage("charge.list.detail", map[string]string{
-		"detail": charge.Detail,
-	})
+	detailReport, err := telegrammessages.GetMessage(
+		"charge.list.detail",
+		map[string]string{
+			"detail": charge.Detail,
+		},
+		language,
+	)
 	if err != nil {
 		return "", err
 	}
 
-	adminCommentReport, err := telegrammessages.GetMessage("charge.list.admin_comment", map[string]string{
-		"admin_comment": charge.Detail,
-	})
+	adminCommentReport, err := telegrammessages.GetMessage(
+		"charge.list.admin_comment",
+		map[string]string{
+			"admin_comment": charge.Detail,
+		},
+		language,
+	)
 	if err != nil {
 		return "", err
 	}
 
-	inboundIDReport, err := telegrammessages.GetMessage("charge.list.inbound_id", map[string]string{
-		"inboundID": charge.InboundID,
-	})
+	inboundIDReport, err := telegrammessages.GetMessage(
+		"charge.list.inbound_id",
+		map[string]string{
+			"inboundID": charge.InboundID,
+		},
+		language,
+	)
 	if err != nil {
 		return "", err
 	}
@@ -118,7 +146,11 @@ func (h *Handler) sendNotFoundCharges(user *entity.User) (*core.ResponseHandlerF
 	if err != nil {
 		return nil, err
 	}
-	inboundNotFoundText, _ := telegrammessages.GetMessage("charge.list.not_found", map[string]string{})
+	inboundNotFoundText, _ := telegrammessages.GetMessage(
+		"charge.list.not_found",
+		map[string]string{},
+		user.Language,
+	)
 
 	msgConfig := tgbotapi.NewMessage(id, inboundNotFoundText)
 	return &core.ResponseHandlerFunc{
@@ -128,16 +160,16 @@ func (h *Handler) sendNotFoundCharges(user *entity.User) (*core.ResponseHandlerF
 	}, nil
 }
 
-func (h *Handler) getStatusText(status entity.ChargeStatus) (string, error) {
+func (h *Handler) getStatusText(status entity.ChargeStatus, language entity.Language) (string, error) {
 	scope := "chargeController.charge"
 
 	switch status {
 	case entity.ApprovedStatusCharge:
-		return telegrammessages.GetMessage("charge.status.approved", map[string]string{})
+		return telegrammessages.GetMessage("charge.status.approved", map[string]string{}, language)
 	case entity.RejectedStatusCharge:
-		return telegrammessages.GetMessage("charge.status.rejected", map[string]string{})
+		return telegrammessages.GetMessage("charge.status.rejected", map[string]string{}, language)
 	case entity.AssignedCharged:
-		return telegrammessages.GetMessage("charge.status.pending", map[string]string{})
+		return telegrammessages.GetMessage("charge.status.pending", map[string]string{}, language)
 	}
 	return "", momoError.Scope(scope).ErrorWrite()
 }

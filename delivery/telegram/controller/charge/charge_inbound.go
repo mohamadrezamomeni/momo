@@ -50,7 +50,11 @@ func (h *Handler) ChargeInbound(update *core.Update) (*core.ResponseHandlerFunc,
 		return nil, err
 	}
 
-	title, err := telegrammessages.GetMessage("charge.successfully_extending", map[string]string{})
+	title, err := telegrammessages.GetMessage(
+		"charge.successfully_extending",
+		map[string]string{},
+		update.UserSystem.Language,
+	)
 	if err != nil {
 		return nil, err
 	}

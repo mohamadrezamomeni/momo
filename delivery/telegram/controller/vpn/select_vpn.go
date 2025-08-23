@@ -26,6 +26,7 @@ func (h *Handler) AskSelectingVPNType(update *core.Update) (*core.ResponseHandle
 	text, err := telegrammessages.GetMessage(
 		"vpn.select_vpn",
 		map[string]string{},
+		update.UserSystem.Language,
 	)
 	if err != nil {
 		return nil, err

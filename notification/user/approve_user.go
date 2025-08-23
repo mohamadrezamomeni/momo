@@ -16,7 +16,7 @@ func (h *Handler) ApproveUserByAddmin(c *core.Context) (*core.ResponseHandler, e
 		return nil, err
 	}
 
-	title, err := telegrammessages.GetMessage("auth.approve_user", map[string]string{})
+	title, err := telegrammessages.GetMessage("auth.approve_user", map[string]string{}, user.Language)
 	if err != nil {
 		return nil, err
 	}

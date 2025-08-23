@@ -3,6 +3,7 @@ package telegram
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/mohamadrezamomeni/momo/delivery/telegram/core"
+	"github.com/mohamadrezamomeni/momo/entity"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 	telegrammessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
 	"github.com/mohamadrezamomeni/momo/pkg/utils"
@@ -43,27 +44,31 @@ func (t *Telegram) setMenu(update *core.Update) error {
 }
 
 func (t *Telegram) getCommands() ([]tgbotapi.BotCommand, error) {
-	GenerateClientConfigTitle, err := telegrammessages.GetMessage("inbound.client_config_button", map[string]string{})
+	GenerateClientConfigTitle, err := telegrammessages.GetMessage(
+		"inbound.client_config_button",
+		map[string]string{},
+		entity.EN,
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	listVPNsTitle, err := telegrammessages.GetMessage("inbound.list_button", map[string]string{})
+	listVPNsTitle, err := telegrammessages.GetMessage("inbound.list_button", map[string]string{}, entity.EN)
 	if err != nil {
 		return nil, err
 	}
 
-	createVPNTitle, err := telegrammessages.GetMessage("inbound.create_button", map[string]string{})
+	createVPNTitle, err := telegrammessages.GetMessage("inbound.create_button", map[string]string{}, entity.EN)
 	if err != nil {
 		return nil, err
 	}
 
-	createChargeTitle, err := telegrammessages.GetMessage("charge.extend_button", map[string]string{})
+	createChargeTitle, err := telegrammessages.GetMessage("charge.extend_button", map[string]string{}, entity.EN)
 	if err != nil {
 		return nil, err
 	}
 
-	listChargesTitle, err := telegrammessages.GetMessage("charge.list.button", map[string]string{})
+	listChargesTitle, err := telegrammessages.GetMessage("charge.list.button", map[string]string{}, entity.EN)
 	if err != nil {
 		return nil, err
 	}

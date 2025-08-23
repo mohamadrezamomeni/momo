@@ -36,7 +36,11 @@ func (h *Handler) ListInbounds(update *core.Update) (*core.ResponseHandlerFunc, 
 
 	var sb strings.Builder
 
-	title, err := telegrammessages.GetMessage("inbound.list.inbounds_title", map[string]string{})
+	title, err := telegrammessages.GetMessage(
+		"inbound.list.inbounds_title",
+		map[string]string{},
+		update.UserSystem.Language,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +48,7 @@ func (h *Handler) ListInbounds(update *core.Update) (*core.ResponseHandlerFunc, 
 	sb.WriteString(title)
 
 	for i, inbound := range inbounds {
-		item, err := h.writeItem(i, inbound)
+		item, err := h.writeItem(i, inbound, update.UserSystem.Language)
 		if err != nil {
 			return nil, err
 		}
@@ -60,23 +64,39 @@ func (h *Handler) ListInbounds(update *core.Update) (*core.ResponseHandlerFunc, 
 	}, nil
 }
 
-func (h *Handler) getStatus() (string, string, string, string, error) {
-	active, err := telegrammessages.GetMessage("inbound.list.active", map[string]string{})
+func (h *Handler) getStatus(language entity.Language) (string, string, string, string, error) {
+	active, err := telegrammessages.GetMessage(
+		"inbound.list.active",
+		map[string]string{},
+		language,
+	)
 	if err != nil {
 		return "", "", "", "", err
 	}
 
-	deactive, err := telegrammessages.GetMessage("inbound.list.deactive", map[string]string{})
+	deactive, err := telegrammessages.GetMessage(
+		"inbound.list.deactive",
+		map[string]string{},
+		language,
+	)
 	if err != nil {
 		return "", "", "", "", err
 	}
 
-	block, err := telegrammessages.GetMessage("inbound.list.block", map[string]string{})
+	block, err := telegrammessages.GetMessage(
+		"inbound.list.block",
+		map[string]string{},
+		language,
+	)
 	if err != nil {
 		return "", "", "", "", err
 	}
 
-	unblock, err := telegrammessages.GetMessage("inbound.list.unblock", map[string]string{})
+	unblock, err := telegrammessages.GetMessage(
+		"inbound.list.unblock",
+		map[string]string{},
+		language,
+	)
 	if err != nil {
 		return "", "", "", "", err
 	}
@@ -84,22 +104,30 @@ func (h *Handler) getStatus() (string, string, string, string, error) {
 	return active, deactive, block, unblock, nil
 }
 
-func (h *Handler) writeItem(i int, inbound *entity.Inbound) (string, error) {
+func (h *Handler) writeItem(i int, inbound *entity.Inbound, language entity.Language) (string, error) {
 	var sb strings.Builder
 
-	active, deactive, block, unblock, err := h.getStatus()
+	active, deactive, block, unblock, err := h.getStatus(language)
 
-	idReport, err := telegrammessages.GetMessage("inbound.list.id_report", map[string]string{
-		"counter": strconv.Itoa(i + 1),
-		"id":      inbound.ID,
-	})
+	idReport, err := telegrammessages.GetMessage(
+		"inbound.list.id_report",
+		map[string]string{
+			"counter": strconv.Itoa(i + 1),
+			"id":      inbound.ID,
+		},
+		language,
+	)
 	if err != nil {
 		return "", err
 	}
-	trafficReport, err := telegrammessages.GetMessage("inbound.list.inbound_traffic_used", map[string]string{
-		"traffic_used":  strconv.Itoa(int(inbound.TrafficUsage) / (1000 * 1000)),
-		"traffic_limit": strconv.Itoa(int(inbound.TrafficLimit) / (1000 * 1000)),
-	})
+	trafficReport, err := telegrammessages.GetMessage(
+		"inbound.list.inbound_traffic_used",
+		map[string]string{
+			"traffic_used":  strconv.Itoa(int(inbound.TrafficUsage) / (1000 * 1000)),
+			"traffic_limit": strconv.Itoa(int(inbound.TrafficLimit) / (1000 * 1000)),
+		},
+		language,
+	)
 	if err != nil {
 		return "", err
 	}

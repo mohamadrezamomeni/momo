@@ -112,7 +112,7 @@ func (t *Telegram) send(res *core.ResponseHandlerFunc, update *core.Update) {
 }
 
 func (t *Telegram) sendError(update *core.Update) {
-	errMessage, _ := telegrammessages.GetMessage("error.internal_error", map[string]string{})
+	errMessage, _ := telegrammessages.GetMessage("error.internal_error", map[string]string{}, update.UserSystem.Language)
 	idStr, _ := core.GetID(update)
 	id, _ := utils.ConvertToInt64(idStr)
 	msg := tgbotapi.NewMessage(id, errMessage)

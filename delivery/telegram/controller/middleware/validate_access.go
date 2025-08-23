@@ -21,7 +21,11 @@ func ValidateAccess() core.Middleware {
 				return nil, err
 			}
 			if user != nil && !user.IsApproved {
-				message, _ := telegrammessages.GetMessage("error.forbidden_access", map[string]string{})
+				message, _ := telegrammessages.GetMessage(
+					"error.forbidden_access",
+					map[string]string{},
+					update.UserSystem.Language,
+				)
 				msgConfig := tgbotapi.NewMessage(id, message)
 				return &core.ResponseHandlerFunc{
 					MessageConfig: &msgConfig,

@@ -22,7 +22,11 @@ func (h *Handler) RenderClientConfigButtons(update *core.Update) (*core.Response
 		return nil, err
 	}
 
-	title, err := telegrammessages.GetMessage("inbound.client_config.title_list_inbound", map[string]string{})
+	title, err := telegrammessages.GetMessage(
+		"inbound.client_config.title_list_inbound",
+		map[string]string{},
+		update.UserSystem.Language,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +36,7 @@ func (h *Handler) RenderClientConfigButtons(update *core.Update) (*core.Response
 	var rows [][]tgbotapi.InlineKeyboardButton
 
 	for _, inbound := range inbounds {
-		button, err := h.renderClientConfigButton(inbound)
+		button, err := h.renderClientConfigButton(inbound, update.UserSystem.Language)
 		if err != nil {
 			return nil, err
 		}
@@ -47,27 +51,39 @@ func (h *Handler) RenderClientConfigButtons(update *core.Update) (*core.Response
 	}, nil
 }
 
-func (h *Handler) renderClientConfigButton(inbound *entity.Inbound) (*tgbotapi.InlineKeyboardButton, error) {
-	blockedTitle, err := telegrammessages.GetMessage("inbound.client_config.client_config_item_block", map[string]string{
-		"VPNType": entity.VPNTypeString(inbound.VPNType),
-		"ID":      inbound.ID,
-	})
+func (h *Handler) renderClientConfigButton(inbound *entity.Inbound, language entity.Language) (*tgbotapi.InlineKeyboardButton, error) {
+	blockedTitle, err := telegrammessages.GetMessage(
+		"inbound.client_config.client_config_item_block",
+		map[string]string{
+			"VPNType": entity.VPNTypeString(inbound.VPNType),
+			"ID":      inbound.ID,
+		},
+		language,
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	okConfigItem, err := telegrammessages.GetMessage("inbound.client_config.client_config_item_ok", map[string]string{
-		"VPNType": entity.VPNTypeString(inbound.VPNType),
-		"ID":      inbound.ID,
-	})
+	okConfigItem, err := telegrammessages.GetMessage(
+		"inbound.client_config.client_config_item_ok",
+		map[string]string{
+			"VPNType": entity.VPNTypeString(inbound.VPNType),
+			"ID":      inbound.ID,
+		},
+		language,
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	pendingItem, err := telegrammessages.GetMessage("inbound.client_config.client_config_item_pending", map[string]string{
-		"VPNType": entity.VPNTypeString(inbound.VPNType),
-		"ID":      inbound.ID,
-	})
+	pendingItem, err := telegrammessages.GetMessage(
+		"inbound.client_config.client_config_item_pending",
+		map[string]string{
+			"VPNType": entity.VPNTypeString(inbound.VPNType),
+			"ID":      inbound.ID,
+		},
+		language,
+	)
 	if err != nil {
 		return nil, err
 	}

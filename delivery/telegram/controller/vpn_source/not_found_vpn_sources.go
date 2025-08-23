@@ -8,7 +8,11 @@ import (
 )
 
 func (h *Handler) notFoundAnyVPNSources(update *core.Update) (*core.ResponseHandlerFunc, error) {
-	text, err := telegrammessages.GetMessage("vpn_source.not_found_source", map[string]string{})
+	text, err := telegrammessages.GetMessage(
+		"vpn_source.not_found_source",
+		map[string]string{},
+		update.UserSystem.Language,
+	)
 	if err != nil {
 		return nil, err
 	}

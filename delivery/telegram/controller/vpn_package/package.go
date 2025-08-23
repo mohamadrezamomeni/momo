@@ -8,7 +8,11 @@ import (
 )
 
 func (h *Handler) notFoundAnyVPNPackages(update *core.Update) (*core.ResponseHandlerFunc, error) {
-	text, err := telegrammessages.GetMessage("vpn_package.not_found_package", map[string]string{})
+	text, err := telegrammessages.GetMessage(
+		"vpn_package.not_found_package",
+		map[string]string{},
+		update.UserSystem.Language,
+	)
 	if err != nil {
 		return nil, err
 	}

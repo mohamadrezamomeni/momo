@@ -35,7 +35,11 @@ func (h *Handler) GetClientURI(update *core.Update) (*core.ResponseHandlerFunc, 
 	if err != nil {
 		return nil, err
 	}
-	errorTitle, err := telegrammessages.GetMessage("inbound.client_uri.worng_button_selected", map[string]string{})
+	errorTitle, err := telegrammessages.GetMessage(
+		"inbound.client_uri.worng_button_selected",
+		map[string]string{},
+		update.UserSystem.Language,
+	)
 	if err != nil {
 		return nil, err
 	}

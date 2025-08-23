@@ -16,7 +16,11 @@ func (h *Handler) Start(update *core.Update) (*core.ResponseHandlerFunc, error) 
 	if err != nil {
 		return nil, momoError.Wrap(err).Scope(scope).Input(update).ErrorWrite()
 	}
-	welcomeText, err := telegrammessages.GetMessage("auth.welcome_text", map[string]string{})
+	welcomeText, err := telegrammessages.GetMessage(
+		"auth.welcome_text",
+		map[string]string{},
+		update.UserSystem.Language,
+	)
 	if err != nil {
 		return nil, err
 	}

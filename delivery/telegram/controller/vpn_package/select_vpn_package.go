@@ -31,7 +31,10 @@ func (h *Handler) AskSelectingVPNPackage(update *core.Update) (*core.ResponseHan
 	}
 
 	for _, pkg := range vpnPackages {
-		button, err := h.getPackageButton(pkg)
+		button, err := h.getPackageButton(
+			pkg,
+			update.UserSystem.Language,
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -43,7 +46,11 @@ func (h *Handler) AskSelectingVPNPackage(update *core.Update) (*core.ResponseHan
 		return nil, err
 	}
 
-	askingPackageTitle, err := telegrammessages.GetMessage("vpn_package.ask_selecting_package", map[string]string{})
+	askingPackageTitle, err := telegrammessages.GetMessage(
+		"vpn_package.ask_selecting_package",
+		map[string]string{},
+		update.UserSystem.Language,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -57,31 +64,51 @@ func (h *Handler) AskSelectingVPNPackage(update *core.Update) (*core.ResponseHan
 	}, nil
 }
 
-func (h *Handler) getPackageButton(pkg *entity.VPNPackage) (*tgbotapi.InlineKeyboardButton, error) {
+func (h *Handler) getPackageButton(pkg *entity.VPNPackage, language entity.Language) (*tgbotapi.InlineKeyboardButton, error) {
 	var titleDuration string
 	var err error
 
 	if pkg.Days > 1 {
-		titleDuration, err = telegrammessages.GetMessage("vpn_package.many_days", map[string]string{
-			"count": strconv.Itoa(int(pkg.Days)),
-		})
+		titleDuration, err = telegrammessages.GetMessage(
+			"vpn_package.many_days",
+			map[string]string{
+				"count": strconv.Itoa(int(pkg.Days)),
+			},
+			language,
+		)
 	} else if pkg.Days == 0 {
-		titleDuration, err = telegrammessages.GetMessage("vpn_package.one_day", map[string]string{})
+		titleDuration, err = telegrammessages.GetMessage(
+			"vpn_package.one_day",
+			map[string]string{},
+			language,
+		)
 	} else if pkg.Months > 1 {
-		titleDuration, err = telegrammessages.GetMessage("vpn_package.many_months", map[string]string{
-			"count": strconv.Itoa(int(pkg.Months)),
-		})
+		titleDuration, err = telegrammessages.GetMessage(
+			"vpn_package.many_months",
+			map[string]string{
+				"count": strconv.Itoa(int(pkg.Months)),
+			},
+			language,
+		)
 	} else {
-		titleDuration, err = telegrammessages.GetMessage("vpn_package.one_month", map[string]string{})
+		titleDuration, err = telegrammessages.GetMessage(
+			"vpn_package.one_month",
+			map[string]string{},
+			language,
+		)
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	titlePkg, err := telegrammessages.GetMessage("vpn_package.package_button", map[string]string{
-		"timeDuration": titleDuration,
-		"price":        pkg.PriceTitle,
-	})
+	titlePkg, err := telegrammessages.GetMessage(
+		"vpn_package.package_button",
+		map[string]string{
+			"timeDuration": titleDuration,
+			"price":        pkg.PriceTitle,
+		},
+		language,
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -3,6 +3,7 @@ package core
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	telegramState "github.com/mohamadrezamomeni/momo/delivery/telegram/state"
+	"github.com/mohamadrezamomeni/momo/entity"
 	momoError "github.com/mohamadrezamomeni/momo/pkg/error"
 	telegrammessages "github.com/mohamadrezamomeni/momo/pkg/telegram_messages"
 )
@@ -66,19 +67,26 @@ func (r *Router) Route(update *Update) (*ResponseHandlerFunc, error) {
 		res, _ = r.RootHandler(update)
 	}
 	if res != nil && res.MenuTab {
-		res.MessageConfig.ReplyMarkup = r.enrichKeyboardMarkup(res.MessageConfig.ReplyMarkup)
+		res.MessageConfig.ReplyMarkup = r.enrichKeyboardMarkup(
+			res.MessageConfig.ReplyMarkup,
+			update.UserSystem.Language,
+		)
 	}
 
 	return res, err
 }
 
-func (r *Router) enrichKeyboardMarkup(replyMarkup interface{}) interface{} {
+func (r *Router) enrichKeyboardMarkup(replyMarkup interface{}, language entity.Language) interface{} {
 	inlineKeyboardMarkup, ok := replyMarkup.(tgbotapi.InlineKeyboardMarkup)
 	if !ok {
 		return replyMarkup
 	}
 
-	menuButtonText, err := telegrammessages.GetMessage("root.menu_button", map[string]string{})
+	menuButtonText, err := telegrammessages.GetMessage(
+		"root.menu_button",
+		map[string]string{},
+		language,
+	)
 	if err != nil {
 		menuButtonText = "menu"
 	}

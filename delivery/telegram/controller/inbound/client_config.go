@@ -35,7 +35,11 @@ func (h *Handler) GetClientConfig(update *core.Update) (*core.ResponseHandlerFun
 	if err != nil {
 		return nil, err
 	}
-	errorTitle, err := telegrammessages.GetMessage("inbound.client_config.worng_button_selected", map[string]string{})
+	errorTitle, err := telegrammessages.GetMessage(
+		"inbound.client_config.worng_button_selected",
+		map[string]string{},
+		update.UserSystem.Language,
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -32,7 +32,11 @@ func (h *Handler) AskVPNSource(update *core.Update) (*core.ResponseHandlerFunc, 
 		return nil, err
 	}
 
-	askingPackageTitle, err := telegrammessages.GetMessage("vpn_source.ask_vpn_source", map[string]string{})
+	askingPackageTitle, err := telegrammessages.GetMessage(
+		"vpn_source.ask_vpn_source",
+		map[string]string{},
+		update.UserSystem.Language,
+	)
 	if err != nil {
 		return nil, err
 	}

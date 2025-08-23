@@ -15,7 +15,7 @@ func MenuConfigMessage(telegramID string, user *entity.User) (*tgbotapi.MessageC
 		return nil, momoError.Wrap(err).Scope(scope).Input(telegramID, user).ErrorWrite()
 	}
 
-	titleMenu, err := telegrammessages.GetMessage("root.menu", map[string]string{})
+	titleMenu, err := telegrammessages.GetMessage("root.menu", map[string]string{}, user.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -24,17 +24,17 @@ func MenuConfigMessage(telegramID string, user *entity.User) (*tgbotapi.MessageC
 
 	inlineKeyboard := [][]tgbotapi.InlineKeyboardButton{}
 
-	inboundRow, err := getInboundRow()
+	inboundRow, err := getInboundRow(user.Language)
 	if err != nil {
 		return nil, err
 	}
 
-	chargeRows, err := getChargeRow()
+	chargeRows, err := getChargeRow(user.Language)
 	if err != nil {
 		return nil, err
 	}
 
-	clienConfigRows, err := getClientConfigRows()
+	clienConfigRows, err := getClientConfigRows(user.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -56,13 +56,13 @@ func MenuConfigMessage(telegramID string, user *entity.User) (*tgbotapi.MessageC
 	return &msgConfig, nil
 }
 
-func getClientConfigRows() ([][]tgbotapi.InlineKeyboardButton, error) {
-	titleGenerateClientConfig, err := telegrammessages.GetMessage("inbound.client_config_button", map[string]string{})
+func getClientConfigRows(language entity.Language) ([][]tgbotapi.InlineKeyboardButton, error) {
+	titleGenerateClientConfig, err := telegrammessages.GetMessage("inbound.client_config_button", map[string]string{}, language)
 	if err != nil {
 		return nil, err
 	}
 
-	titleGenerateClientURI, err := telegrammessages.GetMessage("inbound.client_uri_button", map[string]string{})
+	titleGenerateClientURI, err := telegrammessages.GetMessage("inbound.client_uri_button", map[string]string{}, language)
 	if err != nil {
 		return nil, err
 	}
@@ -75,8 +75,8 @@ func getClientConfigRows() ([][]tgbotapi.InlineKeyboardButton, error) {
 	}, nil
 }
 
-func getInboundRow() ([]tgbotapi.InlineKeyboardButton, error) {
-	titleListVPNs, err := telegrammessages.GetMessage("inbound.list_button", map[string]string{})
+func getInboundRow(language entity.Language) ([]tgbotapi.InlineKeyboardButton, error) {
+	titleListVPNs, err := telegrammessages.GetMessage("inbound.list_button", map[string]string{}, language)
 	if err != nil {
 		return nil, err
 	}
@@ -85,17 +85,17 @@ func getInboundRow() ([]tgbotapi.InlineKeyboardButton, error) {
 	return tgbotapi.NewInlineKeyboardRow(listInboundsButton), nil
 }
 
-func getChargeRow() ([][]tgbotapi.InlineKeyboardButton, error) {
-	titleChargeInbound, err := telegrammessages.GetMessage("charge.extend_button", map[string]string{})
+func getChargeRow(language entity.Language) ([][]tgbotapi.InlineKeyboardButton, error) {
+	titleChargeInbound, err := telegrammessages.GetMessage("charge.extend_button", map[string]string{}, language)
 	if err != nil {
 		return nil, err
 	}
-	titleCreateVPN, err := telegrammessages.GetMessage("inbound.create_button", map[string]string{})
+	titleCreateVPN, err := telegrammessages.GetMessage("inbound.create_button", map[string]string{}, language)
 	if err != nil {
 		return nil, err
 	}
 
-	titleListYourPaymentReports, err := telegrammessages.GetMessage("charge.list_button", map[string]string{})
+	titleListYourPaymentReports, err := telegrammessages.GetMessage("charge.list_button", map[string]string{}, language)
 	if err != nil {
 		return nil, err
 	}

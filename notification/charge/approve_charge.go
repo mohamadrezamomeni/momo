@@ -23,7 +23,7 @@ func (h *Handler) ApproveCharge(c *core.Context) (*core.ResponseHandler, error) 
 
 	title, err := telegrammessages.GetMessage("charge.approve_charge_admin", map[string]string{
 		"id": charge.ID,
-	})
+	}, user.Language)
 	if err != nil {
 		return nil, err
 	}

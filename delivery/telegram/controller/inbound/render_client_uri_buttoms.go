@@ -22,7 +22,11 @@ func (h *Handler) RenderClientURIButtons(update *core.Update) (*core.ResponseHan
 		return nil, err
 	}
 
-	title, err := telegrammessages.GetMessage("inbound.client_uri.title_list_inbound", map[string]string{})
+	title, err := telegrammessages.GetMessage(
+		"inbound.client_uri.title_list_inbound",
+		map[string]string{},
+		update.UserSystem.Language,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +36,7 @@ func (h *Handler) RenderClientURIButtons(update *core.Update) (*core.ResponseHan
 	var rows [][]tgbotapi.InlineKeyboardButton
 
 	for _, inbound := range inbounds {
-		button, err := h.renderClientURIButton(inbound)
+		button, err := h.renderClientURIButton(inbound, update.UserSystem.Language)
 		if err != nil {
 			return nil, err
 		}
@@ -47,27 +51,35 @@ func (h *Handler) RenderClientURIButtons(update *core.Update) (*core.ResponseHan
 	}, nil
 }
 
-func (h *Handler) renderClientURIButton(inbound *entity.Inbound) (*tgbotapi.InlineKeyboardButton, error) {
+func (h *Handler) renderClientURIButton(inbound *entity.Inbound, language entity.Language) (*tgbotapi.InlineKeyboardButton, error) {
 	blockedTitle, err := telegrammessages.GetMessage("inbound.client_uri.client_config_item_block", map[string]string{
 		"VPNType": entity.VPNTypeString(inbound.VPNType),
 		"ID":      inbound.ID,
-	})
+	}, language)
 	if err != nil {
 		return nil, err
 	}
 
-	okConfigItem, err := telegrammessages.GetMessage("inbound.client_uri.client_config_item_ok", map[string]string{
-		"VPNType": entity.VPNTypeString(inbound.VPNType),
-		"ID":      inbound.ID,
-	})
+	okConfigItem, err := telegrammessages.GetMessage(
+		"inbound.client_uri.client_config_item_ok",
+		map[string]string{
+			"VPNType": entity.VPNTypeString(inbound.VPNType),
+			"ID":      inbound.ID,
+		},
+		language,
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	pendingItem, err := telegrammessages.GetMessage("inbound.client_uri.client_config_item_pending", map[string]string{
-		"VPNType": entity.VPNTypeString(inbound.VPNType),
-		"ID":      inbound.ID,
-	})
+	pendingItem, err := telegrammessages.GetMessage(
+		"inbound.client_uri.client_config_item_pending",
+		map[string]string{
+			"VPNType": entity.VPNTypeString(inbound.VPNType),
+			"ID":      inbound.ID,
+		},
+		language,
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -53,7 +53,11 @@ func (h *Handler) CreateInbound(update *core.Update) (*core.ResponseHandlerFunc,
 		return nil, err
 	}
 
-	title, err := telegrammessages.GetMessage("charge.successfully_creating_vpn_request", map[string]string{})
+	title, err := telegrammessages.GetMessage(
+		"charge.successfully_creating_vpn_request",
+		map[string]string{},
+		update.UserSystem.Language,
+	)
 	if err != nil {
 		return nil, err
 	}

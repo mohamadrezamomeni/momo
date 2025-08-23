@@ -13,7 +13,11 @@ func (h *Handler) sendNotFoundInbounds(user *entity.User) (*core.ResponseHandler
 	if err != nil {
 		return nil, err
 	}
-	inboundNotFoundText, _ := telegrammessages.GetMessage("inbound.not_found", map[string]string{})
+	inboundNotFoundText, _ := telegrammessages.GetMessage(
+		"inbound.not_found",
+		map[string]string{},
+		user.Language,
+	)
 
 	msgConfig := tgbotapi.NewMessage(id, inboundNotFoundText)
 	return &core.ResponseHandlerFunc{
