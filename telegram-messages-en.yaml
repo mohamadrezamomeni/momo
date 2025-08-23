@@ -4,7 +4,6 @@ error:
   internal_error: 😕 Oops! Something went wrong. Let the admin know so we can fix it.
   forbidden_access: 🙏 Sorry, access is pending admin approval. Please be patient!
 auth:
-  username_button: 📝 Please enter your username. This username may be used on the platform in the future.
   approve_user: 🎉 You're already approved by admin.
   welcome_text: "Hey there! 👋 \n Welcome home."
 root:
@@ -18,14 +17,14 @@ inbound:
   client_uri_button: "👀 generate your client uri"
   not_found: 🌐 You haven’t created a VPN yet — it would be our honor if you set one up!
   client_config:
-    worng_button_selected: "the input you have selected is not active you can get a config that is active 😊"
-    title_list_inbound: "inbound you will select must be ✅ in some situation your vpn is pending ⏳(isn't assigned to any server in the next 15 minutes it will have been assigned soon) or your vpn is blocked ⛔ by admin you can communicate with admin about this subject"
+    worng_button_selected: "the VPN you have selected is not active you can get a config that is active 😊"
+    title_list_inbound: "VPN you will select must be ✅ in some situation your vpn is pending ⏳(isn't assigned to any server in the next 15 minutes it will have been assigned soon) or your vpn is blocked ⛔ by admin you can communicate with admin about this subject"
     client_config_item_block: "⛔ ID:  :ID: - :VPNType:"
     client_config_item_pending: "⏳ ID:  :ID: - :VPNType:"
     client_config_item_ok: "✅ ID:  :ID: - :VPNType:"
   client_uri:
     worng_button_selected: "the input you have selected is not active you can get a config that is active 😊"
-    title_list_inbound: "inbound you will select must be ✅ in some situation your vpn is pending ⏳(isn't assigned to any server in the next 15 minutes it will have been assigned soon) or your vpn is blocked ⛔ by admin you can communicate with admin about this subject"
+    title_list_inbound: "VPN you will select must be ✅ in some situation your vpn is pending ⏳(isn't assigned to any server in the next 15 minutes it will have been assigned soon) or your vpn is blocked ⛔ by admin you can communicate with admin about this subject"
     client_config_item_block: "⛔ ID:  :ID: - :VPNType:"
     client_config_item_pending: "⏳ ID:  :ID: - :VPNType:"
     client_config_item_ok: "✅ ID:  :ID: - :VPNType:"
@@ -40,7 +39,6 @@ inbound:
   select_vpn:
     ask_id: "<b>📝 select one of your VPNs:</b>\n\n"
     item: "ID:  :ID: - :VPNType:"
-
 vpn_package:
   not_found_package: unforunetly admin haven't introduced any packages please wait admin will do that
   package_button: "📶 10GB ⏳ :timeDuration: 💵 :price:"
@@ -49,10 +47,8 @@ vpn_package:
   many_months: ":count: months"
   one_day: "1 day"
   many_days: ":count: days"
-
 vpn:
   select_vpn: 📝 select your desire vpn
-
 charge:
   extend_button: 📶 Extend your VPN now!
   detail_button: 📝 write your detail of payment
@@ -68,7 +64,7 @@ charge:
     status: "status: :status:"
     detail: "detail: :detail:"
     admin_comment: "Moderator Note: :admin_comment:"
-    inbound_id: "inbound_id: :inboundID:"
+    inbound_id: "VPN_ID: :inboundID:"
   status:
     approved: ✅ approved
     regected: ❌ rejected
