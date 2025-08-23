@@ -20,6 +20,7 @@ type InboundService interface {
 	FindInboundByID(string) (*entity.Inbound, error)
 	ExtendInbound(string, *inboundServiceDto.ExtendInboundDto) error
 	GetClientConfig(string) (string, error)
+	LoadInboundURI(inboundID string) (string, error)
 }
 
 type UserService interface {

@@ -29,4 +29,15 @@ func (h *Handler) SetRouter(telegramRouter *core.Router) {
 		h.RenderClientConfigButtons,
 		middleware.ValidateAccess(),
 	)
+
+	telegramRouter.Register("generate_client_uri",
+		h.GetClientURI,
+		middleware.ValidateAccess(),
+		h.SetStateGettingClientUri,
+	)
+
+	telegramRouter.Register("render_client_uri_buttons",
+		h.RenderClientConfigButtons,
+		middleware.ValidateAccess(),
+	)
 }

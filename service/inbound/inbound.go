@@ -1,6 +1,8 @@
 package inbound
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -131,4 +133,49 @@ func (i *Inbound) GetClientConfig(id string) (string, error) {
 		return "", err
 	}
 	return template, nil
+}
+
+func (i *Inbound) LoadInboundURI(inboundID string) (string, error) {
+	scope := "inboundService.LoadInboundURI"
+
+	inbound, err := i.inboundRepo.FindInboundByID(inboundID)
+	if err != nil {
+		return "", err
+	}
+
+	cfg := struct {
+		V    string `json:"v"`
+		Ps   string `json:"ps"`
+		Add  string `json:"add"`
+		Port string `json:"port"`
+		ID   string `json:"id"`
+		Aid  string `json:"aid"`
+		Net  string `json:"net"`
+		Type string `json:"type"`
+		Host string `json:"host"`
+		Path string `json:"path"`
+		TLS  string `json:"tls"`
+	}{
+		V:    "2",
+		Ps:   "V2Ray-Node",
+		Add:  inbound.Domain,
+		Port: inbound.Port,
+		ID:   inbound.UserID,
+		Aid:  "0",
+		Net:  "tcp",
+		Type: "none",
+		Host: "",
+		Path: "",
+		TLS:  "",
+	}
+
+	jsonBytes, err := json.Marshal(cfg)
+	if err != nil {
+		return "", momoError.Wrap(err).Scope(scope).Input(inboundID).ErrorWrite()
+	}
+
+	encoded := base64.StdEncoding.EncodeToString(jsonBytes)
+
+	uri := "vmess://" + encoded
+	return uri, nil
 }
