@@ -46,7 +46,7 @@ go mod tidy
 
 ### Configuration
 
-Create a `config.json` file:
+Create a `config.yaml` file:
 
 ```yaml
 log:
